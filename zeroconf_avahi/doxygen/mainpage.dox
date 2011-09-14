@@ -1,0 +1,153 @@
+/**
+\mainpage
+\htmlinclude manifest.html
+
+\section Zeroconf
+
+Zeroconf is a standard representing three different functionalities:
+
+ - <b>link-local addressing</b> (without a dhcp server)
+ - <b>multicast dns</b> (automatic resolution of ip addresses)
+ - <b>service discovery</b> (establish and find services without a directory server)  
+
+It is implemented via various libraries on different platforms. On linux 
+it uses the avahi library and this package wraps the avahi library in a
+manner suitable for use with ros. Note : this package does not do link-local addressing, though it may, sometime
+in the future. It's primary focus is the establishment, discovery and resolution of
+zeroconf services. This can be extremely useful in multi-robot/computer environments.
+
+\subsection zservice Zeroconf Services
+
+Zeroconf services are defined by:
+
+ - name
+ - service type
+ - port
+ - description
+ 
+This service is then posted on all your interfaces (default behaviour) to your LANs where
+other computers can detect, and then automatically resolve the ip address and port to 
+your particular service. This lets other computers know who you are, what you are 
+offering and where to get it.
+
+The best example of this behaviour is your humble printer which can almost always
+be auto-discovered in this way (you may have taken that for granted).
+
+A note about <i>service types</i> - these are bizarre strings, that must always begin with a '_' and
+end with the suffix '._tcp' or '._udp'.
+
+\section Usage
+
+\subsection Overview
+
+The zeroconf node allows addition of two entities, <b>Listeners</b> and
+<b>Services</b>. 
+
+<b>Listeners</b> are used to discover the appearance and disappearance of all 
+services belong to a specific service type (e.g. _ros-master._tcp).
+
+<b>Services</b> are zeroconf services published to the network. They require
+a name, service type, port and description. If there is a name collision,
+this package and avahi will rename the service so that it is unique.
+
+\subsection staticConfiguration Static Configuration
+ 
+The zeroconf node can be configured entirely from ros params. All listeners and
+services are added from there. See resources/yaml/test.yaml for an example -
+it should be fairly self explanatory. 
+
+\subsection runtimeConfigu Runtime Configuration
+
+Sometimes its not possible to define your system statically (e.g. apps coming up
+and down) or you don't have access to the zeroconf node's yaml configuration.
+In this case it can be simpler to just add services via this node's ros api.
+In particular, add_service, add_listener. Typical examples from the command
+line:
+
+@code
+rosservice call /zeroconf/add_listener "_ros-master._tcp"
+rosservice call /zeroconf/add_service '{ service: { name: Ros, type: _ros-master._tc    p, domain: local, port: 5555, description: ros } }'
+@endcode
+
+\subsection Monitoring
+
+You can subscribe to <i>new_connections</i> and <i>lost_connections</i> for a live real-time update
+of service additions/removals. Alternatively, the list_xxx_services service calls may be used to
+get the current state. e.g.
+
+@code
+# List all published/discovered services
+rosservice call /zeroconf/list_published_services ""
+rosservice call /zeroconf/list_discovered_services ""
+# List only _ros-master._tcp services
+rosservice call /zeroconf/list_discovered_services "_ros-master._tcp"
+@endcode
+
+\section rosapi Ros Api
+
+\subsection Published Topics
+
+ - <b>new_connections</b> [zeroconf_comms/DiscoveredService]
+
+Publishes any newly discovered services on any one of the zeroconf node's listeners.
+
+ - <b>new_connections</b> [zeroconf_comms/DiscoveredService]
+
+Publishes any removed services on any one of the zeroconf node's listeners.
+
+\subsection Services
+
+ - <b>add_listener</b> (zeroconf_comms/AddListener)
+
+Adds a listener for a specified zeroconf type (e.g. _ros-master._tcp).  
+
+ - <b>add_service</b> (zeroconf_comms/AddService)
+
+Given a simple service definition (zeroconf_comms/PublishedService), this will by default, 
+establish that service on all interfaces (e.g. eth0, wlan0) and protocols (ipv4, ipv6) 
+(this behaviour can be changed or made configurable in the future).
+
+ - <b>list_discovered_services</b> (zeroconf_comms/ListDiscoveredServices)
+
+Lists all discovered services of the type specified by the input string (empty
+string returns all service types currently being discoverd by the listeners). 
+
+ - <b>list_published_services</b> (zeroconf_comms/ListPublishedServices)
+
+Lists all published services of the type specified by the input string (empty
+string returns all service types currently being published on avahi). 
+
+\subsection Parameters
+
+ - <b>~listeners </b>
+ 
+This is an array of strings specifying service types to listen to.
+
+ - <b>~services</b>
+ 
+This is an array of service definitions to publish. Each service definition must
+include the following keys/value pairs (name, type, domain, port, description).
+See resources/yaml/test.yaml for an example.
+
+\section tests Testing
+
+You can test the basic module functionality with 
+
+@code
+> roslaunch zeroconf_avahi test_zeroconf.launch
+OR
+> roslaunch zeroconf_avahi test_params.launch
+@endcode
+
+There are some bash scripts in scripts/test/* which can be used to play around with these nodes.
+On the avahi side, both 'avahi-browse -a' and 'avahi-publish' are useful for testing.
+
+\section Notes
+
+ - @ref avahiGuide "Avahi" : implementation details concerning avahi.
+ 
+\section ToDo
+
+ - Investigate wide area domains
+ - Add a network discovery layer to handle wireless up and downs.
+*/

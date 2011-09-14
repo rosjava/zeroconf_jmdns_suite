@@ -1,0 +1,6 @@
+<launch>
+  <node name="zeroconf_delayed_publisher" pkg="zeroconf_avahi" type="delayed_publisher.py" output="screen"/>
+  <node name="zerconf_advertise_request" pkg="zeroconf_avahi" type="advertise_service.py" output="screen">
+    <remap from="zerconf_advertise_request/advertise_service" to="zeroconf_delayed_publisher/advertise_service"/>
+  </node>
+</launch>

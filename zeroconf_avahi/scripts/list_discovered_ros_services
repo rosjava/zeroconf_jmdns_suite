@@ -1,0 +1,3 @@
+#!/bin/bash
+
+rosservice call /list_discovered_services "_ros-master._tcp"

@@ -1,0 +1,35 @@
+/**
+\mainpage
+\htmlinclude manifest.html
+
+@section Overview
+
+I've checked out the latest sources for the jmdns project and dumped them into a ros package.
+
+This just compiles the jar library file (not the tools). Though feasibly I could add them.
+
+@section original Original Package
+
+The original jmdns download:
+
+@code
+svn checkout https://jmdns.svn.sourceforge.net/svnroot/jmdns/trunk ./jmdns
+@endcode
+
+Build with 'ant jar'. It has a few tools you can use for testing. For publishing:
+
+@code
+java -jar jmdns.jar -rs foobar _concert-master._tcp local. 1234
+@endcode
+
+For browsing:
+
+@code
+java -jar jmdns.jar -browse
+@endcode
+
+@section ToDo
+
+I really should get this package sorted and get some working test programs going (non-android).
+
+*/

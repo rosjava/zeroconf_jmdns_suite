@@ -1,0 +1,17 @@
+/**
+\mainpage
+\htmlinclude manifest.html
+
+\section Overview
+
+Tests usage of the dependant 'jmdns' package.
+
+\section Usage
+
+There's a bash script in /scripts.
+
+@code
+rosrun jmdns_samples discover_scanners
+@endcode
+
+*/

@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Instead, publishing via our zeroconf node itself:
+rosservice call /add_service '{ service: { name: Concerto, type: _concert-master._tcp, domain: local, port: 6666, description: concert } }'

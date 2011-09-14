@@ -1,0 +1,12 @@
+<!--
+	First run the official_demo_publisher on another machine on the lan.
+	Then call this launcher.
+ -->
+<launch>
+  <node name="zeroconf_publisher" pkg="zeroconf_avahi" type="single_publisher.py" output="screen">
+    <param name="name" value="Demo Service"/>
+    <param name="service_type" value="_demo._tcp"/>
+    <param name="domain" value="local"/>
+    <param name="port" value="1234"/>
+  </node>
+</launch>

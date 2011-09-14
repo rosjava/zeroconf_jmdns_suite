@@ -1,0 +1,3 @@
+#!/bin/bash
+
+rosservice call /add_listener "_concert-master._tcp"

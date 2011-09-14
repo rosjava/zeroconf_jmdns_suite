@@ -1,0 +1,9 @@
+bundle.version=3.4.1
+-output: build/javax.jmdns-${bundle.version}.jar
+
+Bundle-Name: javax.jmdns
+Bundle-SymbolicName: javax.jmdns
+Bundle-Version: ${bundle.version}
+
+Export-Package: javax.jmdns.*
+Import-Package: *

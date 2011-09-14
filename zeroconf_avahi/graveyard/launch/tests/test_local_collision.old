@@ -1,0 +1,18 @@
+<!--
+	Tests the effects of launching the same service on the same machine 
+	with a different port. Avahi will return a local collision error. 
+ -->
+<launch>
+  <node name="first_publisher" pkg="zeroconf_avahi" type="single_publisher.py" output="screen">
+    <param name="name" value="local_collision_test"/>
+    <param name="service_type" value="_ros-master._tcp"/>
+    <param name="domain" value="local"/>
+    <param name="port" value="11315"/>
+  </node>
+  <node name="second_publisher" pkg="zeroconf_avahi" type="single_publisher.py" output="screen">
+    <param name="name" value="local_collision_test"/>
+    <param name="service_type" value="_ros-master._tcp"/>
+    <param name="domain" value="local"/>
+    <param name="port" value="11316"/>
+  </node>
+</launch>

@@ -1,0 +1,8 @@
+<!--
+    Tests the zeroconf node with a full suite of parameters from the given yaml file. 
+ -->
+<launch>
+  <node pkg="zeroconf_avahi" type="zeroconf" name="zeroconf"  output="screen">
+    <rosparam file="$(find zeroconf_avahi)/resources/yaml/test.yaml" command="load"/>
+  </node>
+</launch>

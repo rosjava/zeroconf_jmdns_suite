@@ -1,0 +1,12 @@
+<launch>
+  <node name="single_publisher" pkg="zeroconf_avahi" type="single_publisher.py" output="screen">
+    <param name="name" value="Dude"/>
+<!--
+    <param name="service_type" value="_concert-master._tcp"/>
+    <param name="service_type" value="_ros-master._tcp"/>
+    <param name="hostname" value="foo"/>
+    <param name="domain" value="local"/>
+    <param name="port" value="11311"/>
+-->
+  </node>
+</launch>

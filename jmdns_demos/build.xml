@@ -1,0 +1,55 @@
+<project name="jmdns_demo" default="default" basedir=".">
+	
+    <!-- Ros Variables -->
+    <property file="ros.properties" />
+    <include file="dependencies.xml" />
+    <property name="jar" location="${ros.artifact.built}"/>
+    <property name="dist" location="build" />
+    <property name="build" location="build/classes" />
+    <property name="src" location="src/main/java" />
+    <property name="javac-source" value="1.6" />
+    <property name="javac-target" value="1.6" />
+	
+	<path id="classpath">
+	  <pathelement location="${build}" />
+	  <pathelement path="${ros.compile.classpath}" />
+	</path>
+	<echo message="${toString:classpath}" />
+	
+    <target name="default" depends="init, compile, jar" />
+
+	<target name="init">
+	  <fail unless="ros.compile.classpath" message="ros.properties is missing.  Please type 'rosmake' first "/>
+      <mkdir dir="${dist}" />
+	  <mkdir dir="${build}" />
+	</target>
+	
+	<target name="compile" depends="init">
+	  <javac debug="true" debuglevel="${debuglevel}" destdir="${build}" source="${javac-source}"
+	      target="${javac-target}" includeantruntime="false">
+	    <classpath refid="classpath" />
+	    <src path="${src}" />
+	  </javac>
+	</target>
+
+    <target name="jar" depends="init, compile">
+      <!-- Can also build this in this xml - see original jmdns sources for that -->
+      <bnd classpath="${build}" files="src/main/osgi/jmdns_demos.bnd"/>
+      <!--
+      <jar destfile="${jar}">
+        <manifest>
+          <attribute name="Main-Class" value="javax.jmdns.demos.RegisterServices" />
+          <attribute name="Class-Path" value="${ros.runtime.classpath}" />
+        </manifest>
+        <fileset dir="${build}" />
+      </jar>
+      -->
+    </target>
+    <target name="clean">
+        <delete dir="${build}" includeEmptyDirs="true"  failonerror="false" />
+        <delete dir="${dist}" includeEmptyDirs="true"  failonerror="false" />
+    </target>
+	<target name="help">
+	</target>
+
+</project>

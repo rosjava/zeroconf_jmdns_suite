@@ -1,0 +1,156 @@
+/**
+ * @file /zeroconf_avahi/include/zeroconf_avahi/zeroconf.hpp
+ *
+ * @brief Zeroconf client class for avahi.
+ *
+ * @date 16/08/2011
+ **/
+
+/*****************************************************************************
+** Includes
+*****************************************************************************/
+
+#include <string>
+
+#include <avahi-client/publish.h>
+#include <avahi-client/client.h>
+#include <avahi-client/lookup.h>
+#include <avahi-common/malloc.h>
+#include <avahi-common/error.h>
+#include <avahi-common/thread-watch.h>
+
+#include <boost/thread/mutex.hpp>
+#include <boost/bimap/bimap.hpp>
+#include <boost/function.hpp>
+
+#include <zeroconf_comms/PublishedService.h>
+#include <zeroconf_comms/DiscoveredService.h>
+
+/*****************************************************************************
+** Namespaces
+*****************************************************************************/
+
+namespace zeroconf_avahi {
+
+/*****************************************************************************
+** Utilities
+*****************************************************************************/
+/**
+ * Required comparison functor for use of PublishedService types in an
+ * ordered set.
+ *
+ * Merge this with the DiscoveredServiceCompare if we don't end up needing
+ * a separate interface (i.e. use a template class).
+ */
+struct PublishedServiceCompare {
+	bool operator() (const zeroconf_comms::PublishedService &a, const zeroconf_comms::PublishedService &b) const {
+		if ( a.name != b.name ) {
+			return a.name < b.name;
+		} else {
+			return a.type < b.type;
+		}
+	}
+};
+
+struct DiscoveredServiceCompare {
+	bool operator() (const zeroconf_comms::DiscoveredService &a, const zeroconf_comms::DiscoveredService &b) const {
+		if ( a.name != b.name ) {
+			return a.name < b.name;
+		} else if ( a.type != b.type ) {
+			return a.type < b.type;
+		} else if ( a.domain != b.domain ) {
+			return a.domain < b.domain;
+		} else if ( a.hostname != b.hostname ) {
+			return a.hostname < b.hostname;
+		} else if ( a.address != b.address ) {
+			return a.address < b.address;
+		} else if ( a.port != b.port ) {
+			return a.port < b.port;
+		} else if ( a.interface != b.interface ) {
+			return a.interface < b.interface;
+		} else {
+			return a.protocol < b.protocol;
+		}
+	}
+};
+
+/*****************************************************************************
+** Interfaces
+*****************************************************************************/
+
+class Zeroconf {
+private:
+	typedef zeroconf_comms::PublishedService PublishedService;
+	typedef boost::bimaps::bimap<AvahiEntryGroup*, boost::bimaps::set_of<PublishedService,PublishedServiceCompare> > service_bimap;
+	typedef boost::bimaps::bimap<AvahiServiceBrowser*, boost::bimaps::set_of<std::string> > discovery_bimap;
+	typedef std::set<zeroconf_comms::DiscoveredService,DiscoveredServiceCompare> discovered_service_set;
+	typedef std::pair<AvahiEntryGroup*,PublishedService > service_map_pair;
+	typedef boost::function<void (zeroconf_comms::DiscoveredService)> connection_signal_cb;
+
+public:
+	Zeroconf();
+	~Zeroconf();
+	bool add_service(const PublishedService &service);
+	bool remove_service(const PublishedService &service);
+	// Todo : would be useful to be able to remove services in various other ways
+	// bool remove_services_by_name(const std::string& service_name);
+	// bool remove_services_by_type(const std::string& service_type);
+	// bool remove_services() <-- remove *all* services
+	bool add_listener(std::string &service_type);
+	void list_discovered_services(const std::string &service_type, std::vector<zeroconf_comms::DiscoveredService> &list);
+	void list_published_services(const std::string &service_type, std::vector<zeroconf_comms::PublishedService> &list);
+
+	void connect_signal_callbacks( connection_signal_cb new_connections, connection_signal_cb lost_connections ) {
+		new_connection_signal = new_connections;
+		lost_connection_signal = lost_connections;
+	}
+
+	void spin();
+
+private:
+	bool invalid_object;
+	AvahiThreadedPoll *threaded_poll;
+    AvahiClient *client;
+    service_bimap committed_services;
+    service_bimap established_services;
+    discovery_bimap discovery_service_types;
+    discovered_service_set discovered_services;
+    boost::mutex service_mutex;
+    const int interface;
+    const int protocol;
+    connection_signal_cb new_connection_signal, lost_connection_signal;
+
+    int ros_to_avahi_protocol(const int &protocol);
+    int avahi_to_ros_protocol(const int &protocol);
+
+	bool add_service_non_threaded(const PublishedService &service);
+	void fail() { avahi_threaded_poll_quit(threaded_poll); invalid_object = true; }
+
+	static void entry_group_callback(AvahiEntryGroup *g, AvahiEntryGroupState state, void *userdata);
+	static void client_callback(AvahiClient *c, AvahiClientState state,void * userdata);
+	static void discovery_callback(
+							AvahiServiceBrowser *b, AvahiIfIndex interface,
+							AvahiProtocol protocol, AvahiBrowserEvent event,
+							const char *name, const char *type,
+							const char *domain, AvahiLookupResultFlags flags,
+							void* userdata);
+	static void resolve_callback(
+							AvahiServiceResolver *r,
+							AvahiIfIndex interface,
+							AvahiProtocol protocol,
+							AvahiResolverEvent event,
+							const char *name,
+							const char *type,
+							const char *domain,
+							const char *host_name,
+							const AvahiAddress *address,
+							uint16_t port,
+							AvahiStringList *txt,
+							AvahiLookupResultFlags flags,
+							void* userdata);
+
+	static void modify_callback(AVAHI_GCC_UNUSED AvahiTimeout *e, void *userdata);
+};
+
+
+} // namespace zeroconf_avahi
