@@ -1,12 +1,13 @@
 /**
  * @file /zeroconf_avahi/src/bin/publisher.cpp
  *
- * @brief This is the example program from avahi.org.
+ * @brief This demos the zeroconf_avahi c++ api.
  *
- * It advertises two printer services, then after 10 seconds, modifies
- * their names.
+ * It advertises two services, then advertises a collision which gets
+ * automatically renamed.
  *
- *   http://avahi.org/download/doxygen/client-publish-service_8c-example.html
+ * To compile this make sure the cmake cache variable
+ * ZEROCONF_AVAHI_COMPILE_EXAMPLES is turned on (by default is off).
  **/
 
 /*****************************************************************************

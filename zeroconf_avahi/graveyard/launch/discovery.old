@@ -1,9 +1,0 @@
-<launch>
-  <node name="discovery" pkg="zeroconf_avahi" type="discovery.py" output="screen">
-    <param name="service_type" value="_ros-master._tcp"/>
-<!--
-    <param name="service_type" value="_concert-master._tcp"/>
-    <param name="domain" value="local"/>
--->
-  </node>
-</launch>

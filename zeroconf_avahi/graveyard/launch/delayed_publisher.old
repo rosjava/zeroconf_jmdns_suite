@@ -1,3 +1,0 @@
-<launch>
-  <node name="zeroconf_delayed_publisher" pkg="zeroconf_avahi" type="delayed_publisher.py" output="screen"/>
-</launch>

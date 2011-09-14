@@ -1,4 +1,0 @@
-<launch>
-  <include file="$(find zeroconf_avahi)/resources/launch/publisher.launch"/>
-  <include file="$(find zeroconf_avahi)/resources/launch/discovery.launch"/>
-</launch>

@@ -12,6 +12,19 @@ These are some notes re development with libavahi.
  - http://avahi.org/wiki/RunningAvahiClientAsThread - put it in its own event thread.
  - http://lists.freedesktop.org/archives/avahi/2010-October/001944.html - reason for entry groups.
 
+\section Rosification
+
+Rather than implement absolutely everything, some constraints in the api were implemented for 
+ros architectures to keep things simple. This can easily be modified on an as needed basis. The
+constraints:
+
+ - one service type per advertised service name 
+
+c.f. a printer which will usually advertise one name, but usually 3 types of printer services. Refer
+to the section below on entry grouips for a more detailed discussion.
+
+ -
+
 \section Threads
 
 \subsection C++
