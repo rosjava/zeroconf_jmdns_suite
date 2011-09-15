@@ -1,8 +1,8 @@
 #!/bin/bash
 
-JMDNS_DIR=`rospack find jmdns`
+JMDNS_DIR=`rospack find zeroconf_jmdns`
 JMDNS_JAR=${JMDNS_DIR}/build/javax.jmdns-3.4.1.jar
-DEMOS_DIR=`rospack find jmdns_demos`
+DEMOS_DIR=`rospack find zeroconf_jmdns_demos`
 DEMOS_JAR=${DEMOS_DIR}/build/javax.jmdns.demos-0.0.1.jar
 OUR_CLASSPATH=${JMDNS_JAR}:${DEMOS_JAR}
 

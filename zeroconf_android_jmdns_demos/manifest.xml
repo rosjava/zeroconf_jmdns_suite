@@ -1,0 +1,14 @@
+<package>
+  <description brief="Android packages for zeroconf testing/demos">
+
+     Android packages for zeroconf testing/demo purposes.
+
+  </description>
+  <author>Daniel Stonier</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/zeroconf_android_jmdns_demos</url>
+
+</package>
+
+

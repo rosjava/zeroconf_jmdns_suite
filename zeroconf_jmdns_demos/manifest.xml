@@ -8,7 +8,7 @@
   <license>BSD</license>
   <review status="api cleared" notes=""/>
   <url>http://ros.org/wiki/jmdns_samples</url>
-  <depend package="jmdns"/>
+  <depend package="zeroconf_jmdns"/>
   <export>
     <rosjava-src location="src/main/java" />
     <rosjava-pathelement location="build" groupId="javax" artifactId="javax.jmdns.demos" version="0.0.1" built="true" />

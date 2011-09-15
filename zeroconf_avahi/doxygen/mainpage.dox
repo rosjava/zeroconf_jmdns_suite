@@ -50,23 +50,64 @@ services belong to a specific service type (e.g. _ros-master._tcp).
 a name, service type, port and description. If there is a name collision,
 this package and avahi will rename the service so that it is unique.
 
+\subsection Launching
+
+Typical launcher to start the zeroconf node looks like:
+
+@code
+<launch>
+  <node pkg="zeroconf_avahi" type="zeroconf" name="zeroconf"  output="screen"/>
+</launch>
+@endcode
+
 \subsection staticConfiguration Static Configuration
  
 The zeroconf node can be configured entirely from ros params. All listeners and
-services are added from there. See resources/yaml/test.yaml for an example -
-it should be fairly self explanatory. 
+services are added from there. An example yaml file for startup configuration of
+the zeroconf node:
+
+@code
+# Special cases:
+#
+# port : if not set, it uses the ros master's port.
+#
+
+listeners: [ '_ros-master._tcp', '_concert-master._tcp' ]
+
+services:
+  - name: Ros
+    type: _ros-master._tcp 
+    domain: local
+    # port: 3555 <- not defined, so will use ros master's port by default.
+    description: dude
+  - name: Rosette
+    type: _ros-master._tcp
+    domain: local
+    port: 3554
+    description: Rosette
+  - name: Concerto
+    type: _concert-master._tcp
+    domain: local
+    port: 3556
+    description: concerto
+@endcode
+
 
 \subsection runtimeConfigu Runtime Configuration
 
 Sometimes its not possible to define your system statically (e.g. apps coming up
 and down) or you don't have access to the zeroconf node's yaml configuration.
 In this case it can be simpler to just add services via this node's ros api.
-In particular, add_service, add_listener. Typical examples from the command
-line:
+In particular, add_service, add_listener. 
+
+Typical usage of the ros api connections from the command line:
 
 @code
-rosservice call /zeroconf/add_listener "_ros-master._tcp"
-rosservice call /zeroconf/add_service '{ service: { name: Ros, type: _ros-master._tc    p, domain: local, port: 5555, description: ros } }'
+# Start the zeroconf node
+> roslaunch zeroconf_avahi zeroconf.launch
+# Call services to configure it
+> rosservice call /zeroconf/add_listener "_ros-master._tcp"
+> rosservice call /zeroconf/add_service '{ service: { name: Ros, type: _ros-master._tc    p, domain: local, port: 5555, description: ros } }'
 @endcode
 
 \subsection Monitoring

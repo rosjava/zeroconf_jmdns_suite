@@ -1,0 +1,8 @@
+
+Need to cleanup and drag across from our yujin repo.
+
+Is there an easy way to share java libraries with android runnable packages? I can do
+from jar file right now, but its terribly awkward, so its almost worth having a separate
+android jmdns library package + pure java jmdns library package.
+
+Probably worth waiting till android.rosjava settles down and our code api review is fixed.

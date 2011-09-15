@@ -13,7 +13,7 @@ This just compiles the jar library file (not the tools). Though feasibly I could
 The original jmdns download:
 
 @code
-svn checkout https://jmdns.svn.sourceforge.net/svnroot/jmdns/trunk ./jmdns
+svn co https://jmdns.svn.sourceforge.net/svnroot/jmdns/trunk@296 ./jmdns
 @endcode
 
 Build with 'ant jar'. It has a few tools you can use for testing. For publishing:
@@ -30,6 +30,8 @@ java -jar jmdns.jar -browse
 
 @section ToDo
 
-I really should get this package sorted and get some working test programs going (non-android).
-
+ - needs updating, he patched and re-released shortly after
+ - need to test his fix for the network interface bug (http://sourceforge.net/tracker/?func=detail&aid=3399444&group_id=93852&atid=605791)
+ - should probably download in the make part rather than saving files here
+ 
 */

@@ -1,0 +1,14 @@
+<package>
+  <description brief="android library package for jmdns">
+
+     Packages jmdns as an android library.
+
+  </description>
+  <author>Daniel Stonier</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/zeroconf_android_jmdns</url>
+
+</package>
+
+
