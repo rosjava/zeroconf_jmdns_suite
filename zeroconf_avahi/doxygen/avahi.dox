@@ -12,18 +12,26 @@ These are some notes re development with libavahi.
  - http://avahi.org/wiki/RunningAvahiClientAsThread - put it in its own event thread.
  - http://lists.freedesktop.org/archives/avahi/2010-October/001944.html - reason for entry groups.
 
-\section Rosification
+\section rosification Rosification Constraints
 
-Rather than implement absolutely everything, some constraints in the api were implemented for 
+Rather than implement absolutely everything capable by the avahi api, some constraints were implemented for 
 ros architectures to keep things simple. This can easily be modified on an as needed basis. The
 constraints:
 
  - one service type per advertised service name 
 
 c.f. a printer which will usually advertise one name, but usually 3 types of printer services. Refer
-to the section below on entry grouips for a more detailed discussion.
+to the section below on entry groups for a more detailed discussion on atomicized entries.
 
- -
+ - protocol is unspecified
+ 
+Whether advertising or listening, the protocol is left unspecified (that is, it will handle both 
+ipv4 and ipv6 protocols). We could put this as a further variable in the zeroconf_comms formats, but
+seems like unnecessary complication for now.
+
+ - interface is unspecified
+ 
+Same issues as the previous constraint, but for hardware interfaces (e.g. eth0, wlan1). 
 
 \section Threads
 

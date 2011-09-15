@@ -39,6 +39,8 @@ def same_service(service_one, service_two):
       service_type) are:
       
         service_name, port
+      
+      Actually, should also check domain here.
          
     '''
     if ( service_one.name == service_two.name ) and ( service_one.port == service_two.port ):

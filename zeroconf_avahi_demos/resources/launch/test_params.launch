@@ -3,6 +3,6 @@
  -->
 <launch>
   <node pkg="zeroconf_avahi" type="zeroconf" name="zeroconf"  output="screen">
-    <rosparam file="$(find zeroconf_avahi)/resources/yaml/test.yaml" command="load"/>
+    <rosparam file="$(find zeroconf_avahi_demos)/resources/yaml/test.yaml" command="load"/>
   </node>
 </launch>

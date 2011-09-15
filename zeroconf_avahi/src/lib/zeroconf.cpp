@@ -547,7 +547,7 @@ void Zeroconf::entry_group_callback(AvahiEntryGroup *g, AvahiEntryGroupState sta
 				zeroconf->established_services.insert( service_bimap::value_type(g,service));
 				zeroconf->committed_services.left.erase(g);
 			}
-			ROS_INFO_STREAM("Zeroconf: service successfully established ["  << service.name << "][" << service.type << "]");
+			ROS_INFO_STREAM("Zeroconf: service successfully established ["  << service.name << "][" << service.type << "][" << service.port << "]");
             break;
         }
         case AVAHI_ENTRY_GROUP_COLLISION : {

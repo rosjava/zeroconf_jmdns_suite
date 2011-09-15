@@ -1,0 +1,11 @@
+<stack>
+  <description brief="zeroconf api for ros frameworks">
+  C++ and ros api for zero configuration.</description>
+  <author>Maintained by Daniel Stonier</author>
+  <license>BSD</license>  
+  <review status="experimental" notes=""/>
+  <url>http://ros.org/wiki/rocon_tools</url>
+  <depend stack="ros" />
+  <depend stack="ros_comms" />
+  <depend stack="rosjava" />
+</stack>

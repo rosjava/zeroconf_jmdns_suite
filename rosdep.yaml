@@ -1,0 +1,5 @@
+python-avahi:
+  ubuntu: python-avahi
+
+avahi:
+  ubuntu: avahi-daemon libavahi-client-dev libavahi-core-dev

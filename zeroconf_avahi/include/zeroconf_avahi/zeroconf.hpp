@@ -46,8 +46,10 @@ struct PublishedServiceCompare {
 	bool operator() (const zeroconf_comms::PublishedService &a, const zeroconf_comms::PublishedService &b) const {
 		if ( a.name != b.name ) {
 			return a.name < b.name;
-		} else {
+		} else if ( a.type != b.type ) {
 			return a.type < b.type;
+		} else {
+			return a.port < b.port;
 		}
 	}
 };

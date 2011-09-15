@@ -2,12 +2,12 @@
   <description brief="zeroconf services on avahi for ros">
 
      Provides zeroconf services on avahi for ros systems.
-     This is a c++ implementation.  
+     This is a c++ implementation.
 
   </description>
   <author>Daniel Stonier</author>
   <license>BSD</license>
-  <review status="api_cleared" notes=""/>
+  <review status="experimental" notes=""/>
   <url>http://ros.org/wiki/zeroconf_avahi</url>
   
   <depend package="roscpp"/>
@@ -15,7 +15,11 @@
   <depend package="roslib"/>
   <depend package="std_msgs"/>
   <depend package="zeroconf_comms"/>
+  
   <rosdep name="avahi"/>
+
+  <export>
+    <cpp cflags="-I${prefix}/include" lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -lzeroconf_avahi"/>
+  </export>
+
 </package>
-
-

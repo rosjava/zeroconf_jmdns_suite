@@ -1,0 +1,58 @@
+/**
+\mainpage
+\htmlinclude manifest.html
+
+\section Overview
+
+This pacakge provides some sample programs and launchers to test/illustrate usage of 
+the zeroconf_avahi c++ and ros api.
+
+\section tools Avahi Command Line Tools
+
+You can also use some of avahi's command line tools to help debug problems with
+zeroconf. Namely:
+
+@code
+avahi-browse _ros-master._tcp : list all ros master services
+avahi-browse -a : list all discovered services
+avahi-browse -a -r : list and resolve ips for all discovered services
+avahi-publish -s DudeMaster _ros-master._tcp 8889 : publish a service
+@endcode
+
+\section tests Testing
+
+To get verbose output from the demos, make sure you've got rosconsole output at DEBUG level.
+
+@code
+echo log4j.logger.ros.zeroconf_avahi=DEBUG >> $ROS_ROOT/config/rosconsole.config
+@endcode
+
+\subsection Programs
+
+ - demo_zeroconf_api : demos usage of the c++ zeroconf_avahi api (doesn't need roscore).
+ - official-browse-example : sample program from avahi.
+ - official-publisher-example : sample program from avahi. 
+
+\subsection Launchers
+
+You can test the basic module functionality with 
+
+@code
+> roslaunch zeroconf_avahi_demos test_zeroconf.launch
+OR
+> roslaunch zeroconf_demos_avahi test_params.launch
+> rosrun zeroconf_avahi_demos add_ros_listener
+> rosrun zeroconf_avahi_demos add_concert_listener
+> rosrun zeroconf_avahi_demos add_ros
+> rosrun zeroconf_avahi_demos add_collision (test the local collision callback)
+> rosrun zeroconf_avahi_demos add_concert
+> rosrun zeroconf_avahi_demos list_discovered_concert_services
+> rosrun zeroconf_avahi_demos list_discovered_services (list them all!)
+> rosrun zeroconf_avahi_demos list_published_ros_services
+> rosrun zeroconf_avahi_demos list_published_services
+@endcode
+
+The above rosrunnables are just some bash scripts in scripts/* which can be used to play around with these nodes.
+On the avahi side, the command line tools can be useful to help debug/test.
+
+*/

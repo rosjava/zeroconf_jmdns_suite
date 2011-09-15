@@ -129,18 +129,21 @@ This is an array of service definitions to publish. Each service definition must
 include the following keys/value pairs (name, type, domain, port, description).
 See resources/yaml/test.yaml for an example.
 
-\section tests Testing
+\section tools Avahi Command Line Tools
 
-You can test the basic module functionality with 
+You can also use some of avahi's command line tools to help debug problems with
+zeroconf. Namely:
 
 @code
-> roslaunch zeroconf_avahi test_zeroconf.launch
-OR
-> roslaunch zeroconf_avahi test_params.launch
+avahi-browse _ros-master._tcp : list all ros master services
+avahi-browse -a : list all discovered services
+avahi-browse -a -r : list and resolve ips for all discovered services
+avahi-publish -s DudeMaster _ros-master._tcp 8889 : publish a service
 @endcode
+ 
+\section tests Testing
 
-There are some bash scripts in scripts/test/* which can be used to play around with these nodes.
-On the avahi side, both 'avahi-browse -a' and 'avahi-publish' are useful for testing.
+Test launchers, programs are in zeroconf_avahi_demos.
 
 \section Notes
 
@@ -149,5 +152,5 @@ On the avahi side, both 'avahi-browse -a' and 'avahi-publish' are useful for tes
 \section ToDo
 
  - Investigate wide area domains
- - Add a network discovery layer to handle wireless up and downs.
+ - Add a network discovery layer to handle wireless up and downs (i.e. discover when ip's fail to resolve).
 */
