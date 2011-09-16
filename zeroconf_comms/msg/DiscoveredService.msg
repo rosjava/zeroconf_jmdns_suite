@@ -7,7 +7,7 @@ string domain
 string hostname
 string address
 int32 port
-int32 interface
+int32 hardware_interface
 int8 protocol
 string description
 

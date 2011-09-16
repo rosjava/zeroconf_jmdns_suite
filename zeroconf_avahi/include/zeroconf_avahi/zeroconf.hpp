@@ -68,8 +68,8 @@ struct DiscoveredServiceCompare {
 			return a.address < b.address;
 		} else if ( a.port != b.port ) {
 			return a.port < b.port;
-		} else if ( a.interface != b.interface ) {
-			return a.interface < b.interface;
+		} else if ( a.hardware_interface != b.hardware_interface ) {
+			return a.hardware_interface < b.hardware_interface;
 		} else {
 			return a.protocol < b.protocol;
 		}

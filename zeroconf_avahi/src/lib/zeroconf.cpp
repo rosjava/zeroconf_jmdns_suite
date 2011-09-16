@@ -360,7 +360,7 @@ void Zeroconf::discovery_callback(
     		service.name = name;
     		service.type = type;
     		service.domain = domain;
-    		service.interface = interface;
+    		service.hardware_interface = interface;
     		service.protocol = zeroconf->avahi_to_ros_protocol(protocol);
 			if ( zeroconf->lost_connection_signal ) {
 				zeroconf->lost_connection_signal(service);
@@ -386,7 +386,7 @@ void Zeroconf::discovery_callback(
 				boost::mutex::scoped_lock lock(zeroconf->service_mutex);
 				discovered_service_set::iterator iter = zeroconf->discovered_services.begin();
 				while ( iter != zeroconf->discovered_services.end() ) {
-					if ( ( iter->name == name ) && ( iter->type == type ) && ( iter->domain == domain ) && ( iter->interface == interface ) && ( iter->protocol == service.protocol )) {
+					if ( ( iter->name == name ) && ( iter->type == type ) && ( iter->domain == domain ) && ( iter->hardware_interface == interface ) && ( iter->protocol == service.protocol )) {
 						/*********************
 						** Detailed Logging
 						**********************/
@@ -459,7 +459,7 @@ void Zeroconf::resolve_callback(
             service.hostname = host_name;
             service.port = port;
             service.address = a;
-    		service.interface = interface;
+    		service.hardware_interface = interface;
     		if ( protocol == AVAHI_PROTO_INET ) {
     			service.protocol = zeroconf_comms::Protocols::IPV4;
     		} else {
@@ -492,7 +492,7 @@ void Zeroconf::resolve_callback(
         	ROS_DEBUG_STREAM("Zeroconf: \thostname: " << service.hostname );
         	ROS_DEBUG_STREAM("Zeroconf: \taddress: " << service.address );
         	ROS_DEBUG_STREAM("Zeroconf: \tport: " << service.port );
-        	ROS_DEBUG_STREAM("Zeroconf: \tinterface: " << service.interface );
+        	ROS_DEBUG_STREAM("Zeroconf: \tinterface: " << service.hardware_interface );
         	if ( service.protocol == zeroconf_comms::Protocols::IPV4 ) {
             	ROS_DEBUG("Zeroconf: \tprotocol: ipv4");
         	} else {
