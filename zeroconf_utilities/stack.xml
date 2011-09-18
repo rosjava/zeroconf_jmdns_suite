@@ -1,0 +1,12 @@
+<stack>
+  <description brief="Utilities for working with zero-configuration">
+    Utilities and tools built on top of the zeroconf implementations.
+  </description>
+  <author>Maintained by Daniel Stonier</author>
+  <license>BSD</license>  
+  <review status="experimental" notes=""/>
+  <url>http://ros.org/wiki/zeroconf_utilities</url>
+  <depend stack="ros" />
+  <depend stack="zeroconf_implementations" />
+
+</stack>
