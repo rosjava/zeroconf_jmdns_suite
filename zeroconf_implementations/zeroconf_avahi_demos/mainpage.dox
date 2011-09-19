@@ -39,8 +39,9 @@ You can test the basic module functionality with
 
 @code
 > roslaunch zeroconf_avahi_demos test_zeroconf.launch
-OR
+# OR
 > roslaunch zeroconf_demos_avahi test_params.launch
+# Then do some simple tests with the provided bash scripts
 > rosrun zeroconf_avahi_demos add_ros_listener
 > rosrun zeroconf_avahi_demos add_concert_listener
 > rosrun zeroconf_avahi_demos add_ros
