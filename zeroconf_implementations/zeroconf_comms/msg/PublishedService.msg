@@ -1,5 +1,5 @@
 #
-# Provides all the properties required for definition of a zeroconf service.
+# Provides all the properties required for publishing of a zeroconf service.
 
 string name
 string type

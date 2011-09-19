@@ -1,10 +1,13 @@
 <stack>
-  <description brief="zeroconf api for ros frameworks">
-  C++ and ros api for zero configuration.</description>
+  <description brief="Zeroconf api for ros frameworks">
+  Cnvenient wrappers around platform-dependant implementations whose 
+  purpose are both to expose a fairly standard sort of api as well 
+  as a ros api (topics and services) where practical.
+  </description>
   <author>Maintained by Daniel Stonier</author>
   <license>BSD</license>  
   <review status="experimental" notes=""/>
-  <url>http://ros.org/wiki/rocon_tools</url>
+  <url>http://ros.org/wiki/zeroconf_implementations</url>
   <depend stack="ros" />
   <depend stack="ros_comms" />
   <depend stack="rosjava" />
