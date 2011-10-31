@@ -76,6 +76,23 @@ struct DiscoveredServiceCompare {
 	}
 };
 
+//struct DiscoveredServiceEqual {
+//	bool operator() (const zeroconf_comms::DiscoveredService &a, const zeroconf_comms::DiscoveredService &b) const {
+//		if ( ( a.name == b.name ) &&
+//		     ( a.type == b.type ) &&
+//		     ( a.domain == b.domain ) &&
+//		     ( a.hostname == b.hostname ) &&
+//		     ( a.address == b.address ) &&
+//		     ( a.port == b.port ) &&
+//		     ( a.hardware_interface != b.hardware_interface ) &&
+//		} else if ( a.hardware_interface != b.hardware_interface ) {
+//			return a.hardware_interface < b.hardware_interface;
+//		} else {
+//			return a.protocol < b.protocol;
+//		}
+//	}
+//};
+
 /*****************************************************************************
 ** Interfaces
 *****************************************************************************/

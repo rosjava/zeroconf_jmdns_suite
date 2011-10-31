@@ -240,21 +240,36 @@ bool Zeroconf::remove_service(const PublishedService &service) {
 	avahi_threaded_poll_unlock(threaded_poll);
 	return erased;
 }
-
+/**
+ * Retrieves all the currently discovered services, or just those of those of the specified type that have
+ * been discovered. It goes the extra yard as well, just to make sure those services are resolvable
+ * (i.e. haven't dropped out or gone out of wireless range) which is important for robotics.
+ *
+ * @param service_type : service type specification
+ * @param list : list of services that have been discovered (return value)
+ */
 void Zeroconf::list_discovered_services(const std::string &service_type, std::vector<zeroconf_comms::DiscoveredService> &list) {
 	list.clear();
 	boost::mutex::scoped_lock lock(service_mutex);
+	avahi_threaded_poll_lock(threaded_poll);
 	if ( service_type == "" ) {
 		for ( discovered_service_set::iterator iter = discovered_services.begin(); iter != discovered_services.end(); ++iter) {
+            if (!(avahi_service_resolver_new(client, interface, protocol, iter->name.c_str(), iter->type.c_str(), iter->domain.c_str(), AVAHI_PROTO_UNSPEC, static_cast<AvahiLookupFlags>(0), Zeroconf::resolve_callback, this))) {
+            	ROS_ERROR_STREAM("Zeroconf: failed to resolve service [" << iter->name << "][" <<  avahi_strerror(avahi_client_errno(client)) << "]");
+            }
 			list.push_back(*iter);
 		}
 	} else {
 		for ( discovered_service_set::iterator iter = discovered_services.begin(); iter != discovered_services.end(); ++iter) {
 			if ( iter->type == service_type ) {
+	            if (!(avahi_service_resolver_new(client, interface, protocol, iter->name.c_str(), iter->type.c_str(), iter->domain.c_str(), AVAHI_PROTO_UNSPEC, static_cast<AvahiLookupFlags>(0), Zeroconf::resolve_callback, this))) {
+	            	ROS_ERROR_STREAM("Zeroconf: failed to resolve service [" << iter->name << "][" <<  avahi_strerror(avahi_client_errno(client)) << "]");
+	            }
 				list.push_back(*iter);
 			}
 		}
 	}
+	avahi_threaded_poll_unlock(threaded_poll);
 }
 void Zeroconf::list_published_services(const std::string &service_type, std::vector<zeroconf_comms::PublishedService> &list) {
 	list.clear();
@@ -311,7 +326,20 @@ int Zeroconf::avahi_to_ros_protocol(const int &protocol) {
 /*****************************************************************************
 ** Discovery Callbacks
 *****************************************************************************/
-
+/**
+ * Called whenever a service that is being listened to is added or removed.
+ * If you've got no listeners, this doesn't get called.
+ *
+ * @param browser
+ * @param interface
+ * @param protocol
+ * @param event
+ * @param name
+ * @param type
+ * @param domain
+ * @param flags
+ * @param userdata
+ */
 void Zeroconf::discovery_callback(
 						AvahiServiceBrowser *browser,
 						AvahiIfIndex interface,
@@ -418,7 +446,24 @@ void Zeroconf::discovery_callback(
        	}
     }
 }
-
+/**
+ * Just makes sure that you can actually resolve a discovered service whenever a
+ * new service is discovered on the lan.
+ *
+ * @param resolver
+ * @param interface
+ * @param protocol
+ * @param event
+ * @param name
+ * @param type
+ * @param domain
+ * @param host_name
+ * @param address
+ * @param port
+ * @param txt
+ * @param flags
+ * @param userdata
+ */
 void Zeroconf::resolve_callback(
     AvahiServiceResolver *resolver,
     AvahiIfIndex interface,
@@ -442,6 +487,19 @@ void Zeroconf::resolve_callback(
     switch (event) {
         case AVAHI_RESOLVER_FAILURE: {
         	ROS_ERROR_STREAM("Zeroconf: failed to resolve service [" << name << "][" <<  type << "][" << domain << "][" << avahi_strerror(avahi_client_errno(avahi_service_resolver_get_client(resolver))) << "]");
+        	// If it has failed to resolve, the only meaningful information we have is name, type and domain.
+        	// Hardware interface and protocol may also be valid - I'm not sure as with quick testing, it may have just been showing defaults of quick testing was just showing up defaults of 2 and 0.
+            // std::cout << "Hardware Interface: " << interface << std::endl;
+            // std::cout << "Protocol" << protocol << std::endl;
+    		discovered_service_set::iterator iter = zeroconf->discovered_services.begin();
+    		while ( iter != zeroconf->discovered_services.end() ) {
+    			if ( ( iter->name == name ) &&
+    				 ( iter->type == type ) &&
+    				 ( iter->domain == domain ) ) { // might need to also add interface and protocol checks in here.
+        			ROS_ERROR_STREAM("An existing service failed to resolve, removing it from the discovered services list.");
+    				zeroconf->discovered_services.erase(iter++); // this is probably going to bomb as we're deleting from the avahi thread
+    			} else { iter++; }
+    		}
             break;
         }
         case AVAHI_RESOLVER_FOUND: {
@@ -474,7 +532,14 @@ void Zeroconf::resolve_callback(
             service.cached = ((flags & AVAHI_LOOKUP_RESULT_CACHED) == 0 ? false : true );
 			{
 				boost::mutex::scoped_lock lock(zeroconf->service_mutex);
-				zeroconf->discovered_services.insert(service);
+				if ( (zeroconf->discovered_services.insert(service)).second ) {
+					// std::cout << "Inserted a new discovered sevice." << std::endl;
+				} else {
+					/* In this case, the callback is a result of the zeroconf just trying to resolve
+					 * an already discovered service just to check if its still resolvable (i.e. not
+					 * dropped out or gone out of wireless range). */
+					// std::cout << "Tried inserting an existing discovered sevice." << std::endl;
+				}
 			}
 			/*********************
 			** Signals
@@ -613,7 +678,10 @@ void Zeroconf::entry_group_callback(AvahiEntryGroup *g, AvahiEntryGroupState sta
 ** Daemon Callbacks
 *****************************************************************************/
 /**
- * Used to update client connection with the avahi daemon.
+ * Used to update client connection with the avahi daemon. This gets called in
+ * Zeroconf's construction where it checks to see that the avahi-daemon is
+ * actually up and running.
+ *
  * @param c : client that is connecting.
  * @param state : updated state for the client-daemon connection.
  * @param userdata : this will always be the Zeroconf class.
