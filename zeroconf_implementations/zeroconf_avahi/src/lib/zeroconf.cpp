@@ -550,7 +550,7 @@ void Zeroconf::resolve_callback(
 			/*********************
 			** Logging
 			**********************/
-        	ROS_INFO_STREAM("Zeroconf: discovered new service [" << name << "][" << type << "][" << domain << "][" << service.address << "]");
+        	ROS_INFO_STREAM("Zeroconf: resolved new service [" << name << "][" << type << "][" << domain << "][" << service.address << "]");
         	ROS_DEBUG_STREAM("Zeroconf: \tname: " << service.name );
         	ROS_DEBUG_STREAM("Zeroconf: \ttype: " << service.type );
         	ROS_DEBUG_STREAM("Zeroconf: \tdomain: " << service.domain );
