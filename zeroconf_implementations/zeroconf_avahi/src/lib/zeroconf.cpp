@@ -496,8 +496,16 @@ void Zeroconf::resolve_callback(
     			if ( ( iter->name == name ) &&
     				 ( iter->type == type ) &&
     				 ( iter->domain == domain ) ) { // might need to also add interface and protocol checks in here.
-        			ROS_ERROR_STREAM("An existing service failed to resolve, removing it from the discovered services list.");
-    				zeroconf->discovered_services.erase(iter++); // this is probably going to bomb as we're deleting from the avahi thread
+        			ROS_ERROR_STREAM("An existing service failed to resolve, not doing anything yet.");
+        			// problems with const if we set iter-> elements.
+//        			iter->port = 0;
+//        			iter->address = "";
+//        			iter->hostname = "";
+        			// i dont think we want to actually do this.
+//        			{
+//        				boost::mutex::scoped_lock lock(service_mutex);
+//        				zeroconf->discovered_services.erase(iter++);
+//        			}
     			} else { iter++; }
     		}
             break;
