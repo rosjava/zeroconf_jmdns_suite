@@ -75,7 +75,11 @@ struct DiscoveredServiceCompare {
 		}
 	}
 };
-
+/**
+ * It's important that a discovered service not only records all its characteristics,
+ * but keeps it's resolver open so that it can update if the remote end disconnects,
+ * reconnects or even disconnects and is then superceded by a new connection.
+ */
 class DiscoveredAvahiService {
 public:
 	DiscoveredAvahiService() : resolver(NULL) {}
@@ -85,6 +89,31 @@ public:
 	zeroconf_comms::DiscoveredService service;
 	AvahiServiceResolver *resolver;
 };
+
+struct DiscoveredAvahiServiceCompare {
+	bool operator() (const DiscoveredAvahiService &avahi_service_a, const DiscoveredAvahiService &avahi_service_b) const {
+		const zeroconf_comms::DiscoveredService &a = avahi_service_a.service;
+		const zeroconf_comms::DiscoveredService &b = avahi_service_b.service;
+		if ( a.name != b.name ) {
+			return a.name < b.name;
+		} else if ( a.type != b.type ) {
+			return a.type < b.type;
+		} else if ( a.domain != b.domain ) {
+			return a.domain < b.domain;
+		} else if ( a.hostname != b.hostname ) {
+			return a.hostname < b.hostname;
+		} else if ( a.address != b.address ) {
+			return a.address < b.address;
+		} else if ( a.port != b.port ) {
+			return a.port < b.port;
+		} else if ( a.hardware_interface != b.hardware_interface ) {
+			return a.hardware_interface < b.hardware_interface;
+		} else {
+			return a.protocol < b.protocol;
+		}
+	}
+};
+
 
 /*****************************************************************************
 ** Interfaces
@@ -96,6 +125,7 @@ private:
 	typedef boost::bimaps::bimap<AvahiEntryGroup*, boost::bimaps::set_of<PublishedService,PublishedServiceCompare> > service_bimap;
 	typedef boost::bimaps::bimap<AvahiServiceBrowser*, boost::bimaps::set_of<std::string> > discovery_bimap;
 	typedef std::set<zeroconf_comms::DiscoveredService,DiscoveredServiceCompare> discovered_service_set;
+	typedef std::set<DiscoveredAvahiService,DiscoveredServiceCompare> discovered_service_set;
 	typedef std::pair<AvahiEntryGroup*,PublishedService > service_map_pair;
 	typedef boost::function<void (zeroconf_comms::DiscoveredService)> connection_signal_cb;
 
