@@ -21,12 +21,13 @@
 #include <avahi-common/thread-watch.h>
 #include <cstdio>
 #include <cstdlib>
+#include <vector>
 
 struct Zeroconf {
 	AvahiThreadedPoll *threaded_poll;
     AvahiClient *client;
 	AvahiServiceBrowser *service_browser;
-	AvahiServiceResolver *resolver;
+	std::vector<AvahiServiceResolver*> resolvers;
 	Zeroconf() : threaded_poll(NULL), client(NULL), service_browser(NULL)
 	{}
 };
@@ -91,9 +92,12 @@ void discovery_callback(
 		case AVAHI_BROWSER_NEW: {
 			ROS_INFO_STREAM("Zeroconf: discovered new service [" << name << "][" << type << "][" << domain << "]");
 			// Kind of bad - it makes a new resolver but only keeps a pointer to the last
-			zeroconf->resolver = avahi_service_resolver_new(zeroconf->client, interface, protocol, name, type, domain, AVAHI_PROTO_UNSPEC, static_cast<AvahiLookupFlags>(0), resolve_callback, zeroconf);
-			if (!zeroconf->resolver ) {
+
+			AvahiServiceResolver* resolver = avahi_service_resolver_new(zeroconf->client, interface, protocol, name, type, domain, AVAHI_PROTO_UNSPEC, static_cast<AvahiLookupFlags>(0), resolve_callback, zeroconf);
+			if ( !resolver ) {
 				ROS_ERROR_STREAM("Zeroconf: failed to resolve service [" << name << "][" <<  avahi_strerror(avahi_client_errno(zeroconf->client)) << "]");
+			} else {
+				zeroconf->resolvers.push_back(resolver);
 			}
 			break;
 		}
@@ -114,6 +118,10 @@ void discovery_callback(
 			ROS_DEBUG_STREAM("Zeroconf: \tdomain: " << domain );
 			ROS_DEBUG_STREAM("Zeroconf: \tinterface: " << interface );
 			ROS_DEBUG_STREAM("Zeroconf: \tprotocol: " << proto_txt );
+			for ( unsigned int i = 0; i < zeroconf->resolvers.size(); ++i ) {
+				avahi_service_resolver_free(zeroconf->resolvers[i]);
+			}
+			zeroconf->resolvers.clear();
 			break;
 		}
     }
@@ -151,12 +159,12 @@ int main(int argc, char **argv) {
 
 	int i = 0;
     while(1) {
-    	if ( i == 5 ) {
-    		std::cout << "Freeing" << std::endl;
-			avahi_threaded_poll_lock(zeroconf.threaded_poll);
-			avahi_service_browser_free(zeroconf.service_browser);
-			avahi_threaded_poll_unlock(zeroconf.threaded_poll);
-    	}
+//    	if ( i == 5 ) {
+//    		std::cout << "Freeing" << std::endl;
+//			avahi_threaded_poll_lock(zeroconf.threaded_poll);
+//			avahi_service_browser_free(zeroconf.service_browser);
+//			avahi_threaded_poll_unlock(zeroconf.threaded_poll);
+//    	}
     	++i;
     	sleep(1);
     }

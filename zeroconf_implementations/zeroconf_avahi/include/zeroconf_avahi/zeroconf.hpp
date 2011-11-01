@@ -76,6 +76,16 @@ struct DiscoveredServiceCompare {
 	}
 };
 
+class DiscoveredAvahiService {
+public:
+	DiscoveredAvahiService() : resolver(NULL) {}
+	~DiscoveredAvahiService() {
+		avahi_service_resolver_free(resolver);
+	}
+	zeroconf_comms::DiscoveredService service;
+	AvahiServiceResolver *resolver;
+};
+
 /*****************************************************************************
 ** Interfaces
 *****************************************************************************/
@@ -124,6 +134,7 @@ private:
 
     int ros_to_avahi_protocol(const int &protocol);
     int avahi_to_ros_protocol(const int &protocol);
+    std::string avahi_to_txt_protocol(const int &protocol);
 
 	bool add_service_non_threaded(const PublishedService &service);
 	void fail() { avahi_threaded_poll_quit(threaded_poll); invalid_object = true; }

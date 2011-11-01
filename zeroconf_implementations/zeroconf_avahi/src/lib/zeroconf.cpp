@@ -323,6 +323,22 @@ int Zeroconf::avahi_to_ros_protocol(const int &protocol) {
 	}
 }
 
+std::string Zeroconf::avahi_to_txt_protocol(const int &protocol) {
+	switch (protocol) {
+		case (AVAHI_PROTO_UNSPEC) : {
+			return "unspecified";
+		}
+		case (AVAHI_PROTO_INET) : {
+			return "ipv4";
+		}
+		case (AVAHI_PROTO_INET6) : {
+			return "ipv6";
+		}
+		default :
+			return "unspecified";
+	}
+}
+
 /*****************************************************************************
 ** Discovery Callbacks
 *****************************************************************************/
@@ -363,23 +379,21 @@ void Zeroconf::discovery_callback(
             return;
 
         case AVAHI_BROWSER_NEW: {
-        	ROS_INFO_STREAM("Zeroconf: discovered new service [" << name << "][" << type << "][" << domain << "]");
+        	std::string protocol_txt = zeroconf->avahi_to_txt_protocol(protocol);
+        	ROS_INFO_STREAM("Zeroconf: discovered new service [" << name << "][" << type << "][" << domain << "][" << interface << "][" << protocol_txt << "]");
             /* We ignore the returned resolver object. In the callback
                function we free it. If the server is terminated before
                the callback function is called the server will free
                the resolver for us. */
-            if (!(avahi_service_resolver_new(zeroconf->client, interface, protocol, name, type, domain, AVAHI_PROTO_UNSPEC, static_cast<AvahiLookupFlags>(0), Zeroconf::resolve_callback, zeroconf))) {
-            	ROS_ERROR_STREAM("Zeroconf: failed to resolve service [" << name << "][" <<  avahi_strerror(avahi_client_errno(zeroconf->client)) << "]");
+        	AvahiServiceResolver* resolver = avahi_service_resolver_new(zeroconf->client, interface, protocol, name, type, domain, AVAHI_PROTO_UNSPEC, static_cast<AvahiLookupFlags>(0), Zeroconf::resolve_callback, zeroconf);
+            if ( !resolver ) {
+            	ROS_ERROR_STREAM("Zeroconf: failed to resolve service [" << name << "][" <<  avahi_strerror(avahi_client_errno(zeroconf->client)) << "][" << interface << "][" << protocol_txt << "]");
             }
             break;
         }
+
         case AVAHI_BROWSER_REMOVE: {
-        	std::string proto_txt;
-        	if ( protocol == AVAHI_PROTO_INET ) {
-        		proto_txt = "ipv4";
-        	} else {
-        		proto_txt = "ipv6";
-        	}
+        	std::string proto_txt = zeroconf->avahi_to_txt_protocol(protocol);
 
 			/*********************
 			** Signals
@@ -393,6 +407,7 @@ void Zeroconf::discovery_callback(
 			if ( zeroconf->lost_connection_signal ) {
 				zeroconf->lost_connection_signal(service);
 			}
+
         	/*********************
 			** Logging
 			**********************/
@@ -526,11 +541,7 @@ void Zeroconf::resolve_callback(
             service.port = port;
             service.address = a;
     		service.hardware_interface = interface;
-    		if ( protocol == AVAHI_PROTO_INET ) {
-    			service.protocol = zeroconf_comms::Protocols::IPV4;
-    		} else {
-    			service.protocol = zeroconf_comms::Protocols::IPV6;
-    		}
+    		service.protocol = zeroconf->avahi_to_ros_protocol(protocol);
             service.description = t;
             service.cookie = avahi_string_list_get_service_cookie(txt);
             service.is_local = ((flags & AVAHI_LOOKUP_RESULT_LOCAL) == 0 ? false : true );
@@ -558,7 +569,7 @@ void Zeroconf::resolve_callback(
 			/*********************
 			** Logging
 			**********************/
-        	ROS_INFO_STREAM("Zeroconf: resolved new service [" << name << "][" << type << "][" << domain << "][" << service.address << "]");
+        	ROS_INFO_STREAM("Zeroconf: resolved new service [" << name << "][" << type << "][" << domain << "][" << interface << "][" << zeroconf->avahi_to_txt_protocol(protocol) << "][" << service.address << ":" << service.port << "]");
         	ROS_DEBUG_STREAM("Zeroconf: \tname: " << service.name );
         	ROS_DEBUG_STREAM("Zeroconf: \ttype: " << service.type );
         	ROS_DEBUG_STREAM("Zeroconf: \tdomain: " << service.domain );

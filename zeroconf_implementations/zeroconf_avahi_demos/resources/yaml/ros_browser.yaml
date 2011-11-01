@@ -1,0 +1,4 @@
+# Ros master browser only
+#
+
+listeners: [ '_ros-master._tcp', '_concert-master._tcp' ]
