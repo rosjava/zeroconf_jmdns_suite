@@ -254,18 +254,12 @@ void Zeroconf::list_discovered_services(const std::string &service_type, std::ve
 	avahi_threaded_poll_lock(threaded_poll);
 	if ( service_type == "" ) {
 		for ( discovered_service_set::iterator iter = discovered_services.begin(); iter != discovered_services.end(); ++iter) {
-            if (!(avahi_service_resolver_new(client, interface, protocol, iter->name.c_str(), iter->type.c_str(), iter->domain.c_str(), AVAHI_PROTO_UNSPEC, static_cast<AvahiLookupFlags>(0), Zeroconf::resolve_callback, this))) {
-            	ROS_ERROR_STREAM("Zeroconf: failed to resolve service [" << iter->name << "][" <<  avahi_strerror(avahi_client_errno(client)) << "]");
-            }
-			list.push_back(*iter);
+			list.push_back((*iter)->service);
 		}
 	} else {
 		for ( discovered_service_set::iterator iter = discovered_services.begin(); iter != discovered_services.end(); ++iter) {
-			if ( iter->type == service_type ) {
-	            if (!(avahi_service_resolver_new(client, interface, protocol, iter->name.c_str(), iter->type.c_str(), iter->domain.c_str(), AVAHI_PROTO_UNSPEC, static_cast<AvahiLookupFlags>(0), Zeroconf::resolve_callback, this))) {
-	            	ROS_ERROR_STREAM("Zeroconf: failed to resolve service [" << iter->name << "][" <<  avahi_strerror(avahi_client_errno(client)) << "]");
-	            }
-				list.push_back(*iter);
+			if ( (*iter)->service.type == service_type ) {
+				list.push_back((*iter)->service);
 			}
 		}
 	}
@@ -429,19 +423,19 @@ void Zeroconf::discovery_callback(
 				boost::mutex::scoped_lock lock(zeroconf->service_mutex);
 				discovered_service_set::iterator iter = zeroconf->discovered_services.begin();
 				while ( iter != zeroconf->discovered_services.end() ) {
-					if ( ( iter->name == name ) && ( iter->type == type ) && ( iter->domain == domain ) && ( iter->hardware_interface == interface ) && ( iter->protocol == service.protocol )) {
+					if ( ( (*iter)->service.name == name ) && ( (*iter)->service.type == type ) && ( (*iter)->service.domain == domain ) && ( (*iter)->service.hardware_interface == interface ) && ( (*iter)->service.protocol == service.protocol )) {
 						/*********************
 						** Detailed Logging
 						**********************/
-			        	ROS_DEBUG_STREAM("Zeroconf: \thostname: " << iter->hostname );
-			        	ROS_DEBUG_STREAM("Zeroconf: \taddress: " << iter->address );
-			        	ROS_DEBUG_STREAM("Zeroconf: \tport: " << iter->port );
-			        	ROS_DEBUG_STREAM("Zeroconf: \tdescription: " << iter->description );
-			        	ROS_DEBUG_STREAM("Zeroconf: \tcookie: " << iter->cookie );
-			        	ROS_DEBUG_STREAM("Zeroconf: \tis_local: " << (iter->is_local ? 1 : 0 ) );
-			        	ROS_DEBUG_STREAM("Zeroconf: \tour_own: " << (iter->our_own ? 1 : 0 ) );
-			        	ROS_DEBUG_STREAM("Zeroconf: \twide_area: " << (iter->wide_area ? 1 : 0 ) );
-			        	ROS_DEBUG_STREAM("Zeroconf: \tmulticast: " << (iter->multicast ? 1 : 0 ) );
+			        	ROS_DEBUG_STREAM("Zeroconf: \thostname: " << (*iter)->service.hostname );
+			        	ROS_DEBUG_STREAM("Zeroconf: \taddress: " << (*iter)->service.address );
+			        	ROS_DEBUG_STREAM("Zeroconf: \tport: " << (*iter)->service.port );
+			        	ROS_DEBUG_STREAM("Zeroconf: \tdescription: " << (*iter)->service.description );
+			        	ROS_DEBUG_STREAM("Zeroconf: \tcookie: " << (*iter)->service.cookie );
+			        	ROS_DEBUG_STREAM("Zeroconf: \tis_local: " << ((*iter)->service.is_local ? 1 : 0 ) );
+			        	ROS_DEBUG_STREAM("Zeroconf: \tour_own: " << ((*iter)->service.our_own ? 1 : 0 ) );
+			        	ROS_DEBUG_STREAM("Zeroconf: \twide_area: " << ((*iter)->service.wide_area ? 1 : 0 ) );
+			        	ROS_DEBUG_STREAM("Zeroconf: \tmulticast: " << ((*iter)->service.multicast ? 1 : 0 ) );
 						zeroconf->discovered_services.erase(iter++);
 					} else {
 						++iter;
@@ -508,9 +502,9 @@ void Zeroconf::resolve_callback(
             // std::cout << "Protocol" << protocol << std::endl;
     		discovered_service_set::iterator iter = zeroconf->discovered_services.begin();
     		while ( iter != zeroconf->discovered_services.end() ) {
-    			if ( ( iter->name == name ) &&
-    				 ( iter->type == type ) &&
-    				 ( iter->domain == domain ) ) { // might need to also add interface and protocol checks in here.
+    			if ( ( (*iter)->service.name == name ) &&
+    				 ( (*iter)->service.type == type ) &&
+    				 ( (*iter)->service.domain == domain ) ) { // might need to also add interface and protocol checks in here.
         			ROS_ERROR_STREAM("An existing service failed to resolve, not doing anything yet.");
         			// problems with const if we set iter-> elements.
 //        			iter->port = 0;
@@ -551,7 +545,8 @@ void Zeroconf::resolve_callback(
             service.cached = ((flags & AVAHI_LOOKUP_RESULT_CACHED) == 0 ? false : true );
 			{
 				boost::mutex::scoped_lock lock(zeroconf->service_mutex);
-				if ( (zeroconf->discovered_services.insert(service)).second ) {
+				boost::shared_ptr<DiscoveredAvahiService> new_service(new DiscoveredAvahiService(service,resolver));
+				if ( (zeroconf->discovered_services.insert(new_service)).second ) {
 					// std::cout << "Inserted a new discovered sevice." << std::endl;
 				} else {
 					/* In this case, the callback is a result of the zeroconf just trying to resolve
@@ -593,7 +588,7 @@ void Zeroconf::resolve_callback(
             break;
         }
     }
-    avahi_service_resolver_free(resolver);
+//    avahi_service_resolver_free(resolver);
 }
 
 

@@ -22,6 +22,7 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/bimap/bimap.hpp>
 #include <boost/function.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <zeroconf_comms/PublishedService.h>
 #include <zeroconf_comms/DiscoveredService.h>
@@ -83,6 +84,9 @@ struct DiscoveredServiceCompare {
 class DiscoveredAvahiService {
 public:
 	DiscoveredAvahiService() : resolver(NULL) {}
+	DiscoveredAvahiService(zeroconf_comms::DiscoveredService &discovered_service, AvahiServiceResolver *new_resolver ) :
+		service(discovered_service),
+		resolver(new_resolver) {}
 	~DiscoveredAvahiService() {
 		avahi_service_resolver_free(resolver);
 	}
@@ -91,9 +95,9 @@ public:
 };
 
 struct DiscoveredAvahiServiceCompare {
-	bool operator() (const DiscoveredAvahiService &avahi_service_a, const DiscoveredAvahiService &avahi_service_b) const {
-		const zeroconf_comms::DiscoveredService &a = avahi_service_a.service;
-		const zeroconf_comms::DiscoveredService &b = avahi_service_b.service;
+	bool operator() (const boost::shared_ptr<DiscoveredAvahiService> avahi_service_a, const boost::shared_ptr<DiscoveredAvahiService> avahi_service_b) const {
+		const zeroconf_comms::DiscoveredService &a = avahi_service_a->service;
+		const zeroconf_comms::DiscoveredService &b = avahi_service_b->service;
 		if ( a.name != b.name ) {
 			return a.name < b.name;
 		} else if ( a.type != b.type ) {
@@ -124,8 +128,8 @@ private:
 	typedef zeroconf_comms::PublishedService PublishedService;
 	typedef boost::bimaps::bimap<AvahiEntryGroup*, boost::bimaps::set_of<PublishedService,PublishedServiceCompare> > service_bimap;
 	typedef boost::bimaps::bimap<AvahiServiceBrowser*, boost::bimaps::set_of<std::string> > discovery_bimap;
-	typedef std::set<zeroconf_comms::DiscoveredService,DiscoveredServiceCompare> discovered_service_set;
-	typedef std::set<DiscoveredAvahiService,DiscoveredServiceCompare> discovered_service_set;
+	//typedef std::set<zeroconf_comms::DiscoveredService,DiscoveredServiceCompare> discovered_service_set;
+	typedef std::set<boost::shared_ptr<DiscoveredAvahiService>,DiscoveredAvahiServiceCompare> discovered_service_set;
 	typedef std::pair<AvahiEntryGroup*,PublishedService > service_map_pair;
 	typedef boost::function<void (zeroconf_comms::DiscoveredService)> connection_signal_cb;
 
