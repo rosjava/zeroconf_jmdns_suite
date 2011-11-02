@@ -55,27 +55,6 @@ struct PublishedServiceCompare {
 	}
 };
 
-struct DiscoveredServiceCompare {
-	bool operator() (const zeroconf_comms::DiscoveredService &a, const zeroconf_comms::DiscoveredService &b) const {
-		if ( a.name != b.name ) {
-			return a.name < b.name;
-		} else if ( a.type != b.type ) {
-			return a.type < b.type;
-		} else if ( a.domain != b.domain ) {
-			return a.domain < b.domain;
-		} else if ( a.hostname != b.hostname ) {
-			return a.hostname < b.hostname;
-		} else if ( a.address != b.address ) {
-			return a.address < b.address;
-		} else if ( a.port != b.port ) {
-			return a.port < b.port;
-		} else if ( a.hardware_interface != b.hardware_interface ) {
-			return a.hardware_interface < b.hardware_interface;
-		} else {
-			return a.protocol < b.protocol;
-		}
-	}
-};
 /**
  * It's important that a discovered service not only records all its characteristics,
  * but keeps it's resolver open so that it can update if the remote end disconnects,
@@ -94,6 +73,12 @@ public:
 	AvahiServiceResolver *resolver;
 };
 
+/**
+ * This is the comparison functor for the discovered services set (typedef discovered_service_set)
+ *
+ * We do not include the resolved properties when comparing elements in this set since often
+ * the zeroconf entities will be unresolvable due to wireless dropouts or moving out of range.
+ */
 struct DiscoveredAvahiServiceCompare {
 	bool operator() (const boost::shared_ptr<DiscoveredAvahiService> avahi_service_a, const boost::shared_ptr<DiscoveredAvahiService> avahi_service_b) const {
 		const zeroconf_comms::DiscoveredService &a = avahi_service_a->service;
@@ -104,12 +89,12 @@ struct DiscoveredAvahiServiceCompare {
 			return a.type < b.type;
 		} else if ( a.domain != b.domain ) {
 			return a.domain < b.domain;
-		} else if ( a.hostname != b.hostname ) {
-			return a.hostname < b.hostname;
-		} else if ( a.address != b.address ) {
-			return a.address < b.address;
-		} else if ( a.port != b.port ) {
-			return a.port < b.port;
+//		} else if ( a.hostname != b.hostname ) {
+//			return a.hostname < b.hostname;
+//		} else if ( a.address != b.address ) {
+//			return a.address < b.address;
+//		} else if ( a.port != b.port ) {
+//			return a.port < b.port;
 		} else if ( a.hardware_interface != b.hardware_interface ) {
 			return a.hardware_interface < b.hardware_interface;
 		} else {
@@ -166,13 +151,24 @@ private:
     const int protocol;
     connection_signal_cb new_connection_signal, lost_connection_signal;
 
+    /*********************
+	** Utilitiies
+	**********************/
     int ros_to_avahi_protocol(const int &protocol);
+    std::string ros_to_txt_protocol(const int &protocol);
     int avahi_to_ros_protocol(const int &protocol);
     std::string avahi_to_txt_protocol(const int &protocol);
+	discovered_service_set::iterator find_discovered_service(zeroconf_comms::DiscoveredService &service);
 
+	/*********************
+	** Mechanics
+	**********************/
 	bool add_service_non_threaded(const PublishedService &service);
 	void fail() { avahi_threaded_poll_quit(threaded_poll); invalid_object = true; }
 
+	/*********************
+	** Callbacks
+	**********************/
 	static void entry_group_callback(AvahiEntryGroup *g, AvahiEntryGroupState state, void *userdata);
 	static void client_callback(AvahiClient *c, AvahiClientState state,void * userdata);
 	static void discovery_callback(
@@ -195,7 +191,6 @@ private:
 							AvahiStringList *txt,
 							AvahiLookupResultFlags flags,
 							void* userdata);
-
 	static void modify_callback(AVAHI_GCC_UNUSED AvahiTimeout *e, void *userdata);
 };
 

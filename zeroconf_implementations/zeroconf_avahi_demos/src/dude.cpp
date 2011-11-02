@@ -131,7 +131,50 @@ void discovery_callback(
 ** Main
 *****************************************************************************/
 
+struct Dude {
+	int a;
+	int b;
+	int c;
+};
+
+class DudeCompare {
+public:
+	bool operator() (const Dude &dude, const Dude &dudette) const {
+		if ( dude.a != dudette.a ) {
+			return dude.a < dudette.a;
+		} else {
+			return dude.b < dudette.b;
+		}
+	}
+};
 int main(int argc, char **argv) {
+	std::set<Dude,DudeCompare> s;
+	std::pair<std::set<Dude>::iterator,bool> result;
+	Dude dude, dude2, dudette;
+	dude.a = 1; dudette.a = 1; dude2.a = 2;
+	dude.b = 2; dudette.b = 2; dude2.b = 3;
+	dude.c = 1; dudette.c = 3; dude2.c = 5;
+	if ( s.insert(dude).second ) {
+		std::cout << "inserted dude" << std::endl;
+	} else {
+		std::cout << "failed to insert dude" << std::endl;
+	}
+	if ( s.insert(dudette).second ) {
+		std::cout << "inserted dudette" << std::endl;
+	} else {
+		std::cout << "failed to insert dudette" << std::endl;
+	}
+	s.insert(dude2);
+	// set has dude and dude2 in it.
+	Dude find_dude;
+	find_dude.a = 1;
+	find_dude.b = 2;
+	// want to find dude1
+	std::set<Dude>::iterator iter;
+	iter = s.find(find_dude);
+	std::cout << "Found dude: " << iter->a << " " << iter->b << " " << iter->c << std::endl;
+
+	return 0;
 
     const int interface = AVAHI_IF_UNSPEC;
     const int protocol = AVAHI_PROTO_UNSPEC;
