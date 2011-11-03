@@ -148,7 +148,7 @@ private:
     discovered_service_set discovered_services;
     boost::mutex service_mutex;
     const int interface;
-    const int protocol;
+    const int permitted_protocols;
     connection_signal_cb new_connection_signal, lost_connection_signal;
 
     /*********************

@@ -19,6 +19,7 @@
 #include <avahi-common/timeval.h>
 #include <zeroconf_comms/Protocols.h>
 #include <avahi-common/thread-watch.h>
+#include <boost/thread/thread.hpp>  // sleep
 #include "../../include/zeroconf_avahi/zeroconf.hpp"
 
 /*****************************************************************************
@@ -36,7 +37,7 @@ Zeroconf::Zeroconf() :
 	threaded_poll(NULL),
 	client(NULL),
 	interface(AVAHI_IF_UNSPEC),
-	protocol(AVAHI_PROTO_UNSPEC) // AVAHI_PROTO_INET, AVAHI_PROTO_INET6
+	permitted_protocols(AVAHI_PROTO_INET) // AVAHI_PROTO_UNSPEC, AVAHI_PROTO_INET, AVAHI_PROTO_INET6
 {
     int error;
 
@@ -103,7 +104,7 @@ bool Zeroconf::add_listener(std::string &service_type) {
 	avahi_threaded_poll_lock(threaded_poll);
     /* Create the service browser */
 	AvahiServiceBrowser *service_browser = NULL;
-    if (!(service_browser = avahi_service_browser_new(client, interface, protocol, service_type.c_str(), NULL, static_cast<AvahiLookupFlags>(0), Zeroconf::discovery_callback, this))) {
+    if (!(service_browser = avahi_service_browser_new(client, interface, permitted_protocols, service_type.c_str(), NULL, static_cast<AvahiLookupFlags>(0), Zeroconf::discovery_callback, this))) {
         fprintf(stderr, "Failed to create service browser: %s\n", avahi_strerror(avahi_client_errno(client)));
         return false;
     }
@@ -177,7 +178,7 @@ bool Zeroconf::add_service_non_threaded(const PublishedService &service) {
 	int ret = avahi_entry_group_add_service(
         		group,
         		interface,
-        		protocol,
+        		permitted_protocols,
         		static_cast<AvahiPublishFlags>(0), // AVAHI_PUBLISH_USE_MULTICAST - we don't seem to need this, but others said they have needed it.
         		service.name.c_str(),
         		service.type.c_str(),
@@ -419,7 +420,7 @@ void Zeroconf::discovery_callback(
         	service.hardware_interface = interface;
         	service.protocol = zeroconf->avahi_to_ros_protocol(protocol);
 
-        	AvahiServiceResolver* resolver = avahi_service_resolver_new(zeroconf->client, interface, protocol, name, type, domain, AVAHI_PROTO_UNSPEC, static_cast<AvahiLookupFlags>(0), Zeroconf::resolve_callback, zeroconf);
+        	AvahiServiceResolver* resolver = avahi_service_resolver_new(zeroconf->client, interface, protocol, name, type, domain, zeroconf->permitted_protocols, static_cast<AvahiLookupFlags>(0), Zeroconf::resolve_callback, zeroconf);
             if ( !resolver ) {
             	ROS_ERROR_STREAM("Zeroconf: avahi resolver failure (avahi daemon problem) [" << name << "][" <<  avahi_strerror(avahi_client_errno(zeroconf->client)) << "][" << interface << "][" << zeroconf->avahi_to_txt_protocol(protocol) << "]");
                 break;
@@ -487,6 +488,18 @@ void Zeroconf::discovery_callback(
  * discovered service goes up and down. Note that this only works if you
  * keep the resolver open (do not free it!).
  *
+ * There are a couple of avahi bugs in here I think. Workarounds:
+ *
+ * 1) Sometimes when a serivce times out and the same service (name, type, domain,
+ * interface and protocol) is started on another address, it will trigger this
+ * callback before actually setting the address value. If you let it sleep for
+ * a bit, it will catch the correct address. Doing that here, but it really shouldn't
+ * call the callback until this is set internally by avahi.
+ *
+ * 2) It will sometimes RESOLVER_FOUND with an ipv6 address for an ipv4 service.
+ * This seems to happen immediately before a service times out. We check for this
+ * here and ignore it if this is the case.
+ *
  * @param resolver
  * @param interface
  * @param protocol
@@ -518,8 +531,6 @@ void Zeroconf::resolve_callback(
 
 	Zeroconf *zeroconf = reinterpret_cast<Zeroconf*>(userdata);
     assert(resolver);
-
-    /* Called whenever a service has been resolved successfully or timed out */
 
     switch (event) {
         case AVAHI_RESOLVER_FAILURE: {
@@ -562,6 +573,10 @@ void Zeroconf::resolve_callback(
         }
         case AVAHI_RESOLVER_FOUND: {
             char a[AVAHI_ADDRESS_STR_MAX], *t;
+
+            // workaround for avahi bug 1) above
+            boost::this_thread::sleep(boost::posix_time::milliseconds(500));
+
             t = avahi_string_list_to_string(txt);
             avahi_address_snprint(a, sizeof(a), address);
 
@@ -572,6 +587,15 @@ void Zeroconf::resolve_callback(
     		service.hardware_interface = interface;
     		service.protocol = zeroconf->avahi_to_ros_protocol(protocol);
 			service.address = a;
+            // workaround for avahi bug 2) above
+			if ( service.protocol == zeroconf_comms::Protocols::IPV4 ) {
+				size_t found=service.address.find(":");
+				if ( found != std::string::npos) {
+					ROS_WARN_STREAM("Zeroconf: avahi is behaving badly (bug) - set an ipv6 address for an ipv4 service, recovering...");
+		            avahi_free(t);
+		            break;
+				}
+			}
 			service.hostname = host_name;
 			service.port = port;
             service.description = t;
@@ -592,7 +616,7 @@ void Zeroconf::resolve_callback(
 					/*********************
 					** Logging
 					**********************/
-		        	ROS_INFO_STREAM("Zeroconf: resolved new service [" << name << "][" << type << "][" << domain << "][" << interface << "][" << zeroconf->ros_to_txt_protocol(service.protocol) << "][" << service.address << ":" << service.port << "]");
+		        	ROS_INFO_STREAM("Zeroconf: resolved service [" << name << "][" << type << "][" << domain << "][" << interface << "][" << zeroconf->ros_to_txt_protocol(service.protocol) << "][" << service.address << ":" << service.port << "]");
 		        	ROS_DEBUG_STREAM("Zeroconf: \tname: " << service.name );
 		        	ROS_DEBUG_STREAM("Zeroconf: \ttype: " << service.type );
 		        	ROS_DEBUG_STREAM("Zeroconf: \tdomain: " << service.domain );
