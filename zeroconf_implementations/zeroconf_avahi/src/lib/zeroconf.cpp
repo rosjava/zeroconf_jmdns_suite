@@ -436,10 +436,11 @@ void Zeroconf::discovery_callback(
 				boost::shared_ptr<DiscoveredAvahiService> new_service(new DiscoveredAvahiService(service,resolver));
 				if ( (zeroconf->discovered_services.insert(new_service)).second ) {
 		        	ROS_INFO_STREAM("Zeroconf: discovered new service [" << name << "][" << type << "][" << domain << "][" << interface << "][" << zeroconf->avahi_to_txt_protocol(protocol) << "]");
-		        	// signal the new connection
-					if ( zeroconf->new_connection_signal ) {
-						zeroconf->new_connection_signal(service);
-					}
+		        	// we signal in the resolver, not here...though this might be a bad design
+		        	// decision if the connection is up and down alot.
+		        	// if ( zeroconf->new_connection_signal ) {
+		        	//     zeroconf->new_connection_signal(service);
+		        	// }
 				} else {
 					ROS_ERROR_STREAM("Tried to insert a new service on top of an old stored one - probably a bug in zeroconf_avahi!");
 				}
@@ -469,9 +470,11 @@ void Zeroconf::discovery_callback(
 					/*********************
 					** Signal
 					**********************/
-					if ( zeroconf->lost_connection_signal ) {
-						zeroconf->lost_connection_signal(service);
-					}
+		        	// we signal in the resolver, not here...though this might be a bad design
+		        	// decision if the connection is up and down alot.
+		        	// if ( zeroconf->lost_connection_signal ) {
+		        	//     zeroconf->lost_connection_signal(service);
+		        	// }
 				} else {
 					ROS_ERROR_STREAM("Zeroconf: attempted to remove a non-discovered service (probably a bug in zeroconf_avahi!)");
 				}
