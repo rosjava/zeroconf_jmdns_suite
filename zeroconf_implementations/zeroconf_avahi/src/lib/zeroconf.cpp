@@ -255,12 +255,18 @@ void Zeroconf::list_discovered_services(const std::string &service_type, std::ve
 	avahi_threaded_poll_lock(threaded_poll);
 	if ( service_type == "" ) {
 		for ( discovered_service_set::iterator iter = discovered_services.begin(); iter != discovered_services.end(); ++iter) {
-			list.push_back((*iter)->service);
+			// ignore services that aren't currently resolved
+			if ( (*iter)->service.address != "" ) {
+				list.push_back((*iter)->service);
+			}
 		}
 	} else {
 		for ( discovered_service_set::iterator iter = discovered_services.begin(); iter != discovered_services.end(); ++iter) {
 			if ( (*iter)->service.type == service_type ) {
-				list.push_back((*iter)->service);
+				// ignore services that aren't currently resolved
+				if ( (*iter)->service.address != "" ) {
+					list.push_back((*iter)->service);
+				}
 			}
 		}
 	}
