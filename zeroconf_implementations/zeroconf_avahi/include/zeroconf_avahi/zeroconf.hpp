@@ -59,15 +59,22 @@ struct PublishedServiceCompare {
  * It's important that a discovered service not only records all its characteristics,
  * but keeps it's resolver open so that it can update if the remote end disconnects,
  * reconnects or even disconnects and is then superceded by a new connection.
+ *
+ * This might need a copy constructor since its getting passed around by an stl container.
  */
 class DiscoveredAvahiService {
 public:
-	DiscoveredAvahiService() : resolver(NULL) {}
+	DiscoveredAvahiService() : resolver(NULL) {
+	}
 	DiscoveredAvahiService(zeroconf_comms::DiscoveredService &discovered_service, AvahiServiceResolver *new_resolver ) :
 		service(discovered_service),
-		resolver(new_resolver) {}
+		resolver(new_resolver) {
+
+	}
 	~DiscoveredAvahiService() {
-		avahi_service_resolver_free(resolver);
+		if ( resolver ) {
+			avahi_service_resolver_free(resolver);
+		}
 	}
 	zeroconf_comms::DiscoveredService service;
 	AvahiServiceResolver *resolver;
@@ -113,7 +120,6 @@ private:
 	typedef zeroconf_comms::PublishedService PublishedService;
 	typedef boost::bimaps::bimap<AvahiEntryGroup*, boost::bimaps::set_of<PublishedService,PublishedServiceCompare> > service_bimap;
 	typedef boost::bimaps::bimap<AvahiServiceBrowser*, boost::bimaps::set_of<std::string> > discovery_bimap;
-	//typedef std::set<zeroconf_comms::DiscoveredService,DiscoveredServiceCompare> discovered_service_set;
 	typedef std::set<boost::shared_ptr<DiscoveredAvahiService>,DiscoveredAvahiServiceCompare> discovered_service_set;
 	typedef std::pair<AvahiEntryGroup*,PublishedService > service_map_pair;
 	typedef boost::function<void (zeroconf_comms::DiscoveredService)> connection_signal_cb;
@@ -128,6 +134,7 @@ public:
 	// bool remove_services_by_type(const std::string& service_type);
 	// bool remove_services() <-- remove *all* services
 	bool add_listener(std::string &service_type);
+	bool remove_listener(const std::string &service_type);
 	void list_discovered_services(const std::string &service_type, std::vector<zeroconf_comms::DiscoveredService> &list);
 	void list_published_services(const std::string &service_type, std::vector<zeroconf_comms::PublishedService> &list);
 

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+rosservice call /remove_listener "_ros-master._tcp"

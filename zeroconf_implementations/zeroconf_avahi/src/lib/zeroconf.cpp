@@ -63,19 +63,20 @@ Zeroconf::Zeroconf() :
 }
 
 Zeroconf::~Zeroconf() {
-    if (threaded_poll) {
-    	avahi_threaded_poll_stop(threaded_poll);
-    }
 	/*********************
 	** Listeners
 	**********************/
 	{
 		boost::mutex::scoped_lock lock(service_mutex);
+		discovered_services.clear();
 		for ( discovery_bimap::left_const_iterator iter = discovery_service_types.left.begin(); iter != discovery_service_types.left.end(); ++iter ) {
 			avahi_service_browser_free(iter->first);
 		}
 		discovery_service_types.clear();
 	}
+    if (threaded_poll) {
+    	avahi_threaded_poll_stop(threaded_poll);
+    }
 	/*********************
 	** Publishers
 	**********************/
@@ -114,6 +115,25 @@ bool Zeroconf::add_listener(std::string &service_type) {
 	}
 	avahi_threaded_poll_unlock(threaded_poll);
 	ROS_INFO_STREAM("Zeroconf: added a listener [" << service_type << "]");
+	return true;
+}
+
+bool Zeroconf::remove_listener(const std::string &service_type) {
+	avahi_threaded_poll_lock(threaded_poll);
+    {
+		boost::mutex::scoped_lock lock(service_mutex);
+		discovered_service_set::iterator iter = discovered_services.begin();
+		while ( iter != discovered_services.end() ) {
+			if ( (*iter)->service.type == service_type ) {
+				discovered_services.erase(iter++);
+			} else {
+				++iter;
+			}
+		}
+		discovery_service_types.right.erase(service_type);
+	}
+	avahi_threaded_poll_unlock(threaded_poll);
+	ROS_INFO_STREAM("Zeroconf: removed a listener [" << service_type << "]");
 	return true;
 }
 /**

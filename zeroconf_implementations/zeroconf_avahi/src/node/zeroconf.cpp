@@ -16,6 +16,7 @@
 
 #include <ros/ros.h>
 #include <zeroconf_comms/AddListener.h>
+#include <zeroconf_comms/RemoveListener.h>
 #include <zeroconf_comms/AddService.h>
 #include <zeroconf_comms/ListDiscoveredServices.h>
 #include <zeroconf_comms/ListPublishedServices.h>
@@ -44,6 +45,7 @@ public:
 		** Ros Comms
 		**********************/
 		server_add_listener = nh.advertiseService("add_listener", &ZeroconfNode::add_listener, this);
+		server_remove_listener = nh.advertiseService("remove_listener", &ZeroconfNode::remove_listener, this);
 		server_add_service = nh.advertiseService("add_service", &ZeroconfNode::add_service, this);
 		server_remove_service = nh.advertiseService("remove_service", &ZeroconfNode::remove_service, this);
 		server_list_discovered_services = nh.advertiseService("list_discovered_services", &ZeroconfNode::list_discovered_services, this);
@@ -135,6 +137,11 @@ private:
 		response.result = zeroconf.add_listener(request.service_type);
 		return true;
 	}
+	bool remove_listener(RemoveListener::Request &request, RemoveListener::Response &response) {
+		ROS_DEBUG_STREAM("Zeroconf: serving a remove_listener call... [" << request.service_type << "]");
+		response.result = zeroconf.remove_listener(request.service_type);
+		return true;
+	}
 	bool add_service(AddService::Request &request, AddService::Response &response) {
 		response.result = zeroconf.add_service(request.service);
 		return true;
@@ -160,7 +167,7 @@ private:
 	}
 
 	Zeroconf zeroconf;
-	ros::ServiceServer server_add_listener, server_add_service, server_remove_service;
+	ros::ServiceServer server_add_listener, server_remove_listener, server_add_service, server_remove_service;
 	ros::ServiceServer server_list_discovered_services, server_list_published_services;
 	ros::Publisher pub_new_connections, pub_lost_connections;
 };

@@ -50,6 +50,7 @@ int main(int argc, char **argv) {
 	zeroconf.remove_service(service_dudette);
 	zeroconf.remove_service(service_dude);
 	zeroconf.remove_service(service_colliding_dude);
+	zeroconf.remove_listener(service_dudette.type);
 	sleep(3);
 	return 0;
 }
