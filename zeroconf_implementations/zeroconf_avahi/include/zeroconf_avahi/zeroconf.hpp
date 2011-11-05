@@ -10,6 +10,7 @@
 ** Includes
 *****************************************************************************/
 
+#include <set>
 #include <string>
 
 #include <avahi-client/publish.h>
@@ -23,6 +24,7 @@
 #include <boost/bimap/bimap.hpp>
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
+
 
 #include <zeroconf_comms/PublishedService.h>
 #include <zeroconf_comms/DiscoveredService.h>
@@ -96,12 +98,6 @@ struct DiscoveredAvahiServiceCompare {
 			return a.type < b.type;
 		} else if ( a.domain != b.domain ) {
 			return a.domain < b.domain;
-//		} else if ( a.hostname != b.hostname ) {
-//			return a.hostname < b.hostname;
-//		} else if ( a.address != b.address ) {
-//			return a.address < b.address;
-//		} else if ( a.port != b.port ) {
-//			return a.port < b.port;
 		} else if ( a.hardware_interface != b.hardware_interface ) {
 			return a.hardware_interface < b.hardware_interface;
 		} else {
@@ -127,7 +123,7 @@ private:
 public:
 	Zeroconf();
 	~Zeroconf();
-	bool add_service(const PublishedService &service);
+	bool add_service(PublishedService &service);
 	bool remove_service(const PublishedService &service);
 	// Todo : would be useful to be able to remove services in various other ways
 	// bool remove_services_by_name(const std::string& service_name);
@@ -170,7 +166,7 @@ private:
 	/*********************
 	** Mechanics
 	**********************/
-	bool add_service_non_threaded(const PublishedService &service);
+	bool add_service_non_threaded(PublishedService &service);
 	void fail() { avahi_threaded_poll_quit(threaded_poll); invalid_object = true; }
 
 	/*********************

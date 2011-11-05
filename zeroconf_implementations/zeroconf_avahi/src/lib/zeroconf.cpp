@@ -12,15 +12,51 @@
 ** Includes
 *****************************************************************************/
 
-#include <ros/ros.h>
 #include <cstdio>
 #include <ctime>
 #include <avahi-common/alternative.h> // avahi_alternative_service_name
 #include <avahi-common/timeval.h>
-#include <zeroconf_comms/Protocols.h>
 #include <avahi-common/thread-watch.h>
 #include <boost/thread/thread.hpp>  // sleep
+#include <zeroconf_comms/Protocols.h>
 #include "../../include/zeroconf_avahi/zeroconf.hpp"
+
+/*****************************************************************************
+** Defines
+*****************************************************************************/
+
+// Fallbacks for printf style logging if no ros environment.
+#ifndef ROS_DEBUG
+  #ifdef ZEROCONF_DEBUG
+    #define ROS_DEBUG(args) printf(args); printf("\n");
+  #else
+    #define ROS_DEBUG(args)
+  #endif
+#endif
+
+#ifndef ROS_INFO
+  #ifdef ZEROCONF_DEBUG
+    #define ROS_INFO(args) printf(args); printf("\n");
+  #else
+    #define ROS_INFO(args)
+  #endif
+#endif
+
+#ifndef ROS_WARN
+  #ifdef ZEROCONF_DEBUG
+    #define ROS_WARN(args) printf(args); printf("\n");
+  #else
+    #define ROS_WARN(args)
+  #endif
+#endif
+
+#ifndef ROS_ERROR
+  #ifdef ZEROCONF_DEBUG
+    #define ROS_ERROR(args) printf(args); prinft("\n");
+  #else
+    #define ROS_ERROR(args)
+  #endif
+#endif
 
 /*****************************************************************************
 ** Namespaces
@@ -68,10 +104,10 @@ Zeroconf::~Zeroconf() {
 	**********************/
 	{
 		boost::mutex::scoped_lock lock(service_mutex);
-		discovered_services.clear();
 		for ( discovery_bimap::left_const_iterator iter = discovery_service_types.left.begin(); iter != discovery_service_types.left.end(); ++iter ) {
 			avahi_service_browser_free(iter->first);
 		}
+		discovered_services.clear(); // avahi_service_resolver_free will get called on each here
 		discovery_service_types.clear();
 	}
     if (threaded_poll) {
@@ -122,6 +158,14 @@ bool Zeroconf::remove_listener(const std::string &service_type) {
 	avahi_threaded_poll_lock(threaded_poll);
     {
 		boost::mutex::scoped_lock lock(service_mutex);
+
+		// browser first - otherwise there is a chance that we'll be calling back on services which have
+		// been removed, but cannot be found in discovered_services
+		discovery_bimap::right_iterator browser_iter = discovery_service_types.right.find(service_type);
+		avahi_service_browser_free(browser_iter->second);
+		discovery_service_types.right.erase(service_type);
+
+		// resolvers second
 		discovered_service_set::iterator iter = discovered_services.begin();
 		while ( iter != discovered_services.end() ) {
 			if ( (*iter)->service.type == service_type ) {
@@ -130,7 +174,6 @@ bool Zeroconf::remove_listener(const std::string &service_type) {
 				++iter;
 			}
 		}
-		discovery_service_types.right.erase(service_type);
 	}
 	avahi_threaded_poll_unlock(threaded_poll);
 	ROS_INFO_STREAM("Zeroconf: removed a listener [" << service_type << "]");
@@ -145,8 +188,11 @@ bool Zeroconf::remove_listener(const std::string &service_type) {
  * We also keep a copy of the service to be added, so we can track
  * through to the entry_group_callback, exactly which service is
  * getting added.
+ *
+ * Note that the service is not const - see add_service_non_threaded
+ * for more details.
  */
-bool Zeroconf::add_service(const PublishedService &service) {
+bool Zeroconf::add_service(PublishedService &service) {
 
 	avahi_threaded_poll_lock(threaded_poll);
 	bool result = add_service_non_threaded(service);
@@ -157,8 +203,12 @@ bool Zeroconf::add_service(const PublishedService &service) {
 /**
  * Non threaded add service - only for internal use because we need to be
  * thread-safe.
+ *
+ * Note that the service is not const - we will rename the service if it
+ * suffers from a local name collision. This is just a convenience and
+ * doesn't help the case when it is renamed in non-local collisions.
  */
-bool Zeroconf::add_service_non_threaded(const PublishedService &service) {
+bool Zeroconf::add_service_non_threaded(PublishedService &service) {
 	/*
 	 * We may still be initialising (from constructor)...check that we're up and running."
 	 */
@@ -211,9 +261,9 @@ bool Zeroconf::add_service_non_threaded(const PublishedService &service) {
         if (ret == AVAHI_ERR_COLLISION) {
         	std::string old_name = service.name;
         	PublishedService new_service = service;
-            new_service.name = avahi_alternative_service_name( service.name.c_str());
+            service.name = avahi_alternative_service_name( service.name.c_str());
             ROS_WARN_STREAM("Zeroconf: local service name collision, renaming [" << service.name << "][" << new_service.name << "]");
-            return add_service_non_threaded(new_service);
+            return add_service_non_threaded(service);
         } else {
 			ROS_ERROR_STREAM("Zeroconf: failed to add service [" << service.type.c_str() << "][" << avahi_strerror(ret) << "]");
 			fail();
@@ -255,7 +305,7 @@ bool Zeroconf::remove_service(const PublishedService &service) {
 			erased = true;
 			ROS_INFO_STREAM("Zeroconf: removing service [" << service.name << "][" << service.type << "]");
 		} else {
-			ROS_WARN_STREAM("Zeroconf: couldn't remove this service as it is not advertised [" << service.name << "][" << service.type << "]");
+			ROS_WARN_STREAM("Zeroconf: couldn't remove not currently advertised service [" << service.name << "][" << service.type << "]");
 		}
 	}
 	avahi_threaded_poll_unlock(threaded_poll);
