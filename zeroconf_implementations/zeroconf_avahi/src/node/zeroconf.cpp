@@ -34,6 +34,12 @@ using namespace zeroconf_comms;
 ** Interface
 *****************************************************************************/
 
+/**
+ * @brief Wraps the library api into a fully functional ros node with ros api.
+ *
+ * Simply envelops the c++ api with ros msg/srv communications. Also has some
+ * magic to help make publishing and browsing ros masters easy.
+ */
 class ZeroconfNode {
 
 private:
@@ -95,7 +101,11 @@ public:
 				        ROS_ERROR_STREAM("Zeroconf: services[" << i << "]['name'] has malformed type, should be of type string");
 			            break;
 			        }
-			        service.name = std::string(value_name);
+		        	service.name = std::string(value_name);
+			        if ( service.name == "Ros Master" ) {
+			        	// add some special ros magic to easily identify master's.
+			        	service.name = service.name + " (" + ros::master::getHost() + ")";
+			        }
 			        XmlRpc::XmlRpcValue value_type = value_service["type"];
 			        if ( value_type.getType() != XmlRpc::XmlRpcValue::TypeString ) {
 				        ROS_ERROR_STREAM("Zeroconf: services[" << i << "]['type'] has malformed type, should be of type string");
@@ -121,10 +131,10 @@ public:
 			        }
 			        XmlRpc::XmlRpcValue value_description = value_service["description"];
 			        if ( value_description.getType() != XmlRpc::XmlRpcValue::TypeString ) {
-				        ROS_ERROR_STREAM("Zeroconf: services[" << i << "]['description'] has malformed type, should be of type string");
-			            break;
+			        	service.description = "";
+			        } else {
+			        	service.description = std::string(value_description);
 			        }
-			        service.description = std::string(value_description);
 			        zeroconf.add_service(service);
 			    }
 		    }
