@@ -22,48 +22,6 @@
 #include "../../include/zeroconf_avahi/zeroconf.hpp"
 
 /*****************************************************************************
-** Defines
-*****************************************************************************/
-
-// Fallbacks for printf style logging if no ros environment.
-// Actually unused for now - the zeroconf_comms msg headers bring in
-// rosconsole/macros_generated.h no matter what we do. Can replace the
-// zeroconf_comms with pure c structures and do conversions between here and
-// the node class, but won't scratch that itch till we need it - it's a simple
-// job.
-#ifndef ROS_DEBUG
-  #ifdef ZEROCONF_DEBUG
-    #define ROS_DEBUG(args) printf(args); printf("\n");
-  #else
-    #define ROS_DEBUG(args)
-  #endif
-#endif
-
-#ifndef ROS_INFO
-  #ifdef ZEROCONF_DEBUG
-    #define ROS_INFO(args) printf(args); printf("\n");
-  #else
-    #define ROS_INFO(args)
-  #endif
-#endif
-
-#ifndef ROS_WARN
-  #ifdef ZEROCONF_DEBUG
-    #define ROS_WARN(args) printf(args); printf("\n");
-  #else
-    #define ROS_WARN(args)
-  #endif
-#endif
-
-#ifndef ROS_ERROR
-  #ifdef ZEROCONF_DEBUG
-    #define ROS_ERROR(args) printf(args); prinft("\n");
-  #else
-    #define ROS_ERROR(args)
-  #endif
-#endif
-
-/*****************************************************************************
 ** Namespaces
 *****************************************************************************/
 
