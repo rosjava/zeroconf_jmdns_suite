@@ -13,7 +13,10 @@ well as a ros api (topics and services) where practical.
 
 === Status ===
 
-Currently awaiting an official code review by interested members of the RoS community.
+ * zeroconf_avahi : pushing to 100% ready.
+ * jmdns : first builds
+ * zeroconf_avahi_python : ...
+ * zeroconf_avahi_embedded : ...
 
 === Roadmap ===
 
