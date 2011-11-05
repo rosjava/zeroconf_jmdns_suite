@@ -26,6 +26,11 @@
 *****************************************************************************/
 
 // Fallbacks for printf style logging if no ros environment.
+// Actually unused for now - the zeroconf_comms msg headers bring in
+// rosconsole/macros_generated.h no matter what we do. Can replace the
+// zeroconf_comms with pure c structures and do conversions between here and
+// the node class, but won't scratch that itch till we need it - it's a simple
+// job.
 #ifndef ROS_DEBUG
   #ifdef ZEROCONF_DEBUG
     #define ROS_DEBUG(args) printf(args); printf("\n");
@@ -79,7 +84,7 @@ Zeroconf::Zeroconf() :
 
     /* Allocate main loop object */
     if (!(threaded_poll = avahi_threaded_poll_new())) {
-        fprintf(stderr, "Failed to create simple poll object.\n");
+    	ROS_ERROR("Zeroconf: failed to create an avahi threaded  poll.");
         invalid_object = true;
         return;
     }
@@ -88,7 +93,7 @@ Zeroconf::Zeroconf() :
 
     /* Check whether creating the client object succeeded */
     if (!client) {
-        fprintf(stderr, "Failed to create client: %s\n", avahi_strerror(error));
+    	ROS_ERROR("Zeroconf: failed to create an avahi client.");
         invalid_object = true;
         return;
     }
@@ -142,7 +147,7 @@ bool Zeroconf::add_listener(std::string &service_type) {
     /* Create the service browser */
 	AvahiServiceBrowser *service_browser = NULL;
     if (!(service_browser = avahi_service_browser_new(client, interface, permitted_protocols, service_type.c_str(), NULL, static_cast<AvahiLookupFlags>(0), Zeroconf::discovery_callback, this))) {
-        fprintf(stderr, "Failed to create service browser: %s\n", avahi_strerror(avahi_client_errno(client)));
+    	ROS_ERROR_STREAM("Zeroconf: failed to create an avahi service browser: " << avahi_strerror(avahi_client_errno(client)) );
         return false;
     }
     {
