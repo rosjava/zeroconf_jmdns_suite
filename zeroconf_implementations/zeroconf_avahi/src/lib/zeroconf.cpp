@@ -1,9 +1,10 @@
 /**
- * @file /zeroconf_avahi/src/lib/publisher.cpp
+ * @file /zeroconf_avahi/src/lib/zeroconf.cpp
  *
- * @brief File comment
+ * @brief Convenient c++ module for interfacing with avahi-daemon.
  *
- * File comment
+ * This is a library (95% pure c++, 5% ros) that provides a convenient
+ * interface for communicating with linux's avahi daemon.
  *
  * @date 16/08/2011
  **/

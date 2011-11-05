@@ -39,6 +39,8 @@ namespace zeroconf_avahi {
 ** Utilities
 *****************************************************************************/
 /**
+ * @brief Internal comparison function for use with ordered sets.
+ *
  * Required comparison functor for use of PublishedService types in an
  * ordered set.
  *
@@ -58,6 +60,8 @@ struct PublishedServiceCompare {
 };
 
 /**
+ * @brief Internal storage for linking discovered service info with active avahi resolvers.
+ *
  * It's important that a discovered service not only records all its characteristics,
  * but keeps it's resolver open so that it can update if the remote end disconnects,
  * reconnects or even disconnects and is then superceded by a new connection.
@@ -83,7 +87,7 @@ public:
 };
 
 /**
- * This is the comparison functor for the discovered services set (typedef discovered_service_set)
+ * @brief Comparison functor for the discovered services set.
  *
  * We do not include the resolved properties when comparing elements in this set since often
  * the zeroconf entities will be unresolvable due to wireless dropouts or moving out of range.
@@ -110,7 +114,25 @@ struct DiscoveredAvahiServiceCompare {
 /*****************************************************************************
 ** Interfaces
 *****************************************************************************/
-
+/**
+ * @brief Ros interface to linux's avahi daemon.
+ *
+ * Avahi code is difficult to use (alot of black magic), so this class provides
+ * a convenient c++ interface to the avahi daemon that supplies the required
+ * api useful for a ros node (separate to this class).
+ *
+ * Constraints:
+ *
+ * It can easily be made purely c++ by substituting ros comms with
+ * pure c++ structs and doing conversions in the ros node
+ * (possibly a future job if necessary).
+ *
+ * Currently defaulting to ipv4 addresses only. Just hardcode the
+ * library to use AVAHI_PROTO_UNSPEC if we ever want to move to
+ * using ipv6 as well (probably need some extra logic here and
+ * there as well).
+ *
+ */
 class Zeroconf {
 private:
 	typedef zeroconf_comms::PublishedService PublishedService;
