@@ -1,0 +1,8 @@
+<!--
+    Browses for ros masters. 
+ -->
+<launch>
+  <node pkg="zeroconf_avahi" type="zeroconf" name="zeroconf"  output="screen">
+    <rosparam param="listeners">['_ros-master._tcp']</rosparam>
+  </node>
+</launch>
