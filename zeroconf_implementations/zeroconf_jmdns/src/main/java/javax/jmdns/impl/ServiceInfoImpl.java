@@ -288,8 +288,14 @@ public class ServiceInfoImpl extends ServiceInfo implements DNSListener, DNSStat
                 index = aType.indexOf("_" + protocol.toLowerCase() + ".");
                 int start = index + protocol.length() + 2;
                 int end = aType.length() - (aType.endsWith(".") ? 1 : 0);
-                domain = casePreservedType.substring(start, end);
-                application = casePreservedType.substring(0, index - 1);
+                if (end > start) {
+                    domain = casePreservedType.substring(start, end);
+                }
+                if (index > 0) {
+                    application = casePreservedType.substring(0, index - 1);
+                } else {
+                    application = "";
+                }
             }
             index = application.toLowerCase().indexOf("._sub");
             if (index > 0) {
@@ -905,6 +911,7 @@ public class ServiceInfoImpl extends ServiceInfo implements DNSListener, DNSStat
                     if (rec.getName().equalsIgnoreCase(this.getQualifiedName())) {
                         DNSRecord.Text txt = (DNSRecord.Text) rec;
                         _text = txt.getText();
+                        _props = null; // set it null for apply update text data
                         serviceUpdated = true;
                     }
                     break;

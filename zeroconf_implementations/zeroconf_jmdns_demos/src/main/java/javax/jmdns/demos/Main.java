@@ -28,6 +28,8 @@ public class Main {
 			NetworkTopology.main(args);
 		} else if ( demo_type.equals("--register_services") ) {
 			RegisterServices.main(args);
+		} else if ( demo_type.equals("--discover_services") ) {
+			DiscoverServices.main(args);
 		} else {
 			Main.usage();
 			System.out.printf("Done *%s*\n",demo_type);

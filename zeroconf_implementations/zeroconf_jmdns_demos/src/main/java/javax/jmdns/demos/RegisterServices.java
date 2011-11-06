@@ -32,11 +32,15 @@ public class RegisterServices {
         jmdns = new HashSet<JmDNS>();
 	}
 	
+	// Prints a pure java list of interfaces and addresses on those interfaces.
+	// Then starts a jmdns instance on each one of those interface-address combinations. 
 	public void init(InetAddress address) {
         try {
 	        Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
             System.out.println("");
             System.out.println("Jmdns Instances");
+            // if you don't hunt down interfaces and addresses, it will just grab a single
+            // interface using some of its own internal logic.
 	        for (NetworkInterface netint : Collections.list(nets)) {
 	        	 System.out.printf("  Interface: %s\n", netint.getName());
 	             Enumeration<InetAddress> inetAddresses = netint.getInetAddresses();
@@ -59,21 +63,27 @@ public class RegisterServices {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.printf("Number of Jmdns Instances: %s\n", jmdns.size());
 	}
-
+	// for each instance, we register a service 
+	// basically just broadcasting the service to everybody here.
 	public void register() {
-        System.out.printf("Registering the service (this is blocking)\n");
+        System.out.printf("JmDNS Instances:\n");
         try {
         	for ( JmDNS mdns : jmdns ) {
         		System.out.printf("  jmdns: %s\n", mdns.getName());
+        	}
+            System.out.printf("Registering the service (this is blocking)(can only advertise on one jmdns)\n");
+        	for ( JmDNS mdns : jmdns ) {
+        		System.out.printf("  jmdns: %s\n", mdns.getName());
         		mdns.registerService(service);
-        		break; // need to create multiple ServiceInfo instances to do repeatedly I think
+        		// can only register the one 'service'..if you try and register it on multiple JmDNS
+        		// instances, it will give you an exception.
+        		break; 
         	}
 	    } catch (IOException e) {
 	        e.printStackTrace();
 	    }
-
-        System.out.printf("Registration done.\n");
 	}
 	
 	public void discovery() {
@@ -83,12 +93,17 @@ public class RegisterServices {
             for ( int j = 0; j < services.length; j = j + 1) {
                 System.out.printf("Service discovered: \n");
                 System.out.printf("   Name   : %s\n", services[j].getName());
-                for ( int i = 0; i < services[j].getInet4Addresses().length; i = i + 1) {
-                	System.out.printf("   Address: %s\n", services[j].getInet4Addresses()[i].getHostAddress());
-                } 
-                for ( int i = 0; i < services[j].getInet6Addresses().length; i = i + 1) {
-                	System.out.printf("   Address: %s\n", services[j].getInet6Addresses()[i].getHostAddress());
-                }
+                try {
+                	System.out.printf("   Address: %s\n", mdns.getInetAddress().getHostAddress());
+	    	    } catch (IOException e) {
+	    	        e.printStackTrace();
+	    	    }
+//                for ( int i = 0; i < services[j].getInet4Addresses().length; i = i + 1) {
+//                	System.out.printf("   Address: %s\n", services[j].getInet4Addresses()[i].getHostAddress());
+//                } 
+//                for ( int i = 0; i < services[j].getInet6Addresses().length; i = i + 1) {
+//                	System.out.printf("   Address: %s\n", services[j].getInet6Addresses()[i].getHostAddress());
+//                }
                 System.out.printf("   Port   : %d\n", services[j].getPort());
             }
     	}

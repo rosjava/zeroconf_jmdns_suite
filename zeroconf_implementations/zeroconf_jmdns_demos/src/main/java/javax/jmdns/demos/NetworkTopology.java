@@ -27,6 +27,7 @@ public class NetworkTopology {
 		}
 		public void inetAddressRemoved(NetworkTopologyEvent event) {
 			System.out.println("  NetworkListener: inetaddress removed");
+			System.out.printf("    Inet Address: %s\n", event.getInetAddress().getHostAddress());
 		}
 	}
 
@@ -51,11 +52,11 @@ public class NetworkTopology {
 	public void discovery() {
 		System.out.println("  Discovery:");
     	for ( int i = 0; i < jmmdns.getHostNames().length; i = i + 1 ) {
-		    System.out.printf("    HostName : %s\n", jmmdns.getHostNames()[i]);
+		    System.out.printf("    HostName: %s\n", jmmdns.getHostNames()[i]);
     	}
     	try {
-	    	for ( int i = 0; i < jmmdns.getInterfaces().length; i = i + 1 ) {
-			    System.out.printf("    Interface: %s\n", jmmdns.getInterfaces()[i]);
+	    	for ( int i = 0; i < jmmdns.getInetAddresses().length; i = i + 1 ) {
+			    System.out.printf("    Address : %s\n", jmmdns.getInetAddresses()[i].getHostAddress());
 	    	}
 	    } catch (IOException e) {
 	        e.printStackTrace();

@@ -51,11 +51,11 @@ public class DiscoverServices {
             		8000, 0, 0, true, properties);
             JmDNS jmdns = JmDNS.create();
 //        	String concert_service_type = "_concert-master._tcp.local.";
-//        	String scanner_service_type = "_scanner._tcp.local.";
-//            jmdns.addServiceListener(scanner_service_type, new SampleListener());
+        	String ros_service_type = "_ros-master._tcp.local.";
+            jmdns.addServiceListener(ros_service_type, new SampleListener());
 //            jmdns.addServiceListener(concert_service_type, new SampleListener());
 //
-//            System.out.println("Press q to quit");
+            System.out.println("Press q to quit");
 //            int b;
 //            while ((b = System.in.read()) != -1 && (char) b != 'q') {
 //            	ServiceInfo[] concert_services = jmdns.list(concert_service_type);
