@@ -10,9 +10,8 @@
   <url>http://jmdns.sourceforge.net/</url>
   <export>
     <rosjava-src location="src/main/java" />
-    <rosjava-pathelement location="build" groupId="javax" artifactId="javax.jmdns" version="3.4.1" built="true" />
+    <rosjava-pathelement location="build" groupId="javax.jmdns" artifactId="jmdns" version="3.4.2" built="true" />
   </export>
-
 </package>
 
 

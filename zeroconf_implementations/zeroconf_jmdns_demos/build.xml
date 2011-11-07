@@ -4,7 +4,7 @@
     <property file="ros.properties" />
     <include file="dependencies.xml" />
     <property name="jar" location="${ros.artifact.built}"/>
-    <property name="dist" location="build" />
+    <property name="build_root" location="build" />
     <property name="build" location="build/classes" />
     <property name="src" location="src/main/java" />
     <property name="javac-source" value="1.6" />
@@ -20,7 +20,6 @@
 
 	<target name="init">
 	  <fail unless="ros.compile.classpath" message="ros.properties is missing.  Please type 'rosmake' first "/>
-      <mkdir dir="${dist}" />
 	  <mkdir dir="${build}" />
 	</target>
 	
@@ -46,10 +45,10 @@
       -->
     </target>
     <target name="clean">
-        <delete dir="${build}" includeEmptyDirs="true"  failonerror="false" />
-        <delete dir="${dist}" includeEmptyDirs="true"  failonerror="false" />
+        <delete dir="${build_root}" includeEmptyDirs="true"  failonerror="false" />
     </target>
 	<target name="help">
+		<!-- add instructions for running demos later here -->
 	</target>
 
 </project>

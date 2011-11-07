@@ -11,7 +11,7 @@
   <depend package="zeroconf_jmdns"/>
   <export>
     <rosjava-src location="src/main/java" />
-    <rosjava-pathelement location="build" groupId="javax" artifactId="javax.jmdns.demos" version="0.0.1" built="true" />
+    <rosjava-pathelement location="build" groupId="javax.jmdns.demos" artifactId="jmdns-demos" version="0.0.1" built="true" />
   </export>
 </package>
 

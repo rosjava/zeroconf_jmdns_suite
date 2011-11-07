@@ -5,15 +5,19 @@
     <property file="ros.properties" />
     <include file="dependencies.xml" />
 	<property name="jar" location="${ros.artifact.built}"/>
-    <property name="dist" location="build" />
+    <property name="build_root" location="build" />
     <property name="build" location="build/classes" />
     <property name="src" location="src/main/java" />
     <property name="javac-source" value="1.6" />
     <property name="javac-target" value="1.6" />
 	
+	<!-- 
+	  Set up a path variable to be used when defining 
+	  classpath inside a javac compile element 
+    -->
 	<path id="classpath">
-	  <pathelement location="${build}" />
-	  <pathelement path="${ros.compile.classpath}" />
+	  <pathelement location="${build}" />             <!-- single location --> 
+	  <pathelement path="${ros.compile.classpath}" /> <!-- List of paths separated by :'s -->
 	</path>
 	<echo message="${toString:classpath}" />
 	
@@ -22,7 +26,6 @@
 	<target name="init">
 	  <fail unless="ros.compile.classpath" message="ros.properties is missing.  Please type 'rosmake' first "/>
 	  <mkdir dir="${build}" />
-	  <mkdir dir="${dist}" />
 	</target>
 	
 	<target name="compile" depends="init">
@@ -35,14 +38,16 @@
 	  </javac>
 	</target>
 
-    <!-- Alternatively, we can embed the xml in here, see rosjava_bootstrap/scripts/build-msg.xml for an example -->
+    <!--
+      Alternatively, we can embed the xml in here, 
+      see rosjava_bootstrap/scripts/build-msg.xml for an example 
+    -->
     <target name="jar" depends="init, compile">
       <bnd classpath="${build}" files="src/main/osgi/jmdns.bnd" />
     </target>
 
     <target name="clean">
-        <delete dir="${build}" includeEmptyDirs="true"  failonerror="false" />
-        <delete dir="${dist}" includeEmptyDirs="true"  failonerror="false" />
+        <delete dir="${build_root}" includeEmptyDirs="true"  failonerror="false" />
     </target>
 
 </project>
