@@ -1,9 +1,11 @@
 bundle.version=3.4.2
--output: build/jmdns-${bundle.version}.jar
+-output: ${ros.artifact.built}
 
-Bundle-Name: javax.jmdns
+Bundle-Name: jmdns
 Bundle-SymbolicName: javax.jmdns
 Bundle-Version: ${bundle.version}
 
-Export-Package: javax.jmdns.*
+Export-Package: javax.jmdns.*, org.ros.*
 Import-Package: *
+
+Main-Class: org.ros.jmdns.Zeroconf
