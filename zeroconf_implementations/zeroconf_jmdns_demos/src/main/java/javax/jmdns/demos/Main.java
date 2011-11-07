@@ -19,6 +19,7 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+        //System.out.println(System.getProperty("java.class.path"));
 		if ( args.length != 1 ) {
 			Main.usage();
 			return;

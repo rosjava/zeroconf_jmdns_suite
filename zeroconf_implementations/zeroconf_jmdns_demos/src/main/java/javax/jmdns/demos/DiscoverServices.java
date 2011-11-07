@@ -50,22 +50,17 @@ public class DiscoverServices {
             		"Ros Master", 
             		8000, 0, 0, true, properties);
             JmDNS jmdns = JmDNS.create();
-//        	String concert_service_type = "_concert-master._tcp.local.";
         	String ros_service_type = "_ros-master._tcp.local.";
             jmdns.addServiceListener(ros_service_type, new SampleListener());
-//            jmdns.addServiceListener(concert_service_type, new SampleListener());
-//
             System.out.println("Press q to quit");
-//            int b;
-//            while ((b = System.in.read()) != -1 && (char) b != 'q') {
-//            	ServiceInfo[] concert_services = jmdns.list(concert_service_type);
-//            	ServiceInfo[] scanner_services = jmdns.list(scanner_service_type);
-//            	System.out.printf("Discovered %1d concert services%n", concert_services.length);
-//            	System.out.printf("Discovered %1d scanner services%n", scanner_services.length);
-//            }
-//            System.out.println("Closing...");
-//            jmdns.close();
-//            System.out.println("Done");
+            int b;
+            while ((b = System.in.read()) != -1 && (char) b != 'q') {
+            	ServiceInfo[] ros_services = jmdns.list(ros_service_type);
+            	System.out.printf("Discovered %1d ros services%n", ros_services.length);
+            }
+            System.out.println("Closing...");
+            jmdns.close();
+            System.out.println("Done");
         } catch (IOException e) {
             e.printStackTrace();
         }
