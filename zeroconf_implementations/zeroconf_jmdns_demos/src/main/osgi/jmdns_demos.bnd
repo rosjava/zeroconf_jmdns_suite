@@ -1,5 +1,5 @@
 bundle.version=0.0.1
--output: build/jmdns_demos-${bundle.version}.jar
+-output: ${ros.artifact.built}
 
 Bundle-Name: javax.jmdns.demos
 Bundle-SymbolicName: javax.jmdns.demos
