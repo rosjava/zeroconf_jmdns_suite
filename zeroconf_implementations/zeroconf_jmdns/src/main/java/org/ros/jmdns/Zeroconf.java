@@ -104,6 +104,14 @@ public class Zeroconf {
 	    } catch (InterruptedException e) {
 	        e.printStackTrace();
 	    }
+		int i = 12;
+		while( i > 11 ) {
+			try {
+		        Thread.sleep(1000L);
+		    } catch (InterruptedException e) {
+		        e.printStackTrace();
+		    }
+		}
 		zeroconf.shutdown();
 	}
 
