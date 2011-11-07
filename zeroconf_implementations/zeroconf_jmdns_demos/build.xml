@@ -17,7 +17,7 @@
 	<echo message="${toString:classpath}" />
 	
     <target name="default" depends="init, compile, jar" />
-
+    
 	<target name="init">
 	  <fail unless="ros.compile.classpath" message="ros.properties is missing.  Please type 'rosmake' first "/>
 	  <mkdir dir="${build}" />
