@@ -30,27 +30,27 @@
 	    <src path="${src}" />
 	  </javac>
 	</target>
-	<!--
-    <path id="runtime-classpath">
-       <pathelement path="${ros.runtime.classpath}" />
-    </path>
-    <echo message="${toString:runtime-classpath}" />
-    <manifestclasspath property="manifest.class.path" jarfile="${jar}">
-        <classpath refid="runtime-classpath"/>
-    </manifestclasspath>
-    -->
+	<tempfile property="temp.file"/>
+	<echo message="${ros.runtime.classpath}" file="${temp.file}"/>
+	<replaceregexp file="${temp.file}"
+	               match=":"
+	               replace=" "
+		flags="g"
+	/>
+    <loadfile property="manifest.classpath" srcFile="${temp.file}"/>
+	<delete file="${temp.file}"/>
 	<target name="jar" depends="init, compile">
-      <!-- Can also build this in this xml - see original jmdns sources for that
+      <!-- Can also build this in this xml - but relative paths are an issue? -->
       <bnd classpath="${build}" files="src/main/osgi/dude.bnd"/>
-      -->
+      <!--
       <jar destfile="${jar}">
         <manifest>
           <attribute name="Main-Class" value="yujin.sandbox.Main" />
-          <!-- <attribute name="Class-Path" value="${ros.runtime.classpath}" /> -->
-          <!-- <attribute name="Class-Path" value="${manifest.class.path}" /> -->
+          <attribute name="Class-Path" value="${ros.runtime.classpath}" />
         </manifest>
         <fileset dir="${build}" />
       </jar>
+      -->
     </target>
 
     <target name="clean">

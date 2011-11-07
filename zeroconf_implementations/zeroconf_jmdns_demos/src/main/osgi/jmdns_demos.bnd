@@ -1,7 +1,7 @@
 bundle.version=0.0.1
 -output: ${ros.artifact.built}
 
-Bundle-Name: javax.jmdns.demos
+Bundle-Name: jmdns_demos
 Bundle-SymbolicName: javax.jmdns.demos
 Bundle-Version: ${bundle.version}
 
@@ -10,6 +10,3 @@ Import-Package: javax.jmdns;version="0.0.0"
 
 Main-Class: javax.jmdns.demos.Main
 Class-Path: ${ros.runtime.classpath}
-
-# Bundle-Class-Path: ., /opt/rocon/yujin_rocon/rocon_tools/jmdns/build, javax.jmdns-3.4.1.jar
-# Class-Path: /opt/rocon/yujin_rocon/rocon_tools/jmdns/build/javax.jmdns-3.4.1.jar

@@ -1,0 +1,15 @@
+#!/bin/bash
+
+DUDE_DIR=`rospack find dude`
+DUDE_JAR=${DUDE_DIR}/build/dude-0.0.1.jar
+OUR_CLASSPATH=${JMDNS_JAR}:${DEMOS_JAR}
+
+# Our OSGI bundle sets everything up
+java -jar ${DUDE_JAR}
+
+# java -classpath ${OUR_CLASSPATH} javax.jmdns.demos.RegisterServices
+# This fails because it the executing main has to be cast from a NodeMain type.
+#rosrun rosjava_bootstrap run.py jmdns_demos javax.jmdns.demos.RegisterServices
+# This one works fine whether we use the ant bundle or the ant jar
+# rosrun yujin_java_tools run.py jmdns_demos javax.jmdns.demos.RegisterServices
+
