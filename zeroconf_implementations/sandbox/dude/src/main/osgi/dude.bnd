@@ -6,7 +6,7 @@ Bundle-SymbolicName: yujin.sandbox
 Bundle-Version: ${bundle.version}
 
 Export-Package: yujin.sandbox.*
-Import-Package: org.ros.node;version="0.0.0", org.ros.address;version="0.0.0"
+Import-Package: org.ros.node, org.ros.address, org.ros.message.std_msgs
 
 Main-Class: yujin.sandbox.Main
 Class-Path: ${manifest.classpath}

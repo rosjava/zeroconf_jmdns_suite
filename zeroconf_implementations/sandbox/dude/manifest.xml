@@ -9,6 +9,7 @@
   <review status="api cleared" notes=""/>
   <url>http://ros.org/wiki/jmdns_samples</url>
   <depend package="rosjava"/>
+  <depend package="std_msgs"/>
   <export>
     <rosjava-src location="src/main/java" />
     <rosjava-pathelement location="build" groupId="yujin.sandbox" artifactId="dude" version="0.0.1" built="true" />
