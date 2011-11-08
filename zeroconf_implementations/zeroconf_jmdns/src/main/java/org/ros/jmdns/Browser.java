@@ -5,37 +5,49 @@ import java.io.IOException;
 import java.lang.Thread;
 
 import javax.jmdns.JmmDNS;
+import javax.jmdns.NetworkTopologyEvent;
+import javax.jmdns.NetworkTopologyListener;
 import javax.jmdns.ServiceEvent;
+import javax.jmdns.ServiceInfo;
 import javax.jmdns.ServiceListener;
 import javax.jmdns.ServiceTypeListener;
 
-public class Browser implements ServiceListener, ServiceTypeListener {
+public class Browser implements ServiceListener, ServiceTypeListener, NetworkTopologyListener {
 
-	private static final long serialVersionUID = 5750114542524415107L;
     JmmDNS                    jmmdns;
     String                    type;
 
     Browser(JmmDNS mmDNS) {
+        this.jmmdns = mmDNS;
+        this.type = "_ros-master._tcp.local.";
+        this.jmmdns.addNetworkTopologyListener(this);
+    }
+    
+	/*************************************************************************
+	 * User Methods 
+	 ************************************************************************/
+    public void listDiscoveredServices() {
+//        ServiceInfo[] serviceInfos = this.jmmdns.getServiceInfos(type, name);
+    }
+    
+	/*************************************************************************
+	 * Network Topology Callbacks 
+	 ************************************************************************/
+	public void inetAddressAdded(NetworkTopologyEvent event) {
+		System.out.printf("[+] NetworkInterface: %s\n", event.getInetAddress().getHostAddress());
         try {
-	        this.jmmdns = mmDNS;
-	        this.type = "_ros-master._tcp.local.";
-
-	        // we need some time for the system to find the interfaces. 
-	        try {
-        		Thread.sleep(1000L);
-		    } catch (InterruptedException e) {
-		        e.printStackTrace();
-		    }
-
-
-	        // 1) initiate a thread pool?
-	        this.jmmdns.addServiceTypeListener(this);
-	        this.jmmdns.addServiceListener(type, this);
+        	event.getDNS().addServiceTypeListener(this);
+        	event.getDNS().addServiceListener(type, this);
         } catch (IOException e) {
 	        e.printStackTrace();
         }
-	    System.out.println("Browser init'd");
-    }
+	}
+	
+	public void inetAddressRemoved(NetworkTopologyEvent event) {
+		System.out.printf("[-] NetworkInterface: %s\n", event.getInetAddress().getHostAddress());
+		event.getDNS().removeServiceTypeListener(this);
+		event.getDNS().removeServiceListener(type, this);
+	}
     
 	/*************************************************************************
 	 * Listener Callbacks 
@@ -43,31 +55,30 @@ public class Browser implements ServiceListener, ServiceTypeListener {
     @Override
     public void serviceAdded(ServiceEvent event) {
         final String name = event.getName();
-
-        System.out.println("ADD: " + name);
+        System.out.println("[+] Service         : " + name);
     }
 
     @Override
     public void serviceRemoved(ServiceEvent event) {
         final String name = event.getName();
-        System.out.println("REMOVE: " + name);
+        System.out.println("[-] Service         : " + name);
     }
 
     @Override
     public void serviceResolved(ServiceEvent event) {
         final String name = event.getName();
-        System.out.println("RESOLVED: " + name);
+        System.out.println("[+] Resolved Service: " + name);
     }
 
     @Override
     public void serviceTypeAdded(ServiceEvent event) {
-        final String aType = event.getType();
-        System.out.println("TYPE: " + aType);
+//        final String aType = event.getType();
+//        System.out.println("TYPE: " + aType);
     }
 
     @Override
     public void subTypeForServiceTypeAdded(ServiceEvent event) {
-        System.out.println("SUBTYPE: " + event.getType());
+//        System.out.println("SUBTYPE: " + event.getType());
     }
 
 	/*************************************************************************
