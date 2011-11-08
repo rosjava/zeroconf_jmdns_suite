@@ -295,6 +295,14 @@ public class JmmDNSImpl implements JmmDNS, NetworkTopologyListener, ServiceInfoI
     @Override
     public void addServiceListener(String type, ServiceListener listener) {
         for (JmDNS mDNS : _knownMDNS.values()) {
+        	System.out.println("Adding listener:");
+		    System.out.printf("  Service type: %s\n", type);
+		    System.out.printf("  mDNS Name   : %s\n", mDNS.getName());
+	    	try {
+	    		System.out.printf("  mDNS Address: %s\n", mDNS.getInetAddress().getHostAddress());
+		    } catch (IOException e) {
+		        e.printStackTrace();
+		    }
             mDNS.addServiceListener(type, listener);
         }
     }
