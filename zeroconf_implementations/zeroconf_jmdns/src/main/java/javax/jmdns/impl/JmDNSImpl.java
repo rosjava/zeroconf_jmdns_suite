@@ -1101,7 +1101,6 @@ public class JmDNSImpl extends JmDNS implements DNSStatefulObject, DNSTaskStarte
                         /** {@inheritDoc} */
                         @Override
                         public void run() {
-                        	System.out.println("_executor.submit is running");
                             status.serviceTypeAdded(event);
                         }
                     });

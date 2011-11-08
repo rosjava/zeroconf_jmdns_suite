@@ -57,7 +57,6 @@ public class Main {
             new Browser(JmmDNS.Factory.getInstance());
             while(true) {
         		try {
-        			System.out.println("Sleeping");
             		Thread.sleep(1000L);
     		    } catch (InterruptedException e) {
     		        e.printStackTrace();
