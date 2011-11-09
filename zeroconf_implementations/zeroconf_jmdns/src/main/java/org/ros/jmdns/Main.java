@@ -54,14 +54,7 @@ public class Main {
         }
 
 		if ((argc == 0) || ((argc >= 1) && "-browse".equals(argv[0]))) {
-            new Browser(JmmDNS.Factory.getInstance());
-            while(true) {
-        		try {
-            		Thread.sleep(1000L);
-    		    } catch (InterruptedException e) {
-    		        e.printStackTrace();
-    		    }
-            }
+			Browser.main(argv);
         } else if (!debug) {
             System.out.println();
             System.out.println("jmdns:");

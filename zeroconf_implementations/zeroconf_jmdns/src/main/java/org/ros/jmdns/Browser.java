@@ -3,6 +3,9 @@ package org.ros.jmdns;
 
 import java.io.IOException;
 import java.lang.Thread;
+import java.net.Inet4Address;
+import java.util.HashMap;
+import java.util.Set;
 
 import javax.jmdns.JmmDNS;
 import javax.jmdns.NetworkTopologyEvent;
@@ -14,20 +17,55 @@ import javax.jmdns.ServiceTypeListener;
 
 public class Browser implements ServiceListener, ServiceTypeListener, NetworkTopologyListener {
 
-    JmmDNS                    jmmdns;
-    String                    type;
+    JmmDNS jmmdns;
+    String service_type;
+    String service_name;                
+    int    service_port;
+    ServiceInfo service_info; // service to be published
 
     Browser(JmmDNS mmDNS) {
+    	/********************
+    	 * Variables
+    	 *******************/
         this.jmmdns = mmDNS;
-        this.type = "_ros-master._tcp.local.";
+        // publishing and listening details
+        this.service_type = "_ros-master._tcp.local.";
+        // publishing details
+        this.service_name = "RosMaster";
+        this.service_port = 8888;
+        String service_key = "description"; // Max 9 chars
+        String text = "Hypothetical ros master";
+        HashMap<String, byte[]> properties = new HashMap<String, byte[]>();
+        properties.put(service_key, text.getBytes());
+        service_info = ServiceInfo.create(service_type, service_name, service_port, 0, 0, true, properties);
+//        service_info = ServiceInfo.create(service_type, service_name, service_port, 0, 0, true, text);
+
+    	/********************
+    	 * Methods
+    	 *******************/
         this.jmmdns.addNetworkTopologyListener(this);
     }
     
 	/*************************************************************************
-	 * User Methods 
+	 * User Interface
 	 ************************************************************************/
+    /**
+     * If you try calling this immediately after a service added callback
+     * occured, you probably wont see anything - it needs some time to resolve.
+     */
     public void listDiscoveredServices() {
-//        ServiceInfo[] serviceInfos = this.jmmdns.getServiceInfos(type, name);
+        ServiceInfo[] service_infos = this.jmmdns.list(service_type);
+        for ( int i = 0; i < service_infos.length; i++ ) {
+        	display(service_infos[i]);
+        }
+    }
+    public void display(ServiceInfo service_info) {
+    	System.out.println("Service Info:");
+    	System.out.printf("  Name   : %s\n", service_info.getName() );
+    	System.out.printf("  Type   : %s\n", service_info.getType() );
+    	for ( int i = 0; i < service_info.getInetAddresses().length; ++i ) {
+        	System.out.printf("  Address: %s\n", service_info.getInetAddresses()[i].getHostAddress() );
+    	}
     }
     
 	/*************************************************************************
@@ -37,7 +75,14 @@ public class Browser implements ServiceListener, ServiceTypeListener, NetworkTop
 		System.out.printf("[+] NetworkInterface: %s\n", event.getInetAddress().getHostAddress());
         try {
         	event.getDNS().addServiceTypeListener(this);
-        	event.getDNS().addServiceListener(type, this);
+        	event.getDNS().addServiceListener(service_type, this);
+        	System.out.printf("Publishing Service on %s:\n",event.getInetAddress().getHostAddress());
+        	System.out.printf("  Name   : %s\n", service_info.getName() );
+        	System.out.printf("  Type   : %s\n", service_info.getType() );
+        	System.out.printf("  Port   : %s\n", service_info.getPort() );
+//        	this.jmmdns.unregisterService(service_info);
+//        	this.jmmdns.registerService(service_info);
+         	event.getDNS().registerService(service_info.clone()); // if you don't clone it, it falls over badly!
         } catch (IOException e) {
 	        e.printStackTrace();
         }
@@ -46,7 +91,14 @@ public class Browser implements ServiceListener, ServiceTypeListener, NetworkTop
 	public void inetAddressRemoved(NetworkTopologyEvent event) {
 		System.out.printf("[-] NetworkInterface: %s\n", event.getInetAddress().getHostAddress());
 		event.getDNS().removeServiceTypeListener(this);
-		event.getDNS().removeServiceListener(type, this);
+		event.getDNS().removeServiceListener(service_type, this);
+    	System.out.println("Unpublishing Service:");
+    	System.out.printf("  Name   : %s\n", service_info.getName() );
+    	System.out.printf("  Type   : %s\n", service_info.getType() );
+    	System.out.printf("  Port   : %s\n", service_info.getPort() );
+    	//this.jmmdns.unregisterService(service_info);
+    	//this.jmmdns.registerService(service_info);
+    	event.getDNS().unregisterService(service_info); // this may not work because we're cloning it.
 	}
     
 	/*************************************************************************
@@ -85,10 +137,13 @@ public class Browser implements ServiceListener, ServiceTypeListener, NetworkTop
 	 * Main 
 	 ************************************************************************/
     public static void main(String argv[]) throws IOException {
-        new Browser(JmmDNS.Factory.getInstance());
+        Browser browser = new Browser(JmmDNS.Factory.getInstance());
+		try {
+    		Thread.sleep(1000L);
+	    } catch (InterruptedException e) { e.printStackTrace(); }
         while(true) {
     		try {
-    			System.out.println("Sleeping");
+    			browser.listDiscoveredServices();
         		Thread.sleep(1000L);
 		    } catch (InterruptedException e) {
 		        e.printStackTrace();
