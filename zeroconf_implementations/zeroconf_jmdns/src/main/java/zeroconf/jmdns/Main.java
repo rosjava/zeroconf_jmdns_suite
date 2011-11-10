@@ -16,7 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-package org.ros.jmdns;
+package src.main.java.zeroconf.jmdns;
 
 import java.io.IOException;
 import java.util.Enumeration;

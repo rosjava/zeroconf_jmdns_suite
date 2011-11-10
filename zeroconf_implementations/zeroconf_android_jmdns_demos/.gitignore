@@ -1,2 +1,9 @@
 /local.properties
 /proguard.cfg
+/build
+/bin
+/gen
+/dependencies.xml
+/default.properties
+/ros.properties
+/.classpath

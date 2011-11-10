@@ -1,4 +1,4 @@
-package org.ros.jmdns;
+package src.main.java.zeroconf.jmdns;
 
 import java.io.IOException;
 import java.lang.Thread;
