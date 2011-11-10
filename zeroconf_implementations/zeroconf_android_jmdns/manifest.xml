@@ -8,6 +8,16 @@
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/zeroconf_android_jmdns</url>
+  <!--
+    Doesn't work with sdk tools v15
+    <depend package="appmanandroid"/> 
+  -->
+  <export>
+    <rosjava-android-lib target="android-13"/>
+    <rosjava-src location="src" />
+    <rosjava-pathelement location="build" groupId="javax.jmdns" artifactId="android-jmdns" version="3.4.2" built="true" />
+  </export>
+
 
 </package>
 

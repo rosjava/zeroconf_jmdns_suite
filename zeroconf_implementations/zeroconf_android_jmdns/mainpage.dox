@@ -2,25 +2,14 @@
 \mainpage
 \htmlinclude manifest.html
 
-\b zeroconf_android_jmdns is ... 
+@section Overview
 
-<!-- 
-Provide an overview of your package.
--->
+This is the android compiled version of jmdns.
 
+@section Notes
 
-\section codeapi Code API
+A bit of redundancy here, as its the same sources as in zeroconf_jmdns.
 
-<!--
-Provide links to specific auto-generated API documentation within your
-package that is of particular interest to a reader. Doxygen will
-document pretty much every part of your code, so do your best here to
-point the reader to the actual API.
-
-If your codebase is fairly large or has different sets of APIs, you
-should use the doxygen 'group' tag to keep these APIs together. For
-example, the roscpp documentation has 'libros' group.
--->
-
+I really should svn download them first in a pre-build command.
 
 */
