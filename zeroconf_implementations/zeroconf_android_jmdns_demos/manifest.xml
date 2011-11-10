@@ -8,7 +8,11 @@
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/zeroconf_android_jmdns_demos</url>
-
+  <depend package="zeroconf_android_jmdns"/>
+  <export>
+    <rosjava-src location="src" />
+    <rosjava-android-app target="android-13" />
+  </export>
 </package>
 
 

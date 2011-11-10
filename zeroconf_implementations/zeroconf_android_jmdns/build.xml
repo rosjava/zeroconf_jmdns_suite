@@ -11,7 +11,6 @@
     <!-- directories -->
     <property name="pwd" location="."/>
     <property name="app.dir" location="."/>
-    <property name="out.library.jar.file" location="${pwd}/bin/android-jmdns-3.4.2.jar"/>
 
     <path id="project.libraries.src">
         <pathelement location="${ros.pkg.android.dir}/library/src"/>

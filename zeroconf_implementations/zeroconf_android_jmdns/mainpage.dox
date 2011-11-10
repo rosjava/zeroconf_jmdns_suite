@@ -6,6 +6,17 @@
 
 This is the android compiled version of jmdns.
 
+@sectino Configuration
+
+Created with 
+
+@code
+android create lib-project -n zeroconf_android_jmdns --target 2 --path . --package javax.jmdns
+@endcode
+
+Mod'd the build.xml to match a typical ros build. Could have used the template in ycs_build/android, but don't want
+the ycs dependency creeping in as this will later disappear once rosjava/android catch up.
+
 @section Notes
 
 A bit of redundancy here, as its the same sources as in zeroconf_jmdns.
