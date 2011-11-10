@@ -1,14 +1,12 @@
-package zeroconf.android.jmdns.demos;
+package ros.android.zeroconf.jmdns.demos;
 
-import android.app.Activity;
-import android.os.Bundle;
-import android.widget.TextView;
 
 import java.io.IOException;
 import java.lang.Thread;
-
 import javax.jmdns.JmmDNS;
-import zeroconf.android.jmdns.demos.Zeroconf;
+import android.app.Activity;
+import android.os.Bundle;
+import android.widget.TextView;
 
 public class ZeroconfActivity extends Activity {
 

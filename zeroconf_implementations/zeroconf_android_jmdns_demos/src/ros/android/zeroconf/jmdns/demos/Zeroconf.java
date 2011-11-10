@@ -1,4 +1,4 @@
-package zeroconf.android.jmdns.demos;
+package ros.android.zeroconf.jmdns.demos;
 
 import java.io.IOException;
 import java.lang.Thread;
