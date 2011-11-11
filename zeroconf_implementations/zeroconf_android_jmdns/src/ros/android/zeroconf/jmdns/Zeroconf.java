@@ -1,9 +1,9 @@
-
-package src.main.java.zeroconf.jmdns;
+package ros.android.zeroconf.jmdns;
 
 import java.io.IOException;
 import java.lang.Thread;
 import java.net.Inet4Address;
+import java.util.Iterator;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -15,19 +15,21 @@ import javax.jmdns.ServiceInfo;
 import javax.jmdns.ServiceListener;
 import javax.jmdns.ServiceTypeListener;
 
-public class Browser implements ServiceListener, ServiceTypeListener, NetworkTopologyListener {
+public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTopologyListener {
 
     JmmDNS jmmdns;
+    Set<String> listeners;
+    Set<ServiceInfo> services;
     String service_type;
     String service_name;                
     int    service_port;
     ServiceInfo service_info; // service to be published
 
-    Browser(JmmDNS mmDNS) {
+    Zeroconf() {
     	/********************
     	 * Variables
     	 *******************/
-        this.jmmdns = mmDNS;
+        this.jmmdns = JmmDNS.Factory.getInstance();
         // publishing and listening details
         this.service_type = "_ros-master._tcp.local.";
         // publishing details
@@ -49,6 +51,21 @@ public class Browser implements ServiceListener, ServiceTypeListener, NetworkTop
 	/*************************************************************************
 	 * User Interface
 	 ************************************************************************/
+    public void addListener(String service_type, String domain) {
+    	String service = service_type + "." + domain + ".";
+    	listeners.add(service);
+    	// add to currently established interfaces
+    	jmmdns.addServiceListener(service, this);
+    }
+    
+    /**
+     * Function stub (will implement later).
+     */
+    public void removeListener() {}
+    
+    public void addService(String service_type, String domain, int port, String description) {
+    	
+    }
     /**
      * If you try calling this immediately after a service added callback
      * occured, you probably wont see anything - it needs some time to resolve.
@@ -75,7 +92,9 @@ public class Browser implements ServiceListener, ServiceTypeListener, NetworkTop
 		System.out.printf("[+] NetworkInterface: %s\n", event.getInetAddress().getHostAddress());
         try {
         	event.getDNS().addServiceTypeListener(this);
-        	event.getDNS().addServiceListener(service_type, this);
+        	for(String service : listeners ) {
+            	event.getDNS().addServiceListener(service, this);
+        	}
         	System.out.printf("Publishing Service on %s:\n",event.getInetAddress().getHostAddress());
         	System.out.printf("  Name   : %s\n", service_info.getName() );
         	System.out.printf("  Type   : %s\n", service_info.getType() );
@@ -137,7 +156,7 @@ public class Browser implements ServiceListener, ServiceTypeListener, NetworkTop
 	 * Main 
 	 ************************************************************************/
     public static void main(String argv[]) throws IOException {
-        Browser browser = new Browser(JmmDNS.Factory.getInstance());
+        Zeroconf browser = new Zeroconf();
 		try {
     		Thread.sleep(1000L);
 	    } catch (InterruptedException e) { e.printStackTrace(); }

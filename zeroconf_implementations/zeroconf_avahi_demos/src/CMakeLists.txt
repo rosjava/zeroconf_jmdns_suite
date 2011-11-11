@@ -15,4 +15,4 @@ rosbuild_add_executable(demo_zeroconf_api demo_zeroconf_api.cpp)
 # Need to rewrite the library without ros msg/srv's to do this
 #add_definitions(-DZEROCONF_DEBUG)
 #add_executable(demo_zeroconf_api demo_zeroconf_api.cpp)
-#target_link_libraries(demo_zeroconf_api zeroconf_avahi) 
+#target_link_libraries(demo_zeroconf_api zeroconf_avahi)

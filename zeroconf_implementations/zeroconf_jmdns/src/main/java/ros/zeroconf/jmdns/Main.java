@@ -16,7 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-package src.main.java.zeroconf.jmdns;
+package ros.zeroconf.jmdns;
 
 import java.io.IOException;
 import java.util.Enumeration;
@@ -54,7 +54,7 @@ public class Main {
         }
 
 		if ((argc == 0) || ((argc >= 1) && "-browse".equals(argv[0]))) {
-			Browser.main(argv);
+			Zeroconf.main(argv);
         } else if (!debug) {
             System.out.println();
             System.out.println("jmdns:");

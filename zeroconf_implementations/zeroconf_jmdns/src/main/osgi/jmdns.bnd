@@ -5,7 +5,7 @@ Bundle-Name: jmdns
 Bundle-SymbolicName: javax.jmdns
 Bundle-Version: ${bundle.version}
 
-Export-Package: javax.jmdns.*, org.ros.*
+Export-Package: javax.jmdns.*, ros.zeroconf.jmdns.*
 Import-Package: *
 
-Main-Class: org.ros.jmdns.Main
+Main-Class: ros.zeroconf.jmdns.Main
