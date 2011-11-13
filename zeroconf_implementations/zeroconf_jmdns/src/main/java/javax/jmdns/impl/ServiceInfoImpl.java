@@ -873,12 +873,26 @@ public class ServiceInfoImpl extends ServiceInfo implements DNSListener, DNSStat
             boolean serviceUpdated = false;
             switch (rec.getRecordType()) {
                 case TYPE_A: // IPv4
+//                	try {
+//                		System.out.printf("UpdateRecord:\n  jmdns: %s\n  type ipv4\n  name: %s [%s]\n  Address: %s\n", 
+//                				this.getDns().getInetAddress().getHostAddress(),
+//                				rec.getName(), this.getServer(),           				
+//                				((Inet4Address) ((DNSRecord.Address) rec).getAddress()).getHostAddress()
+//                				);
+//                	} catch (IOException e) {} 
                     if (rec.getName().equalsIgnoreCase(this.getServer())) {
                         _ipv4Addresses.add((Inet4Address) ((DNSRecord.Address) rec).getAddress());
                         serviceUpdated = true;
                     }
                     break;
                 case TYPE_AAAA: // IPv6
+//                	try {
+//                		System.out.printf("UpdateRecord:\n  jmdns: %s\n  type ipv6\n  name: %s [%s]\n  Address: %s\n", 
+//                				this.getDns().getInetAddress().getHostAddress(),
+//                				rec.getName(), this.getServer(),           				
+//                				((Inet6Address) ((DNSRecord.Address) rec).getAddress()).getHostAddress()
+//                				);
+//                	} catch (IOException e) {} 
                     if (rec.getName().equalsIgnoreCase(this.getServer())) {
                         _ipv6Addresses.add((Inet6Address) ((DNSRecord.Address) rec).getAddress());
                         serviceUpdated = true;
@@ -887,8 +901,17 @@ public class ServiceInfoImpl extends ServiceInfo implements DNSListener, DNSStat
                 case TYPE_SRV:
                     if (rec.getName().equalsIgnoreCase(this.getQualifiedName())) {
                         DNSRecord.Service srv = (DNSRecord.Service) rec;
-                        boolean serverChanged = (_server == null) || !_server.equalsIgnoreCase(srv.getServer());
-                        _server = srv.getServer();
+                        // don't trust srv.getServer (comes from DNSIncoming)
+                        // boolean serverChanged = (_server == null) || !_server.equalsIgnoreCase(srv.getServer());
+                        //_server = srv.getServer();
+                        boolean serverChanged = (_server == null) || !_server.equalsIgnoreCase(this.getDns().getHostName());
+                        _server = this.getDns().getHostName();
+//                    	try {
+//                    		System.out.printf("UpdateRecord:\n  jmdns: %s\n  type srv\n  server: %s\n", 
+//	                    				this.getDns().getInetAddress().getHostAddress(),
+//	                    				srv.getServer()                				
+//	                    				);
+//                    	} catch (IOException e) {} 
                         _port = srv.getPort();
                         _weight = srv.getWeight();
                         _priority = srv.getPriority();
@@ -905,6 +928,13 @@ public class ServiceInfoImpl extends ServiceInfo implements DNSListener, DNSStat
                         } else {
                             serviceUpdated = true;
                         }
+                    } else {
+                    	try {
+                    		System.out.printf("UpdateRecord:\n  jmdns: %s\n  type srv\n  name: %s [%s]\n", 
+	                    				this.getDns().getInetAddress().getHostAddress(),
+	                    				rec.getName(), this.getQualifiedName() 
+	                    				);
+                    	} catch (IOException e) {} 
                     }
                     break;
                 case TYPE_TXT:
@@ -1105,9 +1135,11 @@ public class ServiceInfoImpl extends ServiceInfo implements DNSListener, DNSStat
      */
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof ServiceInfoImpl) && getQualifiedName().equals(((ServiceInfoImpl) obj).getQualifiedName());
+        return (obj instanceof ServiceInfoImpl) && 
+        		getQualifiedName().equals(((ServiceInfoImpl) obj).getQualifiedName()
+        	);
     }
-
+    
     /**
      * {@inheritDoc}
      */

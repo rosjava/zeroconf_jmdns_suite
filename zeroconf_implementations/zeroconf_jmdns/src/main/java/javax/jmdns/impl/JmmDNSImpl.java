@@ -295,11 +295,12 @@ public class JmmDNSImpl implements JmmDNS, NetworkTopologyListener, ServiceInfoI
     @Override
     public void addServiceListener(String type, ServiceListener listener) {
         for (JmDNS mDNS : _knownMDNS.values()) {
-        	System.out.println("Adding listener:");
-		    System.out.printf("  Service type: %s\n", type);
-		    System.out.printf("  mDNS Name   : %s\n", mDNS.getName());
 	    	try {
-	    		System.out.printf("  mDNS Address: %s\n", mDNS.getInetAddress().getHostAddress());
+	        	System.out.println("Adding listener:");
+			    System.out.printf("  Service type  : %s\n", type);
+			    System.out.printf("  mDNS Name     : %s\n", mDNS.getName());
+			    System.out.printf("  mDNS Localhost: %s\n", mDNS.getHostName());
+	    		System.out.printf("  mDNS Address  : %s\n", mDNS.getInetAddress().getHostAddress());
 		    } catch (IOException e) {
 		        e.printStackTrace();
 		    }
@@ -408,16 +409,46 @@ public class JmmDNSImpl implements JmmDNS, NetworkTopologyListener, ServiceInfoI
     @Override
     public ServiceInfo[] list(final String type, final long timeout) {
         // We need to run this in parallel to respect the timeout.
-        final Set<ServiceInfo> result = Collections.synchronizedSet(new HashSet<ServiceInfo>(_knownMDNS.size() * 5));
+ 
+    	// The .equals for ServiceInfo only compares qualified names, no good for resolved 
+    	// service info comparison here.
+        //final Set<ServiceInfo> result = Collections.synchronizedSet(new HashSet<ServiceInfo>(_knownMDNS.size() * 5));
+    	final List<ServiceInfo> result = new ArrayList<ServiceInfo>(_knownMDNS.size() * 5);
+    	
         ExecutorService executor = Executors.newCachedThreadPool();
         for (final JmDNS mDNS : _knownMDNS.values()) {
+        	List<ServiceInfo> single_mdns_list = new ArrayList<ServiceInfo>();
+        	// try {
+        		// System.out.printf("jmmdns.list(): %s\n",mDNS.getInetAddress().getHostAddress());
+            	for (ServiceInfo service_info : Arrays.asList(mDNS.list(type, timeout)) ) {
+            		boolean duplicate = false;
+            		for ( ServiceInfo existing_service_info : single_mdns_list ) {
+            			if ( ( existing_service_info.getQualifiedName().equals(service_info.getQualifiedName() ) ) &&
+            				 ( existing_service_info.getPort() == service_info.getPort() ) &&
+            				 ( Arrays.equals(existing_service_info.getInetAddresses(),service_info.getInetAddresses()) ) 
+            			   ) {
+            				// System.out.println("  jmmdns.list(): found duplicate service info");
+            				duplicate = true;
+            			}
+            		}
+            		if ( !duplicate ) {
+            			// System.out.printf("  Service: %s\n", service_info.getQualifiedName());
+            			// for ( int i = 0; i < service_info.getInetAddresses().length; ++i ) {
+            			// System.out.printf("    Address: %s\n", service_info.getInetAddresses()[i].getHostAddress() );
+            			// }
+                    	single_mdns_list.add(service_info);
+            		}
+            	}
+            // } catch (IOException exception) {}
+        	final List<ServiceInfo> service_list = new ArrayList<ServiceInfo>(single_mdns_list);
             executor.submit(new Runnable() {
                 /**
                  * {@inheritDoc}
                  */
                 @Override
                 public void run() {
-                    result.addAll(Arrays.asList(mDNS.list(type, timeout)));
+                    //result.addAll(Arrays.asList(mDNS.list(type, timeout)));
+                    result.addAll(service_list);
                 }
             });
         }
