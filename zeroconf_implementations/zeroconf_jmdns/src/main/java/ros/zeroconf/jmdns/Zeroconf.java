@@ -85,12 +85,12 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
         // https://sourceforge.net/tracker/?func=detail&aid=3435220&group_id=93852&atid=605791
         // services.add(ServiceInfo.create(service_type, service_name, service_port, 0, 0, true, text));
     }
+    
     /**
      * If you try calling this immediately after a service added callback
      * occurred, you probably wont see anything - it needs some time to resolve.
      */
     public void listDiscoveredServices() {
-
     	for(String service : listeners ) {
 	        ServiceInfo[] service_infos = this.jmmdns.list(service);
 	        for ( int i = 0; i < service_infos.length; i++ ) {
@@ -98,6 +98,17 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
 	        }
     	}
     }
+    
+    /**
+     * This should be called when your application shuts down to remove all services
+     * so you don't pollute the zeroconf namespace with hanging, unresolvable services. 
+     */
+    public void removeAllServices() {
+    	System.out.printf("Removing all services\n");
+    	jmmdns.unregisterAllServices();
+    	services.clear();
+    }
+    
     public void display(ServiceInfo service_info) {
     	System.out.println("Service Info:");
     	System.out.printf("  Name   : %s\n", service_info.getName() );
@@ -214,7 +225,7 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
 		    }
     		++i;
     		if ( i == 8 ) {
-//    	        publisher.removeService("DudeMaster", "_ros-master._tcp", "local", 8888, "Dude's test master");
+    			publisher.removeAllServices();
     		}
         }
     }
