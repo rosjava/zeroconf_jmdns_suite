@@ -22,7 +22,7 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     Set<String> listeners;
     Set<ServiceInfo> services;
 
-    Zeroconf() {
+    public Zeroconf() {
     	/********************
     	 * Variables
     	 *******************/
@@ -78,11 +78,21 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
      */
     public void addService(String name, String type, String domain, int port, String description) {
     	String full_service_type = type + "." + domain + ".";
+    	System.out.printf("Registering service: %s\n", full_service_type);
         String service_key = "description"; // Max 9 chars
         String text = "Hypothetical ros master";
         HashMap<String, byte[]> properties = new HashMap<String, byte[]>();
         properties.put(service_key, text.getBytes());
-        services.add(ServiceInfo.create(full_service_type, name, port, 0, 0, true, properties));
+        ServiceInfo service_info = ServiceInfo.create(full_service_type, name, port, 0, 0, true, properties);
+        // we need much better logic here to handle duplications.
+        if ( services.add(service_info) ) {
+        	try {
+        		jmmdns.registerService(service_info);
+            } catch (IOException e) {
+    	        e.printStackTrace();
+            }
+        }
+        
         // this is broken - it adds it, but fails to resolve it on other systems
         // https://sourceforge.net/tracker/?func=detail&aid=3435220&group_id=93852&atid=605791
         // services.add(ServiceInfo.create(service_type, service_name, service_port, 0, 0, true, text));
