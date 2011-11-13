@@ -137,6 +137,11 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     	}
     }
     
+    public void shutdown() throws IOException {
+    	removeAllServices();
+    	jmmdns.close();
+    }
+    
 	/*************************************************************************
 	 * Network Topology Callbacks 
 	 ************************************************************************/
@@ -229,8 +234,7 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     		++i;
         }
         browser.removeListener("_ros-master._tcp","local");
-        System.out.println("Done");
-        browser.jmmdns.close();
+        browser.shutdown();
     }
     
     public static void main_publisher(String argv[]) throws IOException {
