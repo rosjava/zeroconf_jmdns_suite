@@ -12,6 +12,10 @@
     Doesn't work with sdk tools v15
     <depend package="appmanandroid"/> 
   -->
+  <rosdep name="ant" />
+  <rosdep name="java" />
+  
+  <depend package="zeroconf_jmdns"/>
   <export>
     <rosjava-android-lib target="android-13"/>
     <rosjava-src location="src" />

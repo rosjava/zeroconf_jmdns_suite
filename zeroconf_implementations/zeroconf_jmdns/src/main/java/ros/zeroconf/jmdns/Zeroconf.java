@@ -33,6 +33,7 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     	/********************
     	 * Methods
     	 *******************/
+        // be nice to get rid of this completely - and have it in the jmdns library itself.
         this.jmmdns.addNetworkTopologyListener(this);
     }
     
@@ -48,7 +49,7 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     }
     
     /**
-     * Function stub (will implement later).
+     * Removes a single listener - though we're not likely to use this much.
      */
     public void removeListener(String service_type, String domain) {
     	String listener_to_remove = service_type + "." + domain + ".";
@@ -62,11 +63,12 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
 				break;
     		}
     	}
-//    	for(String listener : listeners ) {
-//    	}
     }
     /**
      * Publish a zeroconf service.
+     * 
+     * Should actually provide a return value here, so the user can see the
+     * actually published name.
      * 
      * @param name : english readable name for the service
      * @param type : zeroconf service type, e.g. _ros-master._tcp

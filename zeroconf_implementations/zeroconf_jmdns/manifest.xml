@@ -8,6 +8,10 @@
   <license>BSD</license>
   <review status="3rdparty" notes=""/>
   <url>http://jmdns.sourceforge.net/</url>
+  
+  <rosdep name="ant" />
+  <rosdep name="java" />
+
   <export>
     <rosjava-src location="src/main/java" />
     <rosjava-pathelement location="build" groupId="javax.jmdns" artifactId="jmdns" version="3.4.2" built="true" />

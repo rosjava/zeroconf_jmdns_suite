@@ -25,8 +25,6 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-import javax.jmdns.JmmDNS;
-
 /**
  * Main sample program for JmDNS.
  *

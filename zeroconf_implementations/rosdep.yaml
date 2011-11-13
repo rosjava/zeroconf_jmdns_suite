@@ -1,5 +1,12 @@
-python-avahi:
-  ubuntu: python-avahi
-
-avahi:
-  ubuntu: avahi-daemon libavahi-client-dev libavahi-core-dev
+java:
+  ubuntu: openjdk-6-jdk
+  debian: openjdk-6-jdk
+  arch: openjdk6
+  macports: |
+  gentoo: dev-java/sun-jdk
+  freebsd: openjdk6
+ant:
+  ubuntu: 
+    '10.04': ant1.8
+    '10.10': ant
+    '11.04': ant
