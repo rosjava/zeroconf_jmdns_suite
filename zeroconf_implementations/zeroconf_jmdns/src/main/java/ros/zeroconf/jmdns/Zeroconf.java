@@ -41,20 +41,33 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
 	 ************************************************************************/
     public void addListener(String service_type, String domain) {
     	String service = service_type + "." + domain + ".";
-    	System.out.printf("Adding listener to the set: %s\n",service);
+    	System.out.printf("Activating listener: %s\n",service);
     	listeners.add(service);
     	// add to currently established interfaces
-    	System.out.printf("Adding listener to jmmdns: %s\n",service);
     	jmmdns.addServiceListener(service, this);
     }
     
     /**
      * Function stub (will implement later).
      */
-    public void removeListener() {}
+    public void removeListener(String service_type, String domain) {
+    	String listener_to_remove = service_type + "." + domain + ".";
+    	for ( Iterator<String> listener = listeners.iterator(); listener.hasNext(); ) {
+    		String this_listener = listener.next().toString();
+    		if ( this_listener.equals(listener_to_remove) ) { 
+    	    	System.out.printf("Deactivating listener: %s\n",this_listener);
+    	    	listener.remove();
+    	    	// remove from currently established interfaces
+				jmmdns.removeServiceListener(listener_to_remove, this);
+				break;
+    		}
+    	}
+//    	for(String listener : listeners ) {
+//    	}
+    }
     /**
      * Publish a zeroconf service.
-     *  
+     * 
      * @param name : english readable name for the service
      * @param type : zeroconf service type, e.g. _ros-master._tcp
      * @param domain : domain to advertise on (usually 'local')
@@ -68,17 +81,22 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
         HashMap<String, byte[]> properties = new HashMap<String, byte[]>();
         properties.put(service_key, text.getBytes());
         services.add(ServiceInfo.create(full_service_type, name, port, 0, 0, true, properties));
-//        services.add(ServiceInfo.create(service_type, service_name, service_port, 0, 0, true, text));
+        // this is broken - it adds it, but fails to resolve it on other systems
+        // https://sourceforge.net/tracker/?func=detail&aid=3435220&group_id=93852&atid=605791
+        // services.add(ServiceInfo.create(service_type, service_name, service_port, 0, 0, true, text));
     }
     /**
      * If you try calling this immediately after a service added callback
      * occurred, you probably wont see anything - it needs some time to resolve.
      */
     public void listDiscoveredServices() {
-        ServiceInfo[] service_infos = this.jmmdns.list(service_type);
-        for ( int i = 0; i < service_infos.length; i++ ) {
-        	display(service_infos[i]);
-        }
+
+    	for(String service : listeners ) {
+	        ServiceInfo[] service_infos = this.jmmdns.list(service);
+	        for ( int i = 0; i < service_infos.length; i++ ) {
+	        	display(service_infos[i]);
+	        }
+    	}
     }
     public void display(ServiceInfo service_info) {
     	System.out.println("Service Info:");
@@ -96,15 +114,17 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
 		System.out.printf("[+] NetworkInterface: %s\n", event.getInetAddress().getHostAddress());
         try {
         	event.getDNS().addServiceTypeListener(this);
-        	for(String service : listeners ) {
-        		System.out.printf("      Adding service listener '%s'\n",service);
-            	event.getDNS().addServiceListener(service, this);
+        	for(String listener : listeners ) {
+        		System.out.printf("      Adding service listener '%s'\n",listener);
+            	event.getDNS().addServiceListener(listener, this);
         	}
-        	System.out.printf("Publishing Service on %s:\n",event.getInetAddress().getHostAddress());
-        	System.out.printf("  Name   : %s\n", service_info.getName() );
-        	System.out.printf("  Type   : %s\n", service_info.getType() );
-        	System.out.printf("  Port   : %s\n", service_info.getPort() );
-         	//event.getDNS().registerService(service_info.clone()); // if you don't clone it, it falls over badly!
+        	for (ServiceInfo service : services ) {
+            	System.out.printf("Publishing Service on %s:\n",event.getInetAddress().getHostAddress());
+            	System.out.printf("  Name   : %s\n", service.getName() );
+            	System.out.printf("  Type   : %s\n", service.getType() );
+            	System.out.printf("  Port   : %s\n", service.getPort() );
+             	event.getDNS().registerService(service.clone()); // if you don't clone it, it falls over badly!
+        	}
         } catch (IOException e) {
 	        e.printStackTrace();
         }
@@ -113,14 +133,17 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
 	public void inetAddressRemoved(NetworkTopologyEvent event) {
 		System.out.printf("[-] NetworkInterface: %s\n", event.getInetAddress().getHostAddress());
 		event.getDNS().removeServiceTypeListener(this);
-		event.getDNS().removeServiceListener(service_type, this);
-    	System.out.println("Unpublishing Service:");
-    	System.out.printf("  Name   : %s\n", service_info.getName() );
-    	System.out.printf("  Type   : %s\n", service_info.getType() );
-    	System.out.printf("  Port   : %s\n", service_info.getPort() );
-    	//this.jmmdns.unregisterService(service_info);
-    	//this.jmmdns.registerService(service_info);
-    	event.getDNS().unregisterService(service_info); // this may not work because we're cloning it.
+    	for(String listener : listeners ) {
+    		System.out.printf("      Removing service listener '%s'\n",listener);
+    		event.getDNS().removeServiceListener(listener, this);
+    	}
+    	for (ServiceInfo service : services ) {
+	    	System.out.println("Unpublishing Service:");
+	    	System.out.printf("  Name   : %s\n", service.getName() );
+	    	System.out.printf("  Type   : %s\n", service.getType() );
+	    	System.out.printf("  Port   : %s\n", service.getPort() );
+	    	event.getDNS().unregisterService(service); // this may not work because we're cloning it.
+    	}
 	}
     
 	/*************************************************************************
@@ -158,12 +181,13 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
 	/*************************************************************************
 	 * Main 
 	 ************************************************************************/
-    public static void main(String argv[]) throws IOException {
+    public static void main_listener(String argv[]) throws IOException {
         Zeroconf browser = new Zeroconf();
         browser.addListener("_ros-master._tcp","local");
 		try {
     		Thread.sleep(1000L);
 	    } catch (InterruptedException e) { e.printStackTrace(); }
+        int i = 0;
         while(true) {
     		try {
     			browser.listDiscoveredServices();
@@ -171,6 +195,27 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
 		    } catch (InterruptedException e) {
 		        e.printStackTrace();
 		    }
+    		++i;
+    		if ( i == 8 ) {
+    	        browser.removeListener("_ros-master._tcp","local");
+    		}
+        }
+    }
+    
+    public static void main_publisher(String argv[]) throws IOException {
+        Zeroconf publisher = new Zeroconf();
+        publisher.addService("DudeMaster", "_ros-master._tcp", "local", 8888, "Dude's test master");
+        int i = 0;
+        while(true) {
+    		try {
+        		Thread.sleep(1000L);
+		    } catch (InterruptedException e) {
+		        e.printStackTrace();
+		    }
+    		++i;
+    		if ( i == 8 ) {
+//    	        publisher.removeService("DudeMaster", "_ros-master._tcp", "local", 8888, "Dude's test master");
+    		}
         }
     }
 }

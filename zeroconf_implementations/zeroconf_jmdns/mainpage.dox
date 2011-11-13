@@ -5,8 +5,11 @@
 @section Overview
 
 I've checked out the latest sources for the jmdns project and dumped them into a ros package.
+This just compiles the jar library file (not the tools).
 
-This just compiles the jar library file (not the tools). Though feasibly I could add them.
+Currently it serves mostly to help develop the android jmdns package (developing/testing on
+the pc is easier than the android), though feasibly it could be developed to the level of 
+the zeroconf_avahi class.
 
 @section original Original Package
 

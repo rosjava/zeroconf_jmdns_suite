@@ -53,13 +53,16 @@ public class Main {
             debug = true;
         }
 
-		if ((argc == 0) || ((argc >= 1) && "-browse".equals(argv[0]))) {
-			Zeroconf.main(argv);
+		if ((argc == 0) || ((argc >= 1) && "-listener".equals(argv[0]))) {
+			Zeroconf.main_listener(argv);
+		} else if ( "-publisher".equals(argv[0]) ) {
+			Zeroconf.main_publisher(argv);
         } else if (!debug) {
             System.out.println();
             System.out.println("jmdns:");
             System.out.println("     -d                                       - output debugging info");
-            System.out.println("     -browse                                  - GUI browser (default)");
+            System.out.println("     -listener                                  - listens for _ros-master._tcp");
+            System.out.println("     -publisher                                 - publishes a _ros-master._tcp type");
             System.out.println();
             System.exit(1);
         }
