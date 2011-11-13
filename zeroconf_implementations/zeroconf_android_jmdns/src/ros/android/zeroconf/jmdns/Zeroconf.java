@@ -5,6 +5,7 @@ import java.lang.Thread;
 import java.net.Inet4Address;
 import java.util.Iterator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.jmdns.JmmDNS;
@@ -20,31 +21,19 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     JmmDNS jmmdns;
     Set<String> listeners;
     Set<ServiceInfo> services;
-    String service_type;
-    String service_name;                
-    int    service_port;
-    ServiceInfo service_info; // service to be published
 
     Zeroconf() {
     	/********************
     	 * Variables
     	 *******************/
         this.jmmdns = JmmDNS.Factory.getInstance();
-        // publishing and listening details
-        this.service_type = "_ros-master._tcp.local.";
-        // publishing details
-        this.service_name = "RosMaster";
-        this.service_port = 8888;
-        String service_key = "description"; // Max 9 chars
-        String text = "Hypothetical ros master";
-        HashMap<String, byte[]> properties = new HashMap<String, byte[]>();
-        properties.put(service_key, text.getBytes());
-        service_info = ServiceInfo.create(service_type, service_name, service_port, 0, 0, true, properties);
-//        service_info = ServiceInfo.create(service_type, service_name, service_port, 0, 0, true, text);
+        this.listeners = new HashSet<String>();
+        this.services = new HashSet<ServiceInfo>();
 
     	/********************
     	 * Methods
     	 *******************/
+        // be nice to get rid of this completely - and have it in the jmdns library itself.
         this.jmmdns.addNetworkTopologyListener(this);
     }
     
@@ -53,29 +42,75 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
 	 ************************************************************************/
     public void addListener(String service_type, String domain) {
     	String service = service_type + "." + domain + ".";
+    	System.out.printf("Activating listener: %s\n",service);
     	listeners.add(service);
     	// add to currently established interfaces
     	jmmdns.addServiceListener(service, this);
     }
     
     /**
-     * Function stub (will implement later).
+     * Removes a single listener - though we're not likely to use this much.
      */
-    public void removeListener() {}
-    
-    public void addService(String service_type, String domain, int port, String description) {
-    	
+    public void removeListener(String service_type, String domain) {
+    	String listener_to_remove = service_type + "." + domain + ".";
+    	for ( Iterator<String> listener = listeners.iterator(); listener.hasNext(); ) {
+    		String this_listener = listener.next().toString();
+    		if ( this_listener.equals(listener_to_remove) ) { 
+    	    	System.out.printf("Deactivating listener: %s\n",this_listener);
+    	    	listener.remove();
+    	    	// remove from currently established interfaces
+				jmmdns.removeServiceListener(listener_to_remove, this);
+				break;
+    		}
+    	}
     }
     /**
+     * Publish a zeroconf service.
+     * 
+     * Should actually provide a return value here, so the user can see the
+     * actually published name.
+     * 
+     * @param name : english readable name for the service
+     * @param type : zeroconf service type, e.g. _ros-master._tcp
+     * @param domain : domain to advertise on (usually 'local')
+     * @param port : port number
+     * @param description : 
+     */
+    public void addService(String name, String type, String domain, int port, String description) {
+    	String full_service_type = type + "." + domain + ".";
+        String service_key = "description"; // Max 9 chars
+        String text = "Hypothetical ros master";
+        HashMap<String, byte[]> properties = new HashMap<String, byte[]>();
+        properties.put(service_key, text.getBytes());
+        services.add(ServiceInfo.create(full_service_type, name, port, 0, 0, true, properties));
+        // this is broken - it adds it, but fails to resolve it on other systems
+        // https://sourceforge.net/tracker/?func=detail&aid=3435220&group_id=93852&atid=605791
+        // services.add(ServiceInfo.create(service_type, service_name, service_port, 0, 0, true, text));
+    }
+    
+    /**
      * If you try calling this immediately after a service added callback
-     * occured, you probably wont see anything - it needs some time to resolve.
+     * occurred, you probably wont see anything - it needs some time to resolve.
      */
     public void listDiscoveredServices() {
-        ServiceInfo[] service_infos = this.jmmdns.list(service_type);
-        for ( int i = 0; i < service_infos.length; i++ ) {
-        	display(service_infos[i]);
-        }
+    	for(String service : listeners ) {
+	        ServiceInfo[] service_infos = this.jmmdns.list(service);
+	        for ( int i = 0; i < service_infos.length; i++ ) {
+	        	display(service_infos[i]);
+	        }
+    	}
     }
+    
+    /**
+     * This should be called when your application shuts down to remove all services
+     * so you don't pollute the zeroconf namespace with hanging, unresolvable services. 
+     */
+    public void removeAllServices() {
+    	System.out.printf("Removing all services\n");
+    	jmmdns.unregisterAllServices();
+    	services.clear();
+    }
+    
     public void display(ServiceInfo service_info) {
     	System.out.println("Service Info:");
     	System.out.printf("  Name   : %s\n", service_info.getName() );
@@ -92,16 +127,17 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
 		System.out.printf("[+] NetworkInterface: %s\n", event.getInetAddress().getHostAddress());
         try {
         	event.getDNS().addServiceTypeListener(this);
-        	for(String service : listeners ) {
-            	event.getDNS().addServiceListener(service, this);
+        	for(String listener : listeners ) {
+        		System.out.printf("      Adding service listener '%s'\n",listener);
+            	event.getDNS().addServiceListener(listener, this);
         	}
-        	System.out.printf("Publishing Service on %s:\n",event.getInetAddress().getHostAddress());
-        	System.out.printf("  Name   : %s\n", service_info.getName() );
-        	System.out.printf("  Type   : %s\n", service_info.getType() );
-        	System.out.printf("  Port   : %s\n", service_info.getPort() );
-//        	this.jmmdns.unregisterService(service_info);
-//        	this.jmmdns.registerService(service_info);
-         	event.getDNS().registerService(service_info.clone()); // if you don't clone it, it falls over badly!
+        	for (ServiceInfo service : services ) {
+            	System.out.printf("Publishing Service on %s:\n",event.getInetAddress().getHostAddress());
+            	System.out.printf("  Name   : %s\n", service.getName() );
+            	System.out.printf("  Type   : %s\n", service.getType() );
+            	System.out.printf("  Port   : %s\n", service.getPort() );
+             	event.getDNS().registerService(service.clone()); // if you don't clone it, it falls over badly!
+        	}
         } catch (IOException e) {
 	        e.printStackTrace();
         }
@@ -110,14 +146,17 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
 	public void inetAddressRemoved(NetworkTopologyEvent event) {
 		System.out.printf("[-] NetworkInterface: %s\n", event.getInetAddress().getHostAddress());
 		event.getDNS().removeServiceTypeListener(this);
-		event.getDNS().removeServiceListener(service_type, this);
-    	System.out.println("Unpublishing Service:");
-    	System.out.printf("  Name   : %s\n", service_info.getName() );
-    	System.out.printf("  Type   : %s\n", service_info.getType() );
-    	System.out.printf("  Port   : %s\n", service_info.getPort() );
-    	//this.jmmdns.unregisterService(service_info);
-    	//this.jmmdns.registerService(service_info);
-    	event.getDNS().unregisterService(service_info); // this may not work because we're cloning it.
+    	for(String listener : listeners ) {
+    		System.out.printf("      Removing service listener '%s'\n",listener);
+    		event.getDNS().removeServiceListener(listener, this);
+    	}
+    	for (ServiceInfo service : services ) {
+	    	System.out.println("Unpublishing Service:");
+	    	System.out.printf("  Name   : %s\n", service.getName() );
+	    	System.out.printf("  Type   : %s\n", service.getType() );
+	    	System.out.printf("  Port   : %s\n", service.getPort() );
+	    	event.getDNS().unregisterService(service); // this may not work because we're cloning it.
+    	}
 	}
     
 	/*************************************************************************
@@ -155,11 +194,13 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
 	/*************************************************************************
 	 * Main 
 	 ************************************************************************/
-    public static void main(String argv[]) throws IOException {
+    public static void main_listener(String argv[]) throws IOException {
         Zeroconf browser = new Zeroconf();
+        browser.addListener("_ros-master._tcp","local");
 		try {
     		Thread.sleep(1000L);
 	    } catch (InterruptedException e) { e.printStackTrace(); }
+        int i = 0;
         while(true) {
     		try {
     			browser.listDiscoveredServices();
@@ -167,6 +208,27 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
 		    } catch (InterruptedException e) {
 		        e.printStackTrace();
 		    }
+    		++i;
+    		if ( i == 8 ) {
+    	        browser.removeListener("_ros-master._tcp","local");
+    		}
+        }
+    }
+    
+    public static void main_publisher(String argv[]) throws IOException {
+        Zeroconf publisher = new Zeroconf();
+        publisher.addService("DudeMaster", "_ros-master._tcp", "local", 8888, "Dude's test master");
+        int i = 0;
+        while(true) {
+    		try {
+        		Thread.sleep(1000L);
+		    } catch (InterruptedException e) {
+		        e.printStackTrace();
+		    }
+    		++i;
+    		if ( i == 8 ) {
+    			publisher.removeAllServices();
+    		}
         }
     }
 }

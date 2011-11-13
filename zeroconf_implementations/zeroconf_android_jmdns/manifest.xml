@@ -14,8 +14,11 @@
   -->
   <rosdep name="ant" />
   <rosdep name="java" />
-  
+
+  <!-- No real way to pull the classes in from here that I know of 
   <depend package="zeroconf_jmdns"/>
+   -->
+   
   <export>
     <rosjava-android-lib target="android-13"/>
     <rosjava-src location="src" />
