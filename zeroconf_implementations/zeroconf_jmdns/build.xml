@@ -1,5 +1,5 @@
 <!-- Build the Fulfillment stuff -->
-<project name="jmdns" default="default" basedir=".">
+<project name="zeroconf_jmdns" default="default" basedir=".">
 	
     <!-- Ros Variables -->
     <property file="ros.properties" />
