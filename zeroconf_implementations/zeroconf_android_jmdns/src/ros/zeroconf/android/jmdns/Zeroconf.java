@@ -1,11 +1,14 @@
-package ros.android.zeroconf.jmdns;
+package ros.zeroconf.android.jmdns;
 
 import java.io.IOException;
 import java.lang.Thread;
 import java.net.Inet4Address;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Set;
 
 import javax.jmdns.JmmDNS;
@@ -101,14 +104,17 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     /**
      * If you try calling this immediately after a service added callback
      * occurred, you probably wont see anything - it needs some time to resolve.
+     * 
+     * It will block if it needs to resolve services (and aren't in its cache yet).
+     * 
+     * @return service_infos : an array of discovered ServiceInfo objects.
      */
-    public void listDiscoveredServices() {
+    public List<ServiceInfo> listDiscoveredServices() {
+    	List<ServiceInfo> service_infos = new ArrayList<ServiceInfo>();;
     	for(String service : listeners ) {
-	        ServiceInfo[] service_infos = this.jmmdns.list(service);
-	        for ( int i = 0; i < service_infos.length; i++ ) {
-	        	display(service_infos[i]);
-	        }
+	        service_infos.addAll(Arrays.asList(this.jmmdns.list(service)));
     	}
+        return service_infos;
     }
     
     /**
@@ -125,9 +131,15 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     	System.out.println("Service Info:");
     	System.out.printf("  Name   : %s\n", service_info.getName() );
     	System.out.printf("  Type   : %s\n", service_info.getType() );
+    	System.out.printf("  Port   : %s\n", service_info.getPort() );
     	for ( int i = 0; i < service_info.getInetAddresses().length; ++i ) {
         	System.out.printf("  Address: %s\n", service_info.getInetAddresses()[i].getHostAddress() );
     	}
+    }
+    
+    public void shutdown() throws IOException {
+    	removeAllServices();
+    	jmmdns.close();
     }
     
 	/*************************************************************************
@@ -174,8 +186,8 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
 	 ************************************************************************/
     @Override
     public void serviceAdded(ServiceEvent event) {
-        final String name = event.getName();
-        System.out.println("[+] Service         : " + name);
+        final ServiceInfo service_info = event.getInfo();
+        System.out.println("[+] Service         : " + service_info.getQualifiedName());
     }
 
     @Override
@@ -207,22 +219,22 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     public static void main_listener(String argv[]) throws IOException {
         Zeroconf browser = new Zeroconf();
         browser.addListener("_ros-master._tcp","local");
-		try {
-    		Thread.sleep(1000L);
-	    } catch (InterruptedException e) { e.printStackTrace(); }
         int i = 0;
-        while(true) {
+        while( i < 8 ) {
     		try {
-    			browser.listDiscoveredServices();
+    			System.out.println("************ Discovered Services ************");
+    			List<ServiceInfo> service_infos = browser.listDiscoveredServices();
+    			for ( ServiceInfo service_info : service_infos ) {
+	        		browser.display(service_info);
+	        }
         		Thread.sleep(1000L);
 		    } catch (InterruptedException e) {
 		        e.printStackTrace();
 		    }
     		++i;
-    		if ( i == 8 ) {
-    	        browser.removeListener("_ros-master._tcp","local");
-    		}
         }
+        browser.removeListener("_ros-master._tcp","local");
+        browser.shutdown();
     }
     
     public static void main_publisher(String argv[]) throws IOException {

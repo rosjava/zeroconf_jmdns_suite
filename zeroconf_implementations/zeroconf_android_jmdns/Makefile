@@ -9,7 +9,7 @@ update_jmdns:
 	cp -r $(ROSPACK_DIR)/src/main/java/javax/* ./src/javax
 
 update_zeroconf:
-	sed -e 's/ros\.zeroconf/ros\.android\.zeroconf/g' $(ROSPACK_DIR)/src/main/java/ros/zeroconf/jmdns/Zeroconf.java > ./src/ros/android/zeroconf/jmdns/Zeroconf.java
+	sed -e 's/ros\.zeroconf/ros\.zeroconf\.android/g' $(ROSPACK_DIR)/src/main/java/ros/zeroconf/jmdns/Zeroconf.java > ./src/ros/zeroconf/android/jmdns/Zeroconf.java
 
 backdate: backdate_jmdns backdate_zeroconf
 
@@ -17,5 +17,5 @@ backdate_jmdns:
 	cp -r ./src/javax/* $(ROSPACK_DIR)/src/main/java/javax 
 
 backdate_zeroconf:
-	sed -e 's/ros\.android\.zeroconf/ros\.zeroconf/g' ./src/ros/android/zeroconf/jmdns/Zeroconf.java > $(ROSPACK_DIR)/src/main/java/ros/zeroconf/jmdns/Zeroconf.java
+	sed -e 's/ros\.zeroconf\.android/ros\.zeroconf/g' ./src/ros/zeroconf/android/jmdns/Zeroconf.java > $(ROSPACK_DIR)/src/main/java/ros/zeroconf/jmdns/Zeroconf.java
 	

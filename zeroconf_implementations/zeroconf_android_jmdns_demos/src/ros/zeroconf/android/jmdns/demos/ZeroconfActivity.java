@@ -1,4 +1,4 @@
-package ros.android.zeroconf.jmdns.demos;
+package src.ros.zeroconf.android.jmdns.demos;
 
 
 import java.io.IOException;
@@ -7,7 +7,7 @@ import javax.jmdns.JmmDNS;
 import android.app.Activity;
 import android.os.Bundle;
 import android.widget.TextView;
-import ros.android.zeroconf.jmdns.Zeroconf;
+import ros.zeroconf.android.jmdns.Zeroconf;
 
 /**
  * This test does : 
