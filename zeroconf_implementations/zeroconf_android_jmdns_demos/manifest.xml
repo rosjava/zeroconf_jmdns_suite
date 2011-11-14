@@ -11,7 +11,7 @@
   <depend package="zeroconf_android_jmdns"/>
   <export>
     <rosjava-src location="src" />
-    <rosjava-android-app target="android-13" />
+    <rosjava-android-app target="android-10" />
   </export>
 </package>
 
