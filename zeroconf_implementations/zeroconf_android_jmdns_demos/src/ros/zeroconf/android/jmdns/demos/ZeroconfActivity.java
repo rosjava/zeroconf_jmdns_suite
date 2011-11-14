@@ -1,9 +1,12 @@
-package src.ros.zeroconf.android.jmdns.demos;
-
+package ros.zeroconf.android.jmdns.demos;
 
 import java.io.IOException;
 import java.lang.Thread;
+import java.util.List;
+
 import javax.jmdns.JmmDNS;
+import javax.jmdns.ServiceInfo;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.widget.TextView;
@@ -49,7 +52,11 @@ public class ZeroconfActivity extends Activity {
         int i = 0;
         while( i < 10 ) {
     		try {
-    			zeroconf.listDiscoveredServices();
+    			System.out.println("************ Discovered Services ************");
+    			List<ServiceInfo> service_infos = zeroconf.listDiscoveredServices();
+    			for ( ServiceInfo service_info : service_infos ) {
+	        		zeroconf.display(service_info);
+    			}
         		Thread.sleep(1000L);
 		    } catch (InterruptedException e) {
 		        e.printStackTrace();
@@ -64,15 +71,7 @@ public class ZeroconfActivity extends Activity {
     
     @Override
     public void onDestroy() {
-    	System.out.println("*********** Zeroconf Remove All Services **************");
-    	System.out.println("*********** Zeroconf Remove All Services **************");
-    	System.out.println("*********** Zeroconf Remove All Services **************");
-    	System.out.println("*********** Zeroconf Remove All Services **************");
-    	System.out.println("*********** Zeroconf Remove All Services **************");
-    	System.out.println("*********** Zeroconf Remove All Services **************");
-    	System.out.println("*********** Zeroconf Remove All Services **************");
-    	System.out.println("*********** Zeroconf Remove All Services **************");
-    	System.out.println("*********** Zeroconf Remove All Services **************");
+    	System.out.println("*********** Zeroconf Destroy **************");
 		zeroconf.removeAllServices();
 		super.onDestroy();
     }

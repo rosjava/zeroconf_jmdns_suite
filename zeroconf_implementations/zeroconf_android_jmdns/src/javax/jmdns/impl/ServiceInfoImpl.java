@@ -928,13 +928,13 @@ public class ServiceInfoImpl extends ServiceInfo implements DNSListener, DNSStat
                         } else {
                             serviceUpdated = true;
                         }
-                    } else {
-                    	try {
-                    		System.out.printf("UpdateRecord:\n  jmdns: %s\n  type srv\n  name: %s [%s]\n", 
-	                    				this.getDns().getInetAddress().getHostAddress(),
-	                    				rec.getName(), this.getQualifiedName() 
-	                    				);
-                    	} catch (IOException e) {} 
+//                    } else {
+//                    	try {
+//                    		System.out.printf("UpdateRecord:\n  jmdns: %s\n  type srv\n  name: %s [%s]\n", 
+//	                    				this.getDns().getInetAddress().getHostAddress(),
+//	                    				rec.getName(), this.getQualifiedName() 
+//	                    				);
+//                    	} catch (IOException e) {} 
                     }
                     break;
                 case TYPE_TXT:
