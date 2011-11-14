@@ -226,7 +226,7 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     			List<ServiceInfo> service_infos = browser.listDiscoveredServices();
     			for ( ServiceInfo service_info : service_infos ) {
 	        		browser.display(service_info);
-	        }
+    			}
         		Thread.sleep(1000L);
 		    } catch (InterruptedException e) {
 		        e.printStackTrace();
