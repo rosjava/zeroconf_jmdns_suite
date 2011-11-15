@@ -5,8 +5,5 @@
       android:versionName="1.0">
     <application>
     </application>
-    <uses-sdk android:minSdkVersion="10" 
-              android:targetSdkVersion="10"
-              android:maxSdkVersion="14"
-              />
+    <uses-sdk android:minSdkVersion="10"/>
 </manifest>

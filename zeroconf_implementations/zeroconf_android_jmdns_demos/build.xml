@@ -2,6 +2,8 @@
 <project name="zeroconf_android_jmdns_demos" default="debug">
 
     <!-- Properties relevant to the ros build. -->
+    <!-- Properties relevant to the ros build. -->
+    <property file="ros.properties" />
 
     <!-- directories -->
     <property name="pwd" location="."/>
@@ -11,9 +13,9 @@
         <pathelement location="${ros.pkg.android.dir}/library/src"/>
     </path>
 
-
+    <!-- Ros jar dependencies -->
     <mkdir dir="build/libs"/>
-    <echo message="to dir build/libs" />
+    <echo message="copy jar deps -> build/libs" />
     <echo message="${ros.compile.jarfileset}" />
     <copy todir="build/libs" flatten="true">
         <files includes="${ros.compile.jarfileset}" />

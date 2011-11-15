@@ -15,15 +15,13 @@
   <rosdep name="ant" />
   <rosdep name="java" />
 
-  <!-- No real way to pull the classes in from here that I know of 
-   -->
-  <depend package="zeroconf_jmdns"/>
+  <!-- Don't really want to depend on this as it is not android  -->
+  <!-- <depend package="zeroconf_jmdns"/>  -->
    
   <export>
     <rosjava-android-lib target="android-10"/>
-    <!--  Source is actually back in zeroconf_jmdns/src/main/java, this is covered by ant.properties -->
-    <!-- <rosjava-src location="src" /> -->
-    <!-- <rosjava-pathelement location="build" groupId="javax.jmdns" artifactId="android-jmdns" version="3.4.2" built="true" /> -->
+    <rosjava-src location="src" />
+    <!-- <rosjava-pathelement location="bin" groupId="javax.jmdns" artifactId="zeroconf_android_jmdns" version="3.4.2" built="true" />  -->
   </export>
 
 
