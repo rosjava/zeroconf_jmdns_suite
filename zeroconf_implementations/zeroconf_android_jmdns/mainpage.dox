@@ -19,8 +19,6 @@ the ycs dependency creeping in as this will later disappear once rosjava/android
 
 @section Notes
 
-A bit of redundancy here, as its the same sources as in zeroconf_jmdns.
-
-I really should svn download them first in a pre-build command.
+We use the same sources that are found in zeroconf_jmdns (see via a manifest dependency and ant.properties setting).
 
 */

@@ -16,8 +16,8 @@
   <rosdep name="java" />
 
   <!-- No real way to pull the classes in from here that I know of 
-  <depend package="zeroconf_jmdns"/>
    -->
+  <depend package="zeroconf_jmdns"/>
    
   <export>
     <rosjava-android-lib target="android-10"/>
