@@ -21,7 +21,8 @@
    
   <export>
     <rosjava-android-lib target="android-10"/>
-    <rosjava-src location="src" />
+    <!--  Source is actually back in zeroconf_jmdns/src/main/java, this is covered by ant.properties -->
+    <!-- <rosjava-src location="src" /> -->
     <!-- <rosjava-pathelement location="build" groupId="javax.jmdns" artifactId="android-jmdns" version="3.4.2" built="true" /> -->
   </export>
 

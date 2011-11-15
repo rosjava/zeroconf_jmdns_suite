@@ -10,9 +10,8 @@
   <url>http://ros.org/wiki/zeroconf_android_jmdns_demos</url>
   <depend package="zeroconf_android_jmdns"/>
   <export>
+    <rosjava-src location="gen" />
     <rosjava-src location="src" />
     <rosjava-android-app target="android-10" />
   </export>
 </package>
-
-

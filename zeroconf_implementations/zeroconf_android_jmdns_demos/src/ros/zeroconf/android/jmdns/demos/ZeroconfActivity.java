@@ -1,10 +1,8 @@
 package ros.zeroconf.android.jmdns.demos;
 
-import java.io.IOException;
 import java.lang.Thread;
 import java.util.List;
 
-import javax.jmdns.JmmDNS;
 import javax.jmdns.ServiceInfo;
 
 import android.app.Activity;
