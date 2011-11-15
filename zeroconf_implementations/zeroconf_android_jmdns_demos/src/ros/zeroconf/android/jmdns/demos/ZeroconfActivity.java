@@ -10,7 +10,7 @@ import javax.jmdns.ServiceInfo;
 import android.app.Activity;
 import android.os.Bundle;
 import android.widget.TextView;
-import ros.zeroconf.android.jmdns.Zeroconf;
+import ros.zeroconf.jmdns.Zeroconf;
 
 /**
  * This test does : 
