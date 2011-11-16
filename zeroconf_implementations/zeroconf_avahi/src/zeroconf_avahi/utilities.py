@@ -11,7 +11,7 @@ def service_to_str(service):
       String representation of zeroconf announcement 
     '''
     #print service
-    return "\tname: %s\n\ttype: %s [%s]\n\tdomain: %s\n\thostname: %s\n\taddress: %s\n\tport: %d\n\t interface: %d\n\tprotocol: %d\n\tdescription: %s\n\tis_local:%d\n\tour_own: %d\n\twide_area: %d\n\tmulticast: %d" % (
+    return "\tname: %s\n\ttype: %s [%s]\n\tdomain: %s\n\thostname: %s\n\taddress: %s\n\tport: %d\n\tinterface: %d\n\tprotocol: %d\n\tdescription: %s\n\tis_local:%d\n\tour_own: %d\n\twide_area: %d\n\tmulticast: %d" % (
         service.name, 
         service_name(service.type),
         service.type,
