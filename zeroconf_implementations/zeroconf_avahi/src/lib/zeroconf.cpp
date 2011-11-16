@@ -504,11 +504,11 @@ void Zeroconf::discovery_callback(
 					/*********************
 					** Signal
 					**********************/
-		        	// we signal in the resolver, not here...though this might be a bad design
-		        	// decision if the connection is up and down alot.
-		        	// if ( zeroconf->lost_connection_signal ) {
-		        	//     zeroconf->lost_connection_signal(service);
-		        	// }
+		        	// we signal here...though this might get muddled if the connection is up/down alot
+		        	// I haven't road tested this much yet at all.
+		        	if ( zeroconf->lost_connection_signal ) {
+		        	     zeroconf->lost_connection_signal(service);
+		        	}
 				} else {
 					ROS_ERROR_STREAM("Zeroconf: attempted to remove a non-discovered service (probably a bug in zeroconf_avahi!)");
 				}
