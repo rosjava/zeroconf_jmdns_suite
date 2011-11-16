@@ -10,7 +10,7 @@ def service_to_str(service):
     ''' 
       String representation of zeroconf announcement 
     '''
-    print service
+    #print service
     return "\tname: %s\n\ttype: %s [%s]\n\tdomain: %s\n\thostname: %s\n\taddress: %s\n\tport: %d\n\t interface: %d\n\tprotocol: %d\n\tdescription: %s\n\tis_local:%d\n\tour_own: %d\n\twide_area: %d\n\tmulticast: %d" % (
         service.name, 
         service_name(service.type),
@@ -19,7 +19,7 @@ def service_to_str(service):
         service.hostname, 
         service.address, 
         service.port,
-        service.interface,
+        service.hardware_interface,
         service.protocol,
         service.description,
         service.is_local,
@@ -38,12 +38,10 @@ def same_service(service_one, service_two):
       identifying the service for us (remembering that we're discovering on a particular domain and
       service_type) are:
       
-        service_name, port
+        service_name, port, domain
       
-      Actually, should also check domain here.
-         
     '''
-    if ( service_one.name == service_two.name ) and ( service_one.port == service_two.port ):
+    if ( service_one.name == service_two.name ) and ( service_one.port == service_two.port ) and ( service_one.domain == service_two.domain ):
         return True
     else:
         return False
