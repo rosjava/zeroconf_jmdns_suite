@@ -20,6 +20,7 @@
     <copy todir="src/javax">
         <fileset dir="../zeroconf_jmdns/src/main/java/javax" />
     </copy>
+	<!-- Not actually using anymore, but -->
     <copy todir="src/ros">
         <fileset dir="../zeroconf_jmdns/src/main/java/ros" />
     </copy>
@@ -94,12 +95,12 @@
     <!-- only customising one target here -->
     <target name="clean">
         <echo message="cleaning build, bin and gen" />
-        <delete includeEmptyDirs="true">
-            <fileset dir="build" includes="**"/>
-            <fileset dir="bin" includes="**"/>
-            <fileset dir="gen" includes="**"/>
-            <fileset dir="src" includes="**"/>
-        </delete>
+        <delete dir="build"/>
+        <delete dir="gen"/>
+        <delete dir="bin"/>
+        <delete dir="src/javax"/>
+    	<!-- Not actually using anymore, but -->
+        <delete dir="src/ros/zeroconf/jmdns"/> 
     </target>
 
 	<!-- Causes problems with duplicates

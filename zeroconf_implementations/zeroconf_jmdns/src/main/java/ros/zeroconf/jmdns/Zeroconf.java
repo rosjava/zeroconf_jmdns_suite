@@ -83,9 +83,8 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     	String full_service_type = type + "." + domain + ".";
     	System.out.printf("Registering service: %s\n", full_service_type);
         String service_key = "description"; // Max 9 chars
-        String text = "Hypothetical ros master";
         HashMap<String, byte[]> properties = new HashMap<String, byte[]>();
-        properties.put(service_key, text.getBytes());
+        properties.put(service_key,description.getBytes());
         ServiceInfo service_info = ServiceInfo.create(full_service_type, name, port, 0, 0, true, properties);
         // we need much better logic here to handle duplications.
         if ( services.add(service_info) ) {

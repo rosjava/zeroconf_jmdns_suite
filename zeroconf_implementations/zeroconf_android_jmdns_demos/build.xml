@@ -16,7 +16,7 @@
     <!-- Ros jar dependencies -->
     <mkdir dir="build/libs"/>
     <echo message="copy jar deps -> build/libs" />
-    <echo message="${ros.compile.jarfileset}" />
+    <echo message="Ros compile jarset: ${ros.compile.jarfileset}" />
     <copy todir="build/libs" flatten="true">
         <files includes="${ros.compile.jarfileset}" />
     </copy>
