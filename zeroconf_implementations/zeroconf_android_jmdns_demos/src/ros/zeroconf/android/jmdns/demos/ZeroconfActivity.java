@@ -45,12 +45,13 @@ public class ZeroconfActivity extends Activity {
         
         zeroconf = new Zeroconf();
         
-        System.out.println("*********** Zeroconf Listener Test **************");
+        // adb logcat ros:I *:S
+        android.util.Log.i("ros","*********** Zeroconf Listener Test **************");
         zeroconf.addListener("_ros-master._tcp","local");
         int i = 0;
         while( i < 10 ) {
     		try {
-    			System.out.println("************ Discovered Services ************");
+    	        android.util.Log.i("ros","*********** Discovered Services **************");
     			List<ServiceInfo> service_infos = zeroconf.listDiscoveredServices();
     			for ( ServiceInfo service_info : service_infos ) {
 	        		zeroconf.display(service_info);
@@ -63,14 +64,14 @@ public class ZeroconfActivity extends Activity {
         }
         zeroconf.removeListener("_ros-master._tcp","local");
         
-        System.out.println("*********** Zeroconf Publisher Test **************");
+        android.util.Log.i("ros","*********** Zeroconf Publisher Test **************");
         zeroconf.addService("DudeMaster", "_ros-master._tcp", "local", 8888, "Dude's test master");
     }
     
     @Override
     public void onDestroy() {
-    	System.out.println("*********** Zeroconf Destroy **************");
-		zeroconf.removeAllServices();
+        android.util.Log.i("ros","*********** Zeroconf Destroy **************");
+    	zeroconf.removeAllServices();
 		super.onDestroy();
     }
 }
