@@ -89,9 +89,6 @@
             unless="sdk.dir"
     />
 	
-	<!-- This is epic fail, app projects that use this one are hunting for the original classes.jar -->
-	<!-- <property name="out.library.jar.file" location="${ros.artifact.built}" /> --> 
-	
     <!-- only customising one target here -->
     <target name="clean">
         <echo message="cleaning build, bin and gen" />
@@ -102,13 +99,6 @@
     	<!-- Not actually using anymore, but -->
         <delete dir="src/ros/zeroconf/jmdns"/> 
     </target>
-
-	<!-- Causes problems with duplicates
-	<target name="-post-compile">
-		<echo message="creating ${ros.artifact.built}"/>
-	    <copy file="bin/classes.jar" tofile="${ros.artifact.built}" />
-	</target>
-	-->
 
     <!-- version-tag: custom -->
     <import file="${sdk.dir}/tools/ant/build.xml" />
