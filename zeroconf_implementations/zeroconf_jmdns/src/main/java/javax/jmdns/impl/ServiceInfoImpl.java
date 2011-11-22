@@ -887,10 +887,10 @@ public class ServiceInfoImpl extends ServiceInfo implements DNSListener, DNSStat
                     break;
                 case TYPE_AAAA: // IPv6
 //                	try {
-//                		System.out.printf("UpdateRecord:\n  jmdns: %s\n  type ipv6\n  name: %s [%s]\n  Address: %s\n", 
+//                		System.out.printf("UpdateRecord:\n  jmdns: %s\n  type ipv4\n  name: %s [%s]\n  Address: %s\n", 
 //                				this.getDns().getInetAddress().getHostAddress(),
 //                				rec.getName(), this.getServer(),           				
-//                				((Inet6Address) ((DNSRecord.Address) rec).getAddress()).getHostAddress()
+//                				((Inet4Address) ((DNSRecord.Address) rec).getAddress()).getHostAddress()
 //                				);
 //                	} catch (IOException e) {} 
                     if (rec.getName().equalsIgnoreCase(this.getServer())) {
@@ -899,13 +899,16 @@ public class ServiceInfoImpl extends ServiceInfo implements DNSListener, DNSStat
                     }
                     break;
                 case TYPE_SRV:
+                    // do a git checkout 6e46cc136a95849d2799a857da1ac851046aadb9 to see my first experiment here to solve multi-interface issues
                     if (rec.getName().equalsIgnoreCase(this.getQualifiedName())) {
                         DNSRecord.Service srv = (DNSRecord.Service) rec;
-                        // don't trust srv.getServer (comes from DNSIncoming)
-                        // boolean serverChanged = (_server == null) || !_server.equalsIgnoreCase(srv.getServer());
-                        //_server = srv.getServer();
-                        boolean serverChanged = (_server == null) || !_server.equalsIgnoreCase(this.getDns().getHostName());
-                        _server = this.getDns().getHostName();
+                        // DJS: This is the original jmdns, but it fails on multiple interface pc's.
+                        // Issue: http://sourceforge.net/tracker/?func=detail&aid=3437568&group_id=93852&atid=605791
+                        boolean serverChanged = (_server == null) || !_server.equalsIgnoreCase(srv.getServer());
+                        _server = srv.getServer();
+						// DJS: experimented with the following, but it fails on single interface pc's :/
+                        // boolean serverChanged = (_server == null) || !_server.equalsIgnoreCase(this.getDns().getHostName());
+                        // _server = this.getDns().getHostName();
 //                    	try {
 //                    		System.out.printf("UpdateRecord:\n  jmdns: %s\n  type srv\n  server: %s\n", 
 //	                    				this.getDns().getInetAddress().getHostAddress(),
@@ -928,13 +931,13 @@ public class ServiceInfoImpl extends ServiceInfo implements DNSListener, DNSStat
                         } else {
                             serviceUpdated = true;
                         }
-//                    } else {
-//                    	try {
-//                    		System.out.printf("UpdateRecord:\n  jmdns: %s\n  type srv\n  name: %s [%s]\n", 
-//	                    				this.getDns().getInetAddress().getHostAddress(),
-//	                    				rec.getName(), this.getQualifiedName() 
-//	                    				);
-//                    	} catch (IOException e) {} 
+                    } else { // rec.getName != this.getQualifiedName()
+                    	try {
+                    		System.out.printf("UpdateRecord:\n  jmdns: %s\n  type srv\n  name: %s [%s]\n", 
+	                    				this.getDns().getInetAddress().getHostAddress(),
+	                    				rec.getName(), this.getQualifiedName() 
+	                    				);
+                    	} catch (IOException e) {} 
                     }
                     break;
                 case TYPE_TXT:
@@ -1135,11 +1138,9 @@ public class ServiceInfoImpl extends ServiceInfo implements DNSListener, DNSStat
      */
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof ServiceInfoImpl) && 
-        		getQualifiedName().equals(((ServiceInfoImpl) obj).getQualifiedName()
-        	);
+        return (obj instanceof ServiceInfoImpl) && getQualifiedName().equals(((ServiceInfoImpl) obj).getQualifiedName());
     }
-    
+
     /**
      * {@inheritDoc}
      */
