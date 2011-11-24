@@ -102,45 +102,67 @@ void Zeroconf::spin() {
 }
 
 bool Zeroconf::add_listener(std::string &service_type) {
-	avahi_threaded_poll_lock(threaded_poll);
+	/* Check if we're already listening for it. */
+    {
+		boost::mutex::scoped_lock lock(service_mutex);
+		discovery_bimap::right_iterator browser_iter = discovery_service_types.right.find(service_type);
+		if ( browser_iter != discovery_service_types.right.end() ) {
+			ROS_WARN_STREAM("Zeroconf : already listening for services of type '" << service_type << "'");
+			return false;
+		}
+	}
+
     /* Create the service browser */
 	AvahiServiceBrowser *service_browser = NULL;
+	avahi_threaded_poll_lock(threaded_poll);
     if (!(service_browser = avahi_service_browser_new(client, interface, permitted_protocols, service_type.c_str(), NULL, static_cast<AvahiLookupFlags>(0), Zeroconf::discovery_callback, this))) {
     	ROS_ERROR_STREAM("Zeroconf: failed to create an avahi service browser: " << avahi_strerror(avahi_client_errno(client)) );
         return false;
     }
+	avahi_threaded_poll_unlock(threaded_poll);
+	/* Update the internal data */
     {
 		boost::mutex::scoped_lock lock(service_mutex);
 		discovery_service_types.insert(discovery_bimap::value_type(service_browser,service_type));
 	}
-	avahi_threaded_poll_unlock(threaded_poll);
 	ROS_INFO_STREAM("Zeroconf: added a listener [" << service_type << "]");
 	return true;
 }
 
 bool Zeroconf::remove_listener(const std::string &service_type) {
-	avahi_threaded_poll_lock(threaded_poll);
+	AvahiServiceBrowser *service_browser = NULL;
+
+	/* Check if we're already listening for it. */
     {
 		boost::mutex::scoped_lock lock(service_mutex);
-
-		// browser first - otherwise there is a chance that we'll be calling back on services which have
-		// been removed, but cannot be found in discovered_services
 		discovery_bimap::right_iterator browser_iter = discovery_service_types.right.find(service_type);
-		avahi_service_browser_free(browser_iter->second);
-		discovery_service_types.right.erase(service_type);
-
-		// resolvers second
-		discovered_service_set::iterator iter = discovered_services.begin();
-		while ( iter != discovered_services.end() ) {
-			if ( (*iter)->service.type == service_type ) {
-				discovered_services.erase(iter++);
-			} else {
-				++iter;
+		if ( browser_iter == discovery_service_types.right.end() ) {
+			ROS_WARN_STREAM("Zeroconf : not currently listening for '" << service_type << "', aborting listener removal.");
+			return false;
+		} else {
+			ROS_INFO_STREAM("Zeroconf: removing a listener [" << service_type << "]");
+			service_browser = browser_iter->second;
+			// delete internal browser pointers and storage
+			discovery_service_types.right.erase(browser_iter);
+			// delete internally resolved list
+			discovered_service_set::iterator iter = discovered_services.begin();
+			while ( iter != discovered_services.end() ) {
+				if ( (*iter)->service.type == service_type ) {
+					ROS_INFO_STREAM("Zeroconf: erasing element " << *iter);
+					discovered_services.erase(iter++);
+				} else {
+					ROS_INFO_STREAM("Zeroconf: not erasing element " << *iter);
+					++iter;
+				}
 			}
 		}
 	}
-	avahi_threaded_poll_unlock(threaded_poll);
-	ROS_INFO_STREAM("Zeroconf: removed a listener [" << service_type << "]");
+    /* Remove the avahi browser */
+    if ( service_browser ) {
+        avahi_threaded_poll_lock(threaded_poll);
+		avahi_service_browser_free(service_browser);
+		avahi_threaded_poll_unlock(threaded_poll);
+    }
 	return true;
 }
 /**
@@ -257,14 +279,11 @@ bool Zeroconf::remove_service(const PublishedService &service) {
 
 	AvahiEntryGroup *group = NULL;
 	bool erased = false;
-	avahi_threaded_poll_lock(threaded_poll);
 	{
 		boost::mutex::scoped_lock lock(service_mutex);
 		service_bimap::right_const_iterator iter = established_services.right.find(service);
 		if ( iter != established_services.right.end() ) {
 			group = iter->second;
-			avahi_entry_group_reset(group);
-			avahi_entry_group_free(group);
 			established_services.right.erase( service );
 			erased = true;
 			ROS_INFO_STREAM("Zeroconf: removing service [" << service.name << "][" << service.type << "]");
@@ -272,7 +291,12 @@ bool Zeroconf::remove_service(const PublishedService &service) {
 			ROS_WARN_STREAM("Zeroconf: couldn't remove not currently advertised service [" << service.name << "][" << service.type << "]");
 		}
 	}
-	avahi_threaded_poll_unlock(threaded_poll);
+	if ( group ) {
+		avahi_threaded_poll_lock(threaded_poll);
+		avahi_entry_group_reset(group);
+		avahi_entry_group_free(group);
+		avahi_threaded_poll_unlock(threaded_poll);
+	}
 	return erased;
 }
 /**
