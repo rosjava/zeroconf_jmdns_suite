@@ -286,7 +286,6 @@ bool Zeroconf::remove_service(const PublishedService &service) {
 void Zeroconf::list_discovered_services(const std::string &service_type, std::vector<zeroconf_comms::DiscoveredService> &list) {
 	list.clear();
 	boost::mutex::scoped_lock lock(service_mutex);
-	avahi_threaded_poll_lock(threaded_poll);
 	if ( service_type == "" ) {
 		for ( discovered_service_set::iterator iter = discovered_services.begin(); iter != discovered_services.end(); ++iter) {
 			// ignore services that aren't currently resolved
@@ -304,7 +303,6 @@ void Zeroconf::list_discovered_services(const std::string &service_type, std::ve
 			}
 		}
 	}
-	avahi_threaded_poll_unlock(threaded_poll);
 }
 void Zeroconf::list_published_services(const std::string &service_type, std::vector<zeroconf_comms::PublishedService> &list) {
 	list.clear();
