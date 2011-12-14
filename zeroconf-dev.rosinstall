@@ -3,8 +3,6 @@
  {'svn': {'local-name': 'ros_comm', 'uri': 'https://code.ros.org/svn/ros/stacks/ros_comm/tags/ros_comm-1.6.2'}}, 
  {'hg': {'local-name': 'common_rosdeps', 'version': 'common_rosdeps-0.1.8', 'uri': 'https://kforge.ros.org/common/rosdepcore'}},
  {'hg' : {'local-name': 'rosjava_core', 'version': 'default', 'uri': 'https://rosjava.googlecode.com/hg'}},
- {'hg' : {'local-name': 'android', 'version': 'default', 'uri': 'https://android.rosjava.googlecode.com/hg'}},
- {'git': {'local-name': 'zeroconf', 'version': 'master', 'uri': 'git@github.com:stonier/zeroconf-ros-pkg.git'}},
- {'svn': {'local-name': 'ycs/ycs_tools', 'uri': 'http://svn.yujin.com/ycs/trunk/ycs_tools'}}
+ {'git': {'local-name': 'zeroconf_implementations', 'version': 'master', 'uri': 'git@github.com:stonier/zeroconf_implementations.git'}}
 ]
 
