@@ -11,10 +11,12 @@ well as a ros api (topics and services) where practical.
 * Jmdns : a java (generic) and a customised implementation for android.
 * Bonjour : implementations for windows and apple.
 
+Note that the android code can be found in the separate zeroconf_android stack.
+
 === Status ===
 
  * zeroconf_avahi : pushing to 100% ready.
- * jmdns : first builds
+ * jmdns : running, but rough around the edges.
  * zeroconf_avahi_python : ...
  * zeroconf_avahi_embedded : ...
 
