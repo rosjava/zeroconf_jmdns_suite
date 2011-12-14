@@ -1,8 +1,12 @@
 <stack>
   <description brief="Zeroconf api for ros frameworks">
-  Cnvenient wrappers around platform-dependant implementations whose 
+  Convenient wrappers around platform-dependant implementations whose 
   purpose are both to expose a fairly standard sort of api as well 
   as a ros api (topics and services) where practical.
+  
+  The only implementation it doesn't include is the android (will
+  eventually merge back in here if ubuntu starts officially including
+  adk packages).
   </description>
   <author>Maintained by Daniel Stonier</author>
   <license>BSD</license>  
