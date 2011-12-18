@@ -14,5 +14,6 @@
   <url>http://ros.org/wiki/zeroconf_implementations</url>
   <depend stack="ros" /> <!-- roslib -->
   <depend stack="ros_comm" /> <!-- std_msgs, rospy, roscpp -->
+  <depend stack="rosjava_core" /> <!-- rosjava_bootstrap -->
 
 </stack>

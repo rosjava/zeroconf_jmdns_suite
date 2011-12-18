@@ -4,7 +4,7 @@
     <!-- Ros Variables -->
     <property file="ros.properties" />
     <include file="dependencies.xml" />
-	<property name="jar" location="${ros.artifact.built}"/>
+    <property name="jar" location="${ros.artifact.built}"/>
     <property name="build_root" location="build" />
     <property name="build" location="build/classes" />
     <property name="src" location="src/main/java" />
