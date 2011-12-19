@@ -3,6 +3,13 @@
 	
     <!-- Ros Variables -->
     <property file="ros.properties" />
+    <!-- Old Rosjava Check -->
+    <condition property="old-rosjava">
+        <matches pattern="0.1.0" string="${ros.pkg.rosjava_bootstrap.version}"/>
+    </condition>
+    <!-- do not exit with failure (don't want hudson to worry about it right now) -->
+    <fail message="zeroconf_jmdns does not work with rosjava_core less than 0.2.0...exiting" if="old-rosjava" status="0"/>
+
     <include file="dependencies.xml" />
     <property name="build" location="build" />
     <property name="bin" location="bin" />

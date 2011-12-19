@@ -1,10 +1,36 @@
-[
- {'svn': {'local-name': 'ros', 'uri': 'https://code.ros.org/svn/ros/stacks/ros/tags/ros-1.6.7'}}, 
- {'svn': {'local-name': 'ros_comm', 'uri': 'https://code.ros.org/svn/ros/stacks/ros_comm/tags/ros_comm-1.6.6'}}, 
- {'hg': {'local-name': 'common_rosdeps', 'version': 'common_rosdeps-1.0.2', 'uri': 'https://kforge.ros.org/common/rosdepcore'}},
- {'hg' : {'local-name': 'rosjava_core', 'version': 'default', 'uri': 'https://rosjava.googlecode.com/hg'}},
- {'git': {'local-name': 'zeroconf_implementations', 'version': 'master', 'uri': 'git://github.com/stonier/zeroconf_implementations.git'}},
- {'hg' : {'local-name': 'android', 'version': 'default', 'uri': 'https://android.rosjava.googlecode.com/hg'}},
- {'git': {'local-name': 'zeroconf_android', 'version': 'master', 'uri': 'git://github.com/stonier/zeroconf_android.git'}}
-]
+# Official ros
+- svn: 
+    local-name: ros
+    uri: 'https://code.ros.org/svn/ros/stacks/ros/tags/ros-1.6.7'
+
+- svn: 
+    local-name: ros_comm
+    uri: 'https://code.ros.org/svn/ros/stacks/ros_comm/tags/ros_comm-1.6.6'
+
+- hg: 
+    local-name: common_rosdeps
+    version: common_rosdeps-1.0.2
+    uri: 'https://kforge.ros.org/common/rosdepcore'
+
+# Unofficial ros
+- hg:
+    local-name: rosjava_core
+    version: 0b38795943ae
+    uri: 'https://rosjava.googlecode.com/hg'
+
+- hg:
+    local-name: android
+    version: default
+    uri: 'https://android.rosjava.googlecode.com/hg'
+
+# Zeroconf
+- git:
+    local-name: zeroconf_implementations
+    version: master
+    uri: 'git://github.com/stonier/zeroconf_implementations.git'
+
+- git:
+    local-name: zeroconf_android
+    version: master
+    uri: 'git://github.com/stonier/zeroconf_android.git'
 
