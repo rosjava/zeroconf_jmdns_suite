@@ -51,18 +51,24 @@ public class Main {
             debug = true;
         }
 
-		if ((argc == 0) || ((argc >= 1) && "-listener".equals(argv[0]))) {
+		if (argc == 0) {
+        	Main.usage();
+            System.exit(1);
+		} else if ( (argc >= 1) && "-listener".equals(argv[0])) {
 			Zeroconf.main_listener(argv);
 		} else if ( "-publisher".equals(argv[0]) ) {
 			Zeroconf.main_publisher(argv);
-        } else if (!debug) {
-            System.out.println();
-            System.out.println("jmdns:");
-            System.out.println("     -d                                       - output debugging info");
-            System.out.println("     -listener                                  - listens for _ros-master._tcp");
-            System.out.println("     -publisher                                 - publishes a _ros-master._tcp type");
-            System.out.println();
+        } else {
+        	Main.usage();
             System.exit(1);
         }
+    }
+    public static void usage() {
+        System.out.println();
+        System.out.println("jmdns:");
+        System.out.println("     -d         - output debugging info");
+        System.out.println("     -listener  - listens for _ros-master._tcp");
+        System.out.println("     -publisher - publishes a _ros-master._tcp for 8s");
+        System.out.println();
     }
 }
