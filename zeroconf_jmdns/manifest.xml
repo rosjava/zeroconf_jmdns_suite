@@ -9,7 +9,8 @@
   <review status="3rdparty" notes=""/>
   <url>http://jmdns.sourceforge.net/</url>
 
-  <depend package="rosjava_bootstrap"/>
+  <!-- <depend package="rosjava_bootstrap"/> -->
+  <depend package="rosjava"/>
   <rosdep name="ant" />
   <rosdep name="java" />
 
