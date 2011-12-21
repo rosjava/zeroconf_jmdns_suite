@@ -24,6 +24,7 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     JmmDNS jmmdns;
     Set<String> listeners;
     Set<ServiceInfo> services;
+    ZeroconfLogger logger;
 
     public Zeroconf() {
     	/********************
@@ -32,6 +33,7 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
         this.jmmdns = JmmDNS.Factory.getInstance();
         this.listeners = new HashSet<String>();
         this.services = new HashSet<ServiceInfo>();
+        this.logger = new Logger();
 
     	/********************
     	 * Methods
@@ -39,13 +41,29 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
         // be nice to get rid of this completely - and have it in the jmdns library itself.
         this.jmmdns.addNetworkTopologyListener(this);
     }
-    
+
+    public Zeroconf(ZeroconfLogger logger) {
+    	/********************
+    	 * Variables
+    	 *******************/
+        this.jmmdns = JmmDNS.Factory.getInstance();
+        this.listeners = new HashSet<String>();
+        this.services = new HashSet<ServiceInfo>();
+        this.logger = logger;
+
+    	/********************
+    	 * Methods
+    	 *******************/
+        // be nice to get rid of this completely - and have it in the jmdns library itself.
+        this.jmmdns.addNetworkTopologyListener(this);
+    }
+
 	/*************************************************************************
 	 * User Interface
 	 ************************************************************************/
     public void addListener(String service_type, String domain) {
     	String service = service_type + "." + domain + ".";
-    	System.out.printf("Activating listener: %s\n",service);
+    	logger.println("Activating listener: " + service);
     	listeners.add(service);
     	// add to currently established interfaces
     	jmmdns.addServiceListener(service, this);
@@ -59,7 +77,7 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     	for ( Iterator<String> listener = listeners.iterator(); listener.hasNext(); ) {
     		String this_listener = listener.next().toString();
     		if ( this_listener.equals(listener_to_remove) ) { 
-    	    	System.out.printf("Deactivating listener: %s\n",this_listener);
+    			logger.println("Deactivating listener: " + this_listener);
     	    	listener.remove();
     	    	// remove from currently established interfaces
 				jmmdns.removeServiceListener(listener_to_remove, this);
@@ -81,7 +99,7 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
      */
     public void addService(String name, String type, String domain, int port, String description) {
     	String full_service_type = type + "." + domain + ".";
-    	System.out.printf("Registering service: %s\n", full_service_type);
+    	logger.println("Registering service: " + full_service_type);
         String service_key = "description"; // Max 9 chars
         HashMap<String, byte[]> properties = new HashMap<String, byte[]>();
         properties.put(service_key,description.getBytes());
@@ -121,18 +139,18 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
      * so you don't pollute the zeroconf namespace with hanging, unresolvable services. 
      */
     public void removeAllServices() {
-    	System.out.printf("Removing all services\n");
+    	logger.println("Removing all services");
     	jmmdns.unregisterAllServices();
     	services.clear();
     }
     
     public void display(ServiceInfo service_info) {
-    	System.out.println("Service Info:");
-    	System.out.printf("  Name   : %s\n", service_info.getName() );
-    	System.out.printf("  Type   : %s\n", service_info.getType() );
-    	System.out.printf("  Port   : %s\n", service_info.getPort() );
+    	logger.println("Service Info:");
+    	logger.println("  Name   : " + service_info.getName() );
+    	logger.println("  Type   : " + service_info.getType() );
+    	logger.println("  Port   : " + service_info.getPort() );
     	for ( int i = 0; i < service_info.getInetAddresses().length; ++i ) {
-        	System.out.printf("  Address: %s\n", service_info.getInetAddresses()[i].getHostAddress() );
+        	logger.println("  Address: " + service_info.getInetAddresses()[i].getHostAddress() );
     	}
     }
     
@@ -145,18 +163,18 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
 	 * Network Topology Callbacks 
 	 ************************************************************************/
 	public void inetAddressAdded(NetworkTopologyEvent event) {
-		System.out.printf("[+] NetworkInterface: %s\n", event.getInetAddress().getHostAddress());
+		logger.println("[+] NetworkInterface: " + event.getInetAddress().getHostAddress());
         try {
         	event.getDNS().addServiceTypeListener(this);
         	for(String listener : listeners ) {
-        		System.out.printf("      Adding service listener '%s'\n",listener);
+        		logger.println("      Adding service listener '" + listener + "'");
             	event.getDNS().addServiceListener(listener, this);
         	}
         	for (ServiceInfo service : services ) {
-            	System.out.printf("Publishing Service on %s:\n",event.getInetAddress().getHostAddress());
-            	System.out.printf("  Name   : %s\n", service.getName() );
-            	System.out.printf("  Type   : %s\n", service.getType() );
-            	System.out.printf("  Port   : %s\n", service.getPort() );
+        		logger.println("Publishing Service on " + event.getInetAddress().getHostAddress());
+        		logger.println("  Name   : " + service.getName() );
+        		logger.println("  Type   : " + service.getType() );
+        		logger.println("  Port   : " + service.getPort() );
              	event.getDNS().registerService(service.clone()); // if you don't clone it, it falls over badly!
         	}
         } catch (IOException e) {
@@ -165,17 +183,17 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
 	}
 	
 	public void inetAddressRemoved(NetworkTopologyEvent event) {
-		System.out.printf("[-] NetworkInterface: %s\n", event.getInetAddress().getHostAddress());
+		logger.println("[-] NetworkInterface: " + event.getInetAddress().getHostAddress());
 		event.getDNS().removeServiceTypeListener(this);
     	for(String listener : listeners ) {
-    		System.out.printf("      Removing service listener '%s'\n",listener);
+    		logger.println("      Removing service listener '" + listener + "'");
     		event.getDNS().removeServiceListener(listener, this);
     	}
     	for (ServiceInfo service : services ) {
-	    	System.out.println("Unpublishing Service:");
-	    	System.out.printf("  Name   : %s\n", service.getName() );
-	    	System.out.printf("  Type   : %s\n", service.getType() );
-	    	System.out.printf("  Port   : %s\n", service.getPort() );
+    		logger.println("Unpublishing Service:");
+    		logger.println("  Name   : " + service.getName() );
+    		logger.println("  Type   : " + service.getType() );
+    		logger.println("  Port   : " + service.getPort() );
 	    	event.getDNS().unregisterService(service); // this may not work because we're cloning it.
     	}
 	}
@@ -186,30 +204,30 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     @Override
     public void serviceAdded(ServiceEvent event) {
         final ServiceInfo service_info = event.getInfo();
-        System.out.println("[+] Service         : " + service_info.getQualifiedName());
+        logger.println("[+] Service         : " + service_info.getQualifiedName());
     }
 
     @Override
     public void serviceRemoved(ServiceEvent event) {
         final String name = event.getName();
-        System.out.println("[-] Service         : " + name);
+        logger.println("[-] Service         : " + name);
     }
 
     @Override
     public void serviceResolved(ServiceEvent event) {
         final String name = event.getName();
-        System.out.println("[+] Resolved Service: " + name);
+        logger.println("[+] Resolved Service: " + name);
     }
 
     @Override
     public void serviceTypeAdded(ServiceEvent event) {
 //        final String aType = event.getType();
-//        System.out.println("TYPE: " + aType);
+//        logger.println("TYPE: " + aType);
     }
 
     @Override
     public void subTypeForServiceTypeAdded(ServiceEvent event) {
-//        System.out.println("SUBTYPE: " + event.getType());
+//        logger.println("SUBTYPE: " + event.getType());
     }
 
 	/*************************************************************************
