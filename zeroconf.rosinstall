@@ -19,8 +19,8 @@
     uri: 'https://rosjava.googlecode.com/hg'
 
 - hg:
-    local-name: android
-    version: default
+    local-name: android_core
+    version: c3d92a97d06d
     uri: 'https://android.rosjava.googlecode.com/hg'
 
 # Zeroconf
