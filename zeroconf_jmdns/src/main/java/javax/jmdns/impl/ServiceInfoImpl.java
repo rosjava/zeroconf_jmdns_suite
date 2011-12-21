@@ -933,7 +933,7 @@ public class ServiceInfoImpl extends ServiceInfo implements DNSListener, DNSStat
                         }
                     } else { // rec.getName != this.getQualifiedName()
                     	try {
-                    		System.out.printf("UpdateRecord:\n  jmdns: %s\n  type srv\n  name: %s [%s]\n", 
+                    		//System.out.printf("UpdateRecord:\n  jmdns: %s\n  type srv\n  name: %s [%s]\n", 
 	                    				this.getDns().getInetAddress().getHostAddress(),
 	                    				rec.getName(), this.getQualifiedName() 
 	                    				);
