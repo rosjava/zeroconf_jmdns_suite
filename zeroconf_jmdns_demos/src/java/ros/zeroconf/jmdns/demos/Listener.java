@@ -12,17 +12,15 @@ import javax.jmdns.ServiceInfo;
 public class Listener implements ZeroconfListener {
 	
 	public void serviceAdded(ServiceInfo service_info) {
-    	String result = "[+] Service added: " + service_info.getQualifiedName();
+    	String result = "[+] " + service_info.getQualifiedName();
     	System.out.println(result);
 	}
 	public void serviceRemoved(ServiceInfo service_info) {
-		String result = "[-] Service removed: " + service_info.getQualifiedName();
+		String result = "[-] " + service_info.getQualifiedName();
     	System.out.println(result);
 	}
 	public void serviceResolved(ServiceInfo service_info) {
-    	String result = "[*] Service Resolved:\n";
-    	result += "    Name   : " + service_info.getName() + "\n";
-    	result += "    Type   : " + service_info.getType() + "\n";
+    	String result = "[=] " + service_info.getQualifiedName() + "\n";
     	result += "    Port   : " + service_info.getPort() + "\n";
     	for ( int i = 0; i < service_info.getInetAddresses().length; ++i ) {
     		result += "    Address: " + service_info.getInetAddresses()[i].getHostAddress() + "\n";

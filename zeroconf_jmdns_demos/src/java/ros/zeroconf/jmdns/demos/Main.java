@@ -17,7 +17,7 @@ public class Main {
         int argc = argv.length;
         boolean debug = false;
 
-        if ((argc > 0) && "-d".equals(argv[0])) {
+        if ((argc > 0) && "--debug".equals(argv[0])) {
             System.arraycopy(argv, 1, argv, 0, --argc);
 
             {
@@ -36,11 +36,11 @@ public class Main {
 		if (argc == 0) {
         	Main.usage();
             System.exit(1);
-		} else if ( (argc >= 1) && "-listener".equals(argv[0])) {
+		} else if ( (argc >= 1) && "--listener".equals(argv[0])) {
 			Zeroconf.main_listener(argv);
-		} else if ( "-publisher".equals(argv[0]) ) {
+		} else if ( "--publisher".equals(argv[0]) ) {
 			Zeroconf.main_publisher(argv);
-		} else if ( "-discovery".equals(argv[0]) ) {
+		} else if ( "--discovery".equals(argv[0]) ) {
 			Discovery.main(argv);
         } else {
         	Main.usage();
@@ -50,10 +50,10 @@ public class Main {
     public static void usage() {
         System.out.println();
         System.out.println("jmdns:");
-        System.out.println("     -d              - output debugging info");
-        System.out.println("     -publisher      - publishes a _ros-master._tcp for 8s");
-        System.out.println("     -listener       - polling discovery for ros masters (_ros-master._tcp)");
-        System.out.println("     -discovery      - callback discovery for ros services (ros, concert, app-manager)");
+        System.out.println("     --debug          - output debugging info");
+        System.out.println("     --publisher      - publishes a _ros-master._tcp for 8s");
+        System.out.println("     --listener       - polling discovery for ros masters (_ros-master._tcp)");
+        System.out.println("     --discovery      - callback discovery for ros services (ros, concert, app-manager)");
         System.out.println();
     }
 }
