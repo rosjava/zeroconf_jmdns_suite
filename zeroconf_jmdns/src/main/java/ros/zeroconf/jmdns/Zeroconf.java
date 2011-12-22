@@ -32,6 +32,7 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     Set<ServiceInfo> services;
     ZeroconfLogger logger;
     Map<String, ZeroconfListener> listener_callbacks;
+    ZeroconfListener default_listener_callback;
 
     public Zeroconf() {
     	/********************
@@ -42,6 +43,7 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
         this.services = new HashSet<ServiceInfo>();
         this.logger = new Logger();
         this.listener_callbacks = new HashMap<String, ZeroconfListener>();
+        this.default_listener_callback = new DefaultListener();
 
     	/********************
     	 * Methods
@@ -59,6 +61,7 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
         this.services = new HashSet<ServiceInfo>();
         this.logger = logger;
         this.listener_callbacks = new HashMap<String, ZeroconfListener>();
+        this.default_listener_callback = new DefaultListener();
 
     	/********************
     	 * Methods
@@ -70,8 +73,11 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
 	/*************************************************************************
 	 * User Interface
 	 ************************************************************************/
+    public void setDefaultListenerCallback(ZeroconfListener listener_callback) {
+        this.default_listener_callback = listener_callback;
+    }
     public void addListener(String service_type, String domain) {
-    	addListener(service_type, domain, new DefaultListener());
+    	addListener(service_type, domain, this.default_listener_callback);
     }
     
     public void addListener(String service_type, String domain, ZeroconfListener listener_callback) {
