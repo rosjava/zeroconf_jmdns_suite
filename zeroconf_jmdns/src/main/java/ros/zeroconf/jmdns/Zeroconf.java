@@ -22,11 +22,15 @@ import javax.jmdns.ServiceTypeListener;
 
 public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTopologyListener {
 
-	private class DefaultListener implements ZeroconfListener {
-		public void serviceAdded(ServiceInfo service) {}
-		public void serviceRemoved(ServiceInfo service) {}
-		public void serviceResolved(ServiceInfo service) {}
+//	private class DefaultListener implements ZeroconfListener {
+//		public void serviceAdded(ServiceInfo service) {}
+//		public void serviceRemoved(ServiceInfo service) {}
+//		public void serviceResolved(ServiceInfo service) {}
+//	}
+	private class DefaultLogger implements ZeroconfLogger {
+		public void println(String msg) {}
 	}
+	
     JmmDNS jmmdns;
     Set<String> listeners;
     Set<ServiceInfo> services;
@@ -41,9 +45,9 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
         this.jmmdns = JmmDNS.Factory.getInstance();
         this.listeners = new HashSet<String>();
         this.services = new HashSet<ServiceInfo>();
-        this.logger = new Logger();
+        this.logger = new DefaultLogger();
         this.listener_callbacks = new HashMap<String, ZeroconfListener>();
-        this.default_listener_callback = new DefaultListener();
+        this.default_listener_callback = null;
 
     	/********************
     	 * Methods
@@ -61,7 +65,7 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
         this.services = new HashSet<ServiceInfo>();
         this.logger = logger;
         this.listener_callbacks = new HashMap<String, ZeroconfListener>();
-        this.default_listener_callback = new DefaultListener();
+        this.default_listener_callback = null;
 
     	/********************
     	 * Methods
@@ -86,7 +90,9 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     	listeners.add(service);
     	// add to currently established interfaces
     	jmmdns.addServiceListener(service, this);
-    	listener_callbacks.put(service, listener_callback);
+    	if ( listener_callback != null ) { 
+    		listener_callbacks.put(service, listener_callback);
+    	}
     }
     
     /**
@@ -237,10 +243,11 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     @Override
     public void serviceAdded(ServiceEvent event) {
         final ServiceInfo service_info = event.getInfo();
-        logger.println("[+] Service         : " + service_info.getQualifiedName());
         ZeroconfListener callback = listener_callbacks.get(service_info.getType());
         if ( callback != null ) {
         	callback.serviceAdded(service_info);
+        } else {
+            logger.println("[+] Service         : " + service_info.getQualifiedName());
         }
     }
 
@@ -248,10 +255,11 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     public void serviceRemoved(ServiceEvent event) {
         final String name = event.getName();
         final ServiceInfo service_info = event.getInfo();
-        logger.println("[-] Service         : " + name);
         ZeroconfListener callback = listener_callbacks.get(service_info.getType());
         if ( callback != null ) {
         	callback.serviceRemoved(service_info);
+        } else {
+            logger.println("[-] Service         : " + name);
         }
     }
 
@@ -259,10 +267,11 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     public void serviceResolved(ServiceEvent event) {
         final String name = event.getName();
         final ServiceInfo service_info = event.getInfo();
-        logger.println("[+] Resolved Service: " + name);
         ZeroconfListener callback = listener_callbacks.get(service_info.getType());
         if ( callback != null ) {
         	callback.serviceResolved(service_info);
+        } else {
+            logger.println("[+] Resolved Service: " + name);
         }
     }
 

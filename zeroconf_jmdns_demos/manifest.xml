@@ -12,7 +12,7 @@
   <url>http://ros.org/wiki/zeroconf_jmdns_demos</url>
   <depend package="zeroconf_jmdns"/>
   <export>
-    <rosjava-src location="src/main/java" />
+    <rosjava-src location="src/java" />
 <!--    <rosjava-pathelement location="bin" groupId="javax.jmdns.demos" artifactId="jmdns_demos" version="0.0.1" built="true" /> -->
   </export>
 </package>

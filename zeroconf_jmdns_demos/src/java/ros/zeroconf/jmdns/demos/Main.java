@@ -1,21 +1,3 @@
-// Licensed under Apache License version 2.0
-// Original license LGPL
-
-//
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-//
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-// Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public
-// License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-
 package ros.zeroconf.jmdns.demos;
 
 import java.io.IOException;
@@ -58,6 +40,8 @@ public class Main {
 			Zeroconf.main_listener(argv);
 		} else if ( "-publisher".equals(argv[0]) ) {
 			Zeroconf.main_publisher(argv);
+		} else if ( "-master-browser".equals(argv[0]) ) {
+			MasterBrowser.main(argv);
         } else {
         	Main.usage();
             System.exit(1);
@@ -66,9 +50,10 @@ public class Main {
     public static void usage() {
         System.out.println();
         System.out.println("jmdns:");
-        System.out.println("     -d         - output debugging info");
-        System.out.println("     -listener  - listens for _ros-master._tcp");
-        System.out.println("     -publisher - publishes a _ros-master._tcp for 8s");
+        System.out.println("     -d              - output debugging info");
+        System.out.println("     -listener       - listens for _ros-master._tcp");
+        System.out.println("     -publisher      - publishes a _ros-master._tcp for 8s");
+        System.out.println("     -master-browser - listens for ros style masters (ros, concert, app-manager)");
         System.out.println();
     }
 }
