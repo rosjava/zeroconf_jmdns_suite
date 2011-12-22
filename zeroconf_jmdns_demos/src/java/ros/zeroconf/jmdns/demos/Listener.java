@@ -20,13 +20,13 @@ public class Listener implements ZeroconfListener {
     	System.out.println(result);
 	}
 	public void serviceResolved(ServiceInfo service_info) {
-    	String result = "    Service Resolved:\n";
+    	String result = "[*] Service Resolved:\n";
     	result += "    Name   : " + service_info.getName() + "\n";
     	result += "    Type   : " + service_info.getType() + "\n";
     	result += "    Port   : " + service_info.getPort() + "\n";
     	for ( int i = 0; i < service_info.getInetAddresses().length; ++i ) {
-    		result += "    Address: " + service_info.getInetAddresses()[i].getHostAddress();
+    		result += "    Address: " + service_info.getInetAddresses()[i].getHostAddress() + "\n";
     	}
-    	System.out.println(result);
+    	System.out.printf(result);
 	}
 }   

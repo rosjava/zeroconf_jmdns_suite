@@ -22,11 +22,6 @@ import javax.jmdns.ServiceTypeListener;
 
 public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTopologyListener {
 
-//	private class DefaultListener implements ZeroconfListener {
-//		public void serviceAdded(ServiceInfo service) {}
-//		public void serviceRemoved(ServiceInfo service) {}
-//		public void serviceResolved(ServiceInfo service) {}
-//	}
 	private class DefaultLogger implements ZeroconfLogger {
 		public void println(String msg) {}
 	}
@@ -83,7 +78,12 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     public void addListener(String service_type, String domain) {
     	addListener(service_type, domain, this.default_listener_callback);
     }
-    
+    /**
+     * If you call this early in your program, the jmmdns.addServiceListener
+     * will often do nothing as it hasn't discovered the interfaces yet. In
+     * this case, we save the listener data (listeners.add(service) and add
+     * them when the network interfaces come up.
+     */
     public void addListener(String service_type, String domain, ZeroconfListener listener_callback) {
     	String service = service_type + "." + domain + ".";
     	logger.println("Activating listener: " + service);
@@ -243,6 +243,9 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     @Override
     public void serviceAdded(ServiceEvent event) {
         final ServiceInfo service_info = event.getInfo();
+        // might need to add a timeout as a last arg here
+        // true tells it to keep resolving when new, new info comes in (persistent).
+        jmmdns.requestServiceInfo(service_info.getType(), service_info.getName(), true);
         ZeroconfListener callback = listener_callbacks.get(service_info.getType());
         if ( callback != null ) {
         	callback.serviceAdded(service_info);

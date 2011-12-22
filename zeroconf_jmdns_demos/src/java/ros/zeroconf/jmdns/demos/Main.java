@@ -40,8 +40,8 @@ public class Main {
 			Zeroconf.main_listener(argv);
 		} else if ( "-publisher".equals(argv[0]) ) {
 			Zeroconf.main_publisher(argv);
-		} else if ( "-master-browser".equals(argv[0]) ) {
-			MasterBrowser.main(argv);
+		} else if ( "-discovery".equals(argv[0]) ) {
+			Discovery.main(argv);
         } else {
         	Main.usage();
             System.exit(1);
@@ -51,9 +51,9 @@ public class Main {
         System.out.println();
         System.out.println("jmdns:");
         System.out.println("     -d              - output debugging info");
-        System.out.println("     -listener       - listens for _ros-master._tcp");
         System.out.println("     -publisher      - publishes a _ros-master._tcp for 8s");
-        System.out.println("     -master-browser - listens for ros style masters (ros, concert, app-manager)");
+        System.out.println("     -listener       - polling discovery for ros masters (_ros-master._tcp)");
+        System.out.println("     -discovery      - callback discovery for ros services (ros, concert, app-manager)");
         System.out.println();
     }
 }

@@ -4,7 +4,7 @@ import java.io.IOException;
 import ros.zeroconf.jmdns.Zeroconf;
 import ros.zeroconf.jmdns.StandardLogger;
 
-public class MasterBrowser {
+public class Discovery {
 	
 	public static void main(String argv[]) throws IOException {
         Zeroconf zeroconf = new Zeroconf(new StandardLogger());
