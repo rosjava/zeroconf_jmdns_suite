@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Set;
 
 import javax.jmdns.JmmDNS;
@@ -21,10 +22,16 @@ import javax.jmdns.ServiceTypeListener;
 
 public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTopologyListener {
 
+	private class DefaultListener implements ZeroconfListener {
+		public void serviceAdded(ServiceInfo service) {}
+		public void serviceRemoved(ServiceInfo service) {}
+		public void serviceResolved(ServiceInfo service) {}
+	}
     JmmDNS jmmdns;
     Set<String> listeners;
     Set<ServiceInfo> services;
     ZeroconfLogger logger;
+    Map<String, ZeroconfListener> listener_callbacks;
 
     public Zeroconf() {
     	/********************
@@ -34,6 +41,7 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
         this.listeners = new HashSet<String>();
         this.services = new HashSet<ServiceInfo>();
         this.logger = new Logger();
+        this.listener_callbacks = new HashMap<String, ZeroconfListener>();
 
     	/********************
     	 * Methods
@@ -50,6 +58,7 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
         this.listeners = new HashSet<String>();
         this.services = new HashSet<ServiceInfo>();
         this.logger = logger;
+        this.listener_callbacks = new HashMap<String, ZeroconfListener>();
 
     	/********************
     	 * Methods
@@ -62,11 +71,16 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
 	 * User Interface
 	 ************************************************************************/
     public void addListener(String service_type, String domain) {
+    	addListener(service_type, domain, new DefaultListener());
+    }
+    
+    public void addListener(String service_type, String domain, ZeroconfListener listener_callback) {
     	String service = service_type + "." + domain + ".";
     	logger.println("Activating listener: " + service);
     	listeners.add(service);
     	// add to currently established interfaces
     	jmmdns.addServiceListener(service, this);
+    	listener_callbacks.put(service, listener_callback);
     }
     
     /**
@@ -84,6 +98,7 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
 				break;
     		}
     	}
+    	listener_callbacks.remove(listener_to_remove);
     }
     /**
      * Publish a zeroconf service.
@@ -217,18 +232,32 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     public void serviceAdded(ServiceEvent event) {
         final ServiceInfo service_info = event.getInfo();
         logger.println("[+] Service         : " + service_info.getQualifiedName());
+        ZeroconfListener callback = listener_callbacks.get(service_info.getType());
+        if ( callback != null ) {
+        	callback.serviceAdded(service_info);
+        }
     }
 
     @Override
     public void serviceRemoved(ServiceEvent event) {
         final String name = event.getName();
+        final ServiceInfo service_info = event.getInfo();
         logger.println("[-] Service         : " + name);
+        ZeroconfListener callback = listener_callbacks.get(service_info.getType());
+        if ( callback != null ) {
+        	callback.serviceRemoved(service_info);
+        }
     }
 
     @Override
     public void serviceResolved(ServiceEvent event) {
         final String name = event.getName();
+        final ServiceInfo service_info = event.getInfo();
         logger.println("[+] Resolved Service: " + name);
+        ZeroconfListener callback = listener_callbacks.get(service_info.getType());
+        if ( callback != null ) {
+        	callback.serviceResolved(service_info);
+        }
     }
 
     @Override

@@ -9,7 +9,7 @@ import javax.jmdns.ServiceInfo;
  * when you call the addListener command.
  */
 public interface ZeroconfListener {
-	void serviceAdded(ServiceInfo service);
-	void serviceRemoved(ServiceInfo service);
-	void serviceResolved(ServiceInfo service);
+	public void serviceAdded(ServiceInfo service);
+	public void serviceRemoved(ServiceInfo service);
+	public void serviceResolved(ServiceInfo service);
 }
