@@ -154,6 +154,18 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     	}
     }
     
+    public String toString(ServiceInfo service_info) {
+    	String result = "Service Info:\n";
+    	result += "  Name   : " + service_info.getName() + "\n";
+    	result += "  Type   : " + service_info.getType() + "\n";
+    	result += "  Port   : " + service_info.getPort() + "\n";
+    	for ( int i = 0; i < service_info.getInetAddresses().length; ++i ) {
+    		result += "  Address: " + service_info.getInetAddresses()[i].getHostAddress() + "\n";
+    	}
+    	return result;
+    }
+    
+    
     public void shutdown() throws IOException {
     	removeAllServices();
     	jmmdns.close();
