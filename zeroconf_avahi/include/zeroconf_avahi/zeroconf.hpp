@@ -72,8 +72,11 @@ class DiscoveredAvahiService {
 public:
 	DiscoveredAvahiService() : resolver(NULL) {
 	}
-	DiscoveredAvahiService(zeroconf_comms::DiscoveredService &discovered_service, AvahiServiceResolver *new_resolver ) :
+	DiscoveredAvahiService(zeroconf_comms::DiscoveredService &discovered_service, AvahiServiceResolver *new_resolver,
+			int protocol, int hardware_interface ) :
 		service(discovered_service),
+		protocol(protocol),
+		hardware_interface(hardware_interface),
 		resolver(new_resolver) {
 
 	}
@@ -83,6 +86,8 @@ public:
 		}
 	}
 	zeroconf_comms::DiscoveredService service;
+	int protocol;
+	int hardware_interface;
 	AvahiServiceResolver *resolver;
 };
 
@@ -102,10 +107,10 @@ struct DiscoveredAvahiServiceCompare {
 			return a.type < b.type;
 		} else if ( a.domain != b.domain ) {
 			return a.domain < b.domain;
-		} else if ( a.hardware_interface != b.hardware_interface ) {
-			return a.hardware_interface < b.hardware_interface;
+		} else if ( avahi_service_a->hardware_interface != avahi_service_b->hardware_interface ) {
+			return avahi_service_a->hardware_interface < avahi_service_b->hardware_interface;
 		} else {
-			return a.protocol < b.protocol;
+			return avahi_service_a->protocol < avahi_service_b->protocol;
 		}
 	}
 };
