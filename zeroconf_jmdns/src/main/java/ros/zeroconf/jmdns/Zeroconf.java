@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.lang.Thread;
 import java.lang.Boolean;
 import java.net.InetAddress;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.HashMap;
@@ -21,6 +23,20 @@ import javax.jmdns.ServiceListener;
 import javax.jmdns.ServiceTypeListener;
 import org.ros.message.zeroconf_comms.DiscoveredService;
 
+/**
+ * This is a wrapper around the jmmdns (multi-homed) part of the jmdns library. 
+ * 
+ * On the surface it does not look as if we need this wrapper since jmdns has quite
+ * a nice api, but it turned out to be quite awkward to use. There are some broken api, 
+ * others that need some black magic, and also the ouput (in ServiceInfo types) is fixed -
+ * you can't modify, or merge them to simplify the output list of discovered services.
+ * 
+ * Ideally I should work with the jmdns guy and merge alot back upstream, but its rather
+ * a large job to really get in and understand all its workings.
+ * 
+ * In summary, this is a nice, simple api for publishing services and doing service 
+ * discovery (either via polling or via callback).
+ */
 public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTopologyListener {
 
 	private class DefaultLogger implements ZeroconfLogger {
@@ -145,23 +161,13 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
         // https://sourceforge.net/tracker/?func=detail&aid=3435220&group_id=93852&atid=605791
         // services.add(ServiceInfo.create(service_type, service_name, service_port, 0, 0, true, text));
     }
-    
+
     /**
      * If you try calling this immediately after a service added callback
      * occurred, you probably wont see anything - it needs some time to resolve.
      * 
      * It will block if it needs to resolve services (and aren't in its cache yet).
-     * 
-     * @return service_infos : an array of discovered ServiceInfo objects.
      */
-    public List<ServiceInfo> listJmdnsDiscoveredServices() {
-    	List<ServiceInfo> service_infos = new ArrayList<ServiceInfo>();
-    	for(String service : listeners ) {
-	        service_infos.addAll(Arrays.asList(this.jmmdns.list(service)));
-    	}
-        return service_infos;
-    }
-
     public List<DiscoveredService> listDiscoveredServices() {
     	List<ServiceInfo> service_infos = new ArrayList<ServiceInfo>();
     	for(String service : listeners ) {
@@ -177,16 +183,29 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     		for ( DiscoveredService discovered_service : discovered_services ) {
     			if ( service_info.getQualifiedName().equals(discovered_service.name+"."+discovered_service.type+"."+discovered_service.domain+".") ) {
     				for ( InetAddress inet_address : service_info.getInetAddresses() ) {
-    					Boolean address_found = false;
-	    				for ( String unique_address : discovered_service.addresses ) {
-	    					if ( inet_address.getHostAddress().equals(unique_address) ) {
-	    						address_found = true;
-	    						break;
-	    					}
-	    				}
-	    				if ( !address_found ) {
-	    					discovered_service.addresses.add(inet_address.getHostAddress());
-	    				}
+    					if ( inet_address instanceof Inet4Address) {
+        					Boolean address_found = false;
+    	    				for ( String unique_address : discovered_service.ipv4_addresses ) {
+    	    					if ( inet_address.getHostAddress().equals(unique_address) ) {
+    	    						address_found = true;
+    	    						break;
+    	    					}
+    	    				}
+    	    				if ( !address_found ) {
+    	    					discovered_service.ipv4_addresses.add(inet_address.getHostAddress());
+    	    				}
+    					} else { // Inet6Address
+        					Boolean address_found = false;
+    	    				for ( String unique_address : discovered_service.ipv6_addresses ) {
+    	    					if ( inet_address.getHostAddress().equals(unique_address) ) {
+    	    						address_found = true;
+    	    						break;
+    	    					}
+    	    				}
+    	    				if ( !address_found ) {
+    	    					discovered_service.ipv6_addresses.add(inet_address.getHostAddress());
+    	    				}
+    					}
     				}
     				service_found = true;
     				break;
@@ -200,9 +219,13 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     			new_service.domain = service_info.getDomain();
     			new_service.hostname = service_info.getServer();
     			new_service.port = service_info.getPort();
-    			for ( InetAddress inet_address : service_info.getInetAddresses() ) {
-    				new_service.addresses.add(inet_address.getHostAddress());
-    			}
+				for ( InetAddress inet_address : service_info.getInetAddresses() ) {
+					if ( inet_address instanceof Inet4Address) {
+	    				new_service.ipv4_addresses.add(inet_address.getHostAddress());
+					} else { // Inet6Address
+	    				new_service.ipv6_addresses.add(inet_address.getHostAddress());
+					}
+				}
     			discovered_services.add(new_service);
     		}
     		
@@ -220,80 +243,23 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     	services.clear();
     }
     
-    public void display(ServiceInfo service_info) {
-    	logger.println("Service Info:");
-    	logger.println("  Name   : " + service_info.getName() );
-    	logger.println("  Type   : " + service_info.getType() );
-    	logger.println("  Port   : " + service_info.getPort() );
-    	for ( int i = 0; i < service_info.getInetAddresses().length; ++i ) {
-        	logger.println("  Address: " + service_info.getInetAddresses()[i].getHostAddress() );
-    	}
-    }
-    
     public void display(DiscoveredService discovered_service) {
     	logger.println("Discovered Service:");
     	logger.println("  Name   : " + discovered_service.name );
     	logger.println("  Type   : " + discovered_service.type );
     	logger.println("  Port   : " + discovered_service.port );
-    	for ( String address : discovered_service.addresses ) {
+    	for ( String address : discovered_service.ipv4_addresses ) {
         	logger.println("  Address: " + address );
     	}
-    }
-    
-    public String toString(ServiceInfo service_info) {
-    	String result = "Service Info:\n";
-    	result += "  Name   : " + service_info.getName() + "\n";
-    	result += "  Type   : " + service_info.getType() + "\n";
-    	result += "  Port   : " + service_info.getPort() + "\n";
-    	for ( int i = 0; i < service_info.getInetAddresses().length; ++i ) {
-    		result += "  Address: " + service_info.getInetAddresses()[i].getHostAddress() + "\n";
+    	for ( String address : discovered_service.ipv6_addresses ) {
+        	logger.println("  Address: " + address );
     	}
-    	return result;
     }
     
     public void shutdown() throws IOException {
     	removeAllServices();
     	jmmdns.close();
     }
-    
-	/*************************************************************************
-	 * Network Topology Callbacks 
-	 ************************************************************************/
-	public void inetAddressAdded(NetworkTopologyEvent event) {
-		logger.println("[+] NetworkInterface: " + event.getInetAddress().getHostAddress());
-        try {
-        	event.getDNS().addServiceTypeListener(this);
-        	for(String listener : listeners ) {
-        		logger.println("      Adding service listener '" + listener + "'");
-            	event.getDNS().addServiceListener(listener, this);
-        	}
-        	for (ServiceInfo service : services ) {
-        		logger.println("Publishing Service on " + event.getInetAddress().getHostAddress());
-        		logger.println("  Name   : " + service.getName() );
-        		logger.println("  Type   : " + service.getType() );
-        		logger.println("  Port   : " + service.getPort() );
-             	event.getDNS().registerService(service.clone()); // if you don't clone it, it falls over badly!
-        	}
-        } catch (IOException e) {
-	        e.printStackTrace();
-        }
-	}
-	
-	public void inetAddressRemoved(NetworkTopologyEvent event) {
-		logger.println("[-] NetworkInterface: " + event.getInetAddress().getHostAddress());
-		event.getDNS().removeServiceTypeListener(this);
-    	for(String listener : listeners ) {
-    		logger.println("      Removing service listener '" + listener + "'");
-    		event.getDNS().removeServiceListener(listener, this);
-    	}
-    	for (ServiceInfo service : services ) {
-    		logger.println("Unpublishing Service:");
-    		logger.println("  Name   : " + service.getName() );
-    		logger.println("  Type   : " + service.getType() );
-    		logger.println("  Port   : " + service.getPort() );
-	    	event.getDNS().unregisterService(service); // this may not work because we're cloning it.
-    	}
-	}
     
 	/*************************************************************************
 	 * Listener Callbacks 
@@ -350,7 +316,95 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
 //        logger.println("SUBTYPE: " + event.getType());
     }
 
+	/******************************
+	 * Network Topology Callbacks 
+	 *****************************/
+	public void inetAddressAdded(NetworkTopologyEvent event) {
+		logger.println("[+] NetworkInterface: " + event.getInetAddress().getHostAddress());
+        try {
+        	event.getDNS().addServiceTypeListener(this);
+        	for(String listener : listeners ) {
+        		logger.println("      Adding service listener '" + listener + "'");
+            	event.getDNS().addServiceListener(listener, this);
+        	}
+        	for (ServiceInfo service : services ) {
+        		logger.println("Publishing Service on " + event.getInetAddress().getHostAddress());
+        		logger.println("  Name   : " + service.getName() );
+        		logger.println("  Type   : " + service.getType() );
+        		logger.println("  Port   : " + service.getPort() );
+             	event.getDNS().registerService(service.clone()); // if you don't clone it, it falls over badly!
+        	}
+        } catch (IOException e) {
+	        e.printStackTrace();
+        }
+	}
+	
+	public void inetAddressRemoved(NetworkTopologyEvent event) {
+		logger.println("[-] NetworkInterface: " + event.getInetAddress().getHostAddress());
+		event.getDNS().removeServiceTypeListener(this);
+    	for(String listener : listeners ) {
+    		logger.println("      Removing service listener '" + listener + "'");
+    		event.getDNS().removeServiceListener(listener, this);
+    	}
+    	for (ServiceInfo service : services ) {
+    		logger.println("Unpublishing Service:");
+    		logger.println("  Name   : " + service.getName() );
+    		logger.println("  Type   : " + service.getType() );
+    		logger.println("  Port   : " + service.getPort() );
+	    	event.getDNS().unregisterService(service); // this may not work because we're cloning it.
+    	}
+	}
+
 	/*************************************************************************
+	 * Private 
+	 ************************************************************************/
+    
+    /******************************
+	 * Discovery 
+	 *****************************/
+    /**
+     * If you try calling this immediately after a service added callback
+     * occurred, you probably wont see anything - it needs some time to resolve.
+     * 
+     * It will block if it needs to resolve services (and aren't in its cache yet).
+     * 
+     * @sa listDiscoveredServices
+     * 
+     * @return service_infos : an array of discovered ServiceInfo objects.
+     */
+    private List<ServiceInfo> listJmdnsDiscoveredServices() {
+    	List<ServiceInfo> service_infos = new ArrayList<ServiceInfo>();
+    	for(String service : listeners ) {
+	        service_infos.addAll(Arrays.asList(this.jmmdns.list(service)));
+    	}
+        return service_infos;
+    }
+
+    /******************************
+	 * Utility Functions 
+	 *****************************/
+    private String toString(ServiceInfo service_info) {
+    	String result = "Service Info:\n";
+    	result += "  Name   : " + service_info.getName() + "\n";
+    	result += "  Type   : " + service_info.getType() + "\n";
+    	result += "  Port   : " + service_info.getPort() + "\n";
+    	for ( int i = 0; i < service_info.getInetAddresses().length; ++i ) {
+    		result += "  Address: " + service_info.getInetAddresses()[i].getHostAddress() + "\n";
+    	}
+    	return result;
+    }
+
+    private void display(ServiceInfo service_info) {
+    	logger.println("Service Info:");
+    	logger.println("  Name   : " + service_info.getName() );
+    	logger.println("  Type   : " + service_info.getType() );
+    	logger.println("  Port   : " + service_info.getPort() );
+    	for ( int i = 0; i < service_info.getInetAddresses().length; ++i ) {
+        	logger.println("  Address: " + service_info.getInetAddresses()[i].getHostAddress() );
+    	}
+    }
+
+    /*************************************************************************
 	 * Main 
 	 ************************************************************************/
     public static void main_publisher(String argv[]) throws IOException {
