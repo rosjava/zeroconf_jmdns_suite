@@ -15,10 +15,10 @@ Note that the android code can be found in the separate zeroconf_android stack.
 
 === Status ===
 
- * zeroconf_avahi : done
- * jmdns : running, but rough around the edges.
- * zeroconf_avahi_python : ...
- * zeroconf_avahi_embedded : ...
+* zeroconf_avahi : done
+* jmdns : running, but rough around the edges.
+* zeroconf_avahi_python : ...
+* zeroconf_avahi_embedded : ...
 
 === Roadmap ===
 
