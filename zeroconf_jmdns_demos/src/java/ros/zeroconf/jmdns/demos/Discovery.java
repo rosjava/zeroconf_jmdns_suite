@@ -11,7 +11,7 @@ public class Discovery {
 	public static void main_handler(String argv[]) throws IOException {
         Zeroconf zeroconf = new Zeroconf(new StandardLogger());
         DiscoveryHandler listener = new DiscoveryHandler();
-		zeroconf.setDefaultListenerCallback(listener);
+		zeroconf.setDefaultDiscoveryCallback(listener);
         zeroconf.addListener("_ros-master._tcp","local");
 //        zeroconf.addListener("_ros-master._udp","local");
 //        zeroconf.addListener("_concert-master._tcp","local");

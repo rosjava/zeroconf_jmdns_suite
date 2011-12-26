@@ -89,7 +89,7 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
 	/*************************************************************************
 	 * User Interface
 	 ************************************************************************/
-    public void setDefaultListenerCallback(ZeroconfDiscoveryHandler listener_callback) {
+    public void setDefaultDiscoveryCallback(ZeroconfDiscoveryHandler listener_callback) {
         this.default_listener_callback = listener_callback;
     }
     public void addListener(String service_type, String domain) {
