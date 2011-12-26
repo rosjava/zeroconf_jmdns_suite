@@ -243,19 +243,6 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     	services.clear();
     }
     
-    public void display(DiscoveredService discovered_service) {
-    	logger.println("Discovered Service:");
-    	logger.println("  Name   : " + discovered_service.name );
-    	logger.println("  Type   : " + discovered_service.type );
-    	logger.println("  Port   : " + discovered_service.port );
-    	for ( String address : discovered_service.ipv4_addresses ) {
-        	logger.println("  Address: " + address );
-    	}
-    	for ( String address : discovered_service.ipv6_addresses ) {
-        	logger.println("  Address: " + address );
-    	}
-    }
-    
     public void shutdown() throws IOException {
     	removeAllServices();
     	jmmdns.close();
@@ -355,7 +342,37 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     	}
 	}
 
-	/*************************************************************************
+    /******************************
+	 * Utility Functions 
+	 *****************************/
+    public void display(DiscoveredService discovered_service) {
+    	logger.println("Discovered Service:");
+    	logger.println("  Name   : " + discovered_service.name );
+    	logger.println("  Type   : " + discovered_service.type );
+    	logger.println("  Port   : " + discovered_service.port );
+    	for ( String address : discovered_service.ipv4_addresses ) {
+        	logger.println("  Address: " + address );
+    	}
+    	for ( String address : discovered_service.ipv6_addresses ) {
+        	logger.println("  Address: " + address );
+    	}
+    }
+
+    public String toString(DiscoveredService discovered_service) {
+    	String result = "Service Info:\n";
+    	result += "  Name   : " + discovered_service.name + "\n";
+    	result += "  Type   : " + discovered_service.type + "\n";
+    	result += "  Port   : " + discovered_service.port + "\n";
+    	for ( String address : discovered_service.ipv4_addresses ) {
+    		result += "  Address: " + address + "\n";
+    	}
+    	for ( String address : discovered_service.ipv6_addresses ) {
+    		result += "  Address: " + address + "\n";
+    	}
+    	return result;
+    }
+
+    /*************************************************************************
 	 * Private 
 	 ************************************************************************/
     
