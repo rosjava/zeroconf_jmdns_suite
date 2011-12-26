@@ -37,12 +37,10 @@ public class Main {
 		if (argc == 0) {
         	Main.usage();
             System.exit(1);
-		} else if ( (argc >= 1) && "--jmdns-polling".equals(argv[0])) {
-			Discovery.main_jmdns_polling(argv);
 		} else if ( (argc >= 1) && "--polling".equals(argv[0])) {
 			Discovery.main_polling(argv);
 		} else if ( "--publisher".equals(argv[0]) ) {
-			Zeroconf.main_publisher(argv);
+			Publisher.main_publisher(argv);
 		} else if ( "--discovery".equals(argv[0]) ) {
 			Discovery.main_handler(argv);
         } else {

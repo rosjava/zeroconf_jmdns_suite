@@ -2,7 +2,6 @@ package ros.zeroconf.jmdns.demos;
 
 import java.io.IOException;
 import java.util.List;
-import javax.jmdns.ServiceInfo;
 import org.ros.message.zeroconf_comms.DiscoveredService;
 import ros.zeroconf.jmdns.Zeroconf;
 import ros.zeroconf.jmdns.StandardLogger;
@@ -26,30 +25,6 @@ public class Discovery {
 		        e.printStackTrace();
 		    }
         }
-    }
-    public static void main_jmdns_polling(String argv[]) throws IOException {
-        Zeroconf browser = new Zeroconf(new StandardLogger());
-        browser.addListener("_ros-master._tcp","local");
-        int i = 0;
-        while( i < 8 ) {
-    		try {
-    			List<ServiceInfo> service_infos = browser.listJmdnsDiscoveredServices();
-    			if ( service_infos.size() > 0 ) {
-        			System.out.println("************ Discovered Services ************");
-	    			for ( ServiceInfo service_info : service_infos ) {
-		        		browser.display(service_info);
-	    			}
-    			} else {
-    				System.out.println("Waiting for resolvers...");
-    			}
-        		Thread.sleep(1000L);
-		    } catch (InterruptedException e) {
-		        e.printStackTrace();
-		    }
-    		++i;
-        }
-        browser.removeListener("_ros-master._tcp","local");
-        browser.shutdown();
     }
 
     public static void main_polling(String argv[]) throws IOException {

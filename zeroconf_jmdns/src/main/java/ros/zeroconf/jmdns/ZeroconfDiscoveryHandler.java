@@ -1,6 +1,6 @@
 package ros.zeroconf.jmdns;
 
-import javax.jmdns.ServiceInfo;
+import org.ros.message.zeroconf_comms.DiscoveredService;
 
 /**
  * @brief Interface for a user listener.
@@ -19,8 +19,8 @@ import javax.jmdns.ServiceInfo;
  * existing entry. 
  * 
  */
-public interface ZeroconfListener {
-	public void serviceAdded(ServiceInfo service);
-	public void serviceRemoved(ServiceInfo service);
-	public void serviceResolved(ServiceInfo service);
+public interface ZeroconfDiscoveryHandler {
+	public void serviceAdded(DiscoveredService service);
+	public void serviceRemoved(DiscoveredService service);
+	public void serviceResolved(DiscoveredService service);
 }

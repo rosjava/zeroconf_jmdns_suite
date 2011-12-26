@@ -1,7 +1,7 @@
 package ros.zeroconf.jmdns.demos;
 
-import ros.zeroconf.jmdns.ZeroconfListener;
-import javax.jmdns.ServiceInfo;
+import ros.zeroconf.jmdns.ZeroconfDiscoveryHandler;
+import org.ros.message.zeroconf_comms.DiscoveredService;
 
 /**
  * This class is a handler that can be passed to
@@ -9,22 +9,25 @@ import javax.jmdns.ServiceInfo;
  * (service added, resolved, removed) to be processed in a custom way for the user
  * of the class. 
  */
-public class DiscoveryHandler implements ZeroconfListener {
+public class DiscoveryHandler implements ZeroconfDiscoveryHandler {
 	
-	public void serviceAdded(ServiceInfo service_info) {
-    	String result = "[+] " + service_info.getQualifiedName();
+	public void serviceAdded(DiscoveredService discovered_service) {
+		String result = "[+] " + discovered_service.name + "." + discovered_service.type + "." + discovered_service.domain + ".";
     	System.out.println(result);
 	}
-	public void serviceRemoved(ServiceInfo service_info) {
-		String result = "[-] " + service_info.getQualifiedName();
+	public void serviceRemoved(DiscoveredService discovered_service) {
+		String result = "[-] " + discovered_service.name + "." + discovered_service.type + "." + discovered_service.domain + ".";
     	System.out.println(result);
 	}
-	public void serviceResolved(ServiceInfo service_info) {
-    	String result = "[=] " + service_info.getQualifiedName() + "\n";
-    	result += "    Port     : " + service_info.getPort() + "\n";
-    	result += "    Hostname : " + service_info.getServer() + "\n";
-    	for ( int i = 0; i < service_info.getInetAddresses().length; ++i ) {
-    		result += "    Address: " + service_info.getInetAddresses()[i].getHostAddress() + "\n";
+	public void serviceResolved(DiscoveredService discovered_service) {
+		String result = "[=] " + discovered_service.name + "." + discovered_service.type + "." + discovered_service.domain + ".\n";
+    	result += "    Port     : " + discovered_service.port + "\n";
+    	result += "    Hostname : " + discovered_service.hostname + "\n";
+    	for ( String address : discovered_service.ipv4_addresses ) {
+    		result += "    Address: " + address + "\n";
+    	}
+    	for ( String address : discovered_service.ipv6_addresses ) {
+    		result += "    Address: " + address + "\n";
     	}
     	System.out.printf(result);
 	}

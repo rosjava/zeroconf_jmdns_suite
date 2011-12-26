@@ -47,8 +47,8 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     Set<String> listeners;
     Set<ServiceInfo> services;
     ZeroconfLogger logger;
-    Map<String, ZeroconfListener> listener_callbacks;
-    ZeroconfListener default_listener_callback;
+    Map<String, ZeroconfDiscoveryHandler> listener_callbacks;
+    ZeroconfDiscoveryHandler default_listener_callback;
 
     public Zeroconf() {
     	/********************
@@ -58,7 +58,7 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
         this.listeners = new HashSet<String>();
         this.services = new HashSet<ServiceInfo>();
         this.logger = new DefaultLogger();
-        this.listener_callbacks = new HashMap<String, ZeroconfListener>();
+        this.listener_callbacks = new HashMap<String, ZeroconfDiscoveryHandler>();
         this.default_listener_callback = null;
 
     	/********************
@@ -76,7 +76,7 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
         this.listeners = new HashSet<String>();
         this.services = new HashSet<ServiceInfo>();
         this.logger = logger;
-        this.listener_callbacks = new HashMap<String, ZeroconfListener>();
+        this.listener_callbacks = new HashMap<String, ZeroconfDiscoveryHandler>();
         this.default_listener_callback = null;
 
     	/********************
@@ -89,7 +89,7 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
 	/*************************************************************************
 	 * User Interface
 	 ************************************************************************/
-    public void setDefaultListenerCallback(ZeroconfListener listener_callback) {
+    public void setDefaultListenerCallback(ZeroconfDiscoveryHandler listener_callback) {
         this.default_listener_callback = listener_callback;
     }
     public void addListener(String service_type, String domain) {
@@ -101,7 +101,7 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
      * this case, we save the listener data (listeners.add(service) and add
      * them when the network interfaces come up.
      */
-    public void addListener(String service_type, String domain, ZeroconfListener listener_callback) {
+    public void addListener(String service_type, String domain, ZeroconfDiscoveryHandler listener_callback) {
     	String service = service_type + "." + domain + ".";
     	logger.println("Activating listener: " + service);
     	listeners.add(service);
@@ -212,21 +212,7 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     			}
     		}
     		if ( !service_found ) {
-    			DiscoveredService new_service = new DiscoveredService();
-    			new_service.name = service_info.getName();
-    			String[] type_domain_str = service_info.getType().split("\\.");
-    			new_service.type = type_domain_str[0] + "." + type_domain_str[1];
-    			new_service.domain = service_info.getDomain();
-    			new_service.hostname = service_info.getServer();
-    			new_service.port = service_info.getPort();
-				for ( InetAddress inet_address : service_info.getInetAddresses() ) {
-					if ( inet_address instanceof Inet4Address) {
-	    				new_service.ipv4_addresses.add(inet_address.getHostAddress());
-					} else { // Inet6Address
-	    				new_service.ipv6_addresses.add(inet_address.getHostAddress());
-					}
-				}
-    			discovered_services.add(new_service);
+    			discovered_services.add(toDiscoveredService(service_info));
     		}
     		
     	}
@@ -257,9 +243,9 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
         // might need to add a timeout as a last arg here
         // true tells it to keep resolving when new, new info comes in (persistent).
         jmmdns.getServiceInfos(service_info.getType(), service_info.getName(), true);
-        ZeroconfListener callback = listener_callbacks.get(service_info.getType());
+        ZeroconfDiscoveryHandler callback = listener_callbacks.get(service_info.getType());
         if ( callback != null ) {
-        	callback.serviceAdded(service_info);
+        	callback.serviceAdded(toDiscoveredService(service_info));
         } else {
             logger.println("[+] Service         : " + service_info.getQualifiedName());
         }
@@ -269,9 +255,9 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     public void serviceRemoved(ServiceEvent event) {
         final String name = event.getName();
         final ServiceInfo service_info = event.getInfo();
-        ZeroconfListener callback = listener_callbacks.get(service_info.getType());
+        ZeroconfDiscoveryHandler callback = listener_callbacks.get(service_info.getType());
         if ( callback != null ) {
-        	callback.serviceRemoved(service_info);
+        	callback.serviceRemoved(toDiscoveredService(service_info));
         } else {
             logger.println("[-] Service         : " + name);
         }
@@ -280,9 +266,9 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     @Override
     public void serviceResolved(ServiceEvent event) {
         final ServiceInfo service_info = event.getInfo();
-        ZeroconfListener callback = listener_callbacks.get(service_info.getType());
+        ZeroconfDiscoveryHandler callback = listener_callbacks.get(service_info.getType());
         if ( callback != null ) {
-        	callback.serviceResolved(service_info);
+        	callback.serviceResolved(toDiscoveredService(service_info));
         } else {
             logger.println("[=] Resolved        : " + service_info.getQualifiedName());
         	logger.println("      Port          : " + service_info.getPort() );
@@ -375,69 +361,67 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     /*************************************************************************
 	 * Private 
 	 ************************************************************************/
-    
-    /******************************
-	 * Discovery 
-	 *****************************/
-    /**
-     * If you try calling this immediately after a service added callback
-     * occurred, you probably wont see anything - it needs some time to resolve.
-     * 
-     * It will block if it needs to resolve services (and aren't in its cache yet).
-     * 
-     * @sa listDiscoveredServices
-     * 
-     * @return service_infos : an array of discovered ServiceInfo objects.
-     */
-    private List<ServiceInfo> listJmdnsDiscoveredServices() {
-    	List<ServiceInfo> service_infos = new ArrayList<ServiceInfo>();
-    	for(String service : listeners ) {
-	        service_infos.addAll(Arrays.asList(this.jmmdns.list(service)));
-    	}
-        return service_infos;
-    }
+//    /******************************
+//	 * Discovery 
+//	 *****************************/
+//    /**
+//     * If you try calling this immediately after a service added callback
+//     * occurred, you probably wont see anything - it needs some time to resolve.
+//     * 
+//     * It will block if it needs to resolve services (and aren't in its cache yet).
+//     * 
+//     * @sa listDiscoveredServices
+//     * 
+//     * @return service_infos : an array of discovered ServiceInfo objects.
+//     */
+//    private List<ServiceInfo> listJmdnsDiscoveredServices() {
+//    	List<ServiceInfo> service_infos = new ArrayList<ServiceInfo>();
+//    	for(String service : listeners ) {
+//	        service_infos.addAll(Arrays.asList(this.jmmdns.list(service)));
+//    	}
+//        return service_infos;
+//    }
 
     /******************************
 	 * Utility Functions 
 	 *****************************/
-    private String toString(ServiceInfo service_info) {
-    	String result = "Service Info:\n";
-    	result += "  Name   : " + service_info.getName() + "\n";
-    	result += "  Type   : " + service_info.getType() + "\n";
-    	result += "  Port   : " + service_info.getPort() + "\n";
-    	for ( int i = 0; i < service_info.getInetAddresses().length; ++i ) {
-    		result += "  Address: " + service_info.getInetAddresses()[i].getHostAddress() + "\n";
-    	}
-    	return result;
+    private DiscoveredService toDiscoveredService(ServiceInfo service_info) {
+    	DiscoveredService discovered_service = new DiscoveredService();
+		discovered_service.name = service_info.getName();
+		String[] type_domain_str = service_info.getType().split("\\.");
+		discovered_service.type = type_domain_str[0] + "." + type_domain_str[1];
+		discovered_service.domain = service_info.getDomain();
+		discovered_service.hostname = service_info.getServer();
+		discovered_service.port = service_info.getPort();
+		for ( InetAddress inet_address : service_info.getInetAddresses() ) {
+			if ( inet_address instanceof Inet4Address) {
+				discovered_service.ipv4_addresses.add(inet_address.getHostAddress());
+			} else { // Inet6Address
+				discovered_service.ipv6_addresses.add(inet_address.getHostAddress());
+			}
+		}
+    	return discovered_service;
     }
 
-    private void display(ServiceInfo service_info) {
-    	logger.println("Service Info:");
-    	logger.println("  Name   : " + service_info.getName() );
-    	logger.println("  Type   : " + service_info.getType() );
-    	logger.println("  Port   : " + service_info.getPort() );
-    	for ( int i = 0; i < service_info.getInetAddresses().length; ++i ) {
-        	logger.println("  Address: " + service_info.getInetAddresses()[i].getHostAddress() );
-    	}
-    }
+//    private String toString(ServiceInfo service_info) {
+//    	String result = "Service Info:\n";
+//    	result += "  Name   : " + service_info.getName() + "\n";
+//    	result += "  Type   : " + service_info.getType() + "\n";
+//    	result += "  Port   : " + service_info.getPort() + "\n";
+//    	for ( int i = 0; i < service_info.getInetAddresses().length; ++i ) {
+//    		result += "  Address: " + service_info.getInetAddresses()[i].getHostAddress() + "\n";
+//    	}
+//    	return result;
+//    }
+//
+//    private void display(ServiceInfo service_info) {
+//    	logger.println("Service Info:");
+//    	logger.println("  Name   : " + service_info.getName() );
+//    	logger.println("  Type   : " + service_info.getType() );
+//    	logger.println("  Port   : " + service_info.getPort() );
+//    	for ( int i = 0; i < service_info.getInetAddresses().length; ++i ) {
+//        	logger.println("  Address: " + service_info.getInetAddresses()[i].getHostAddress() );
+//    	}
+//    }
 
-    /*************************************************************************
-	 * Main 
-	 ************************************************************************/
-    public static void main_publisher(String argv[]) throws IOException {
-        Zeroconf publisher = new Zeroconf();
-        publisher.addService("DudeMaster", "_ros-master._tcp", "local", 8888, "Dude's test master");
-        int i = 0;
-        while(true) {
-    		try {
-        		Thread.sleep(1000L);
-		    } catch (InterruptedException e) {
-		        e.printStackTrace();
-		    }
-    		++i;
-    		if ( i == 8 ) {
-    			publisher.removeAllServices();
-    		}
-        }
-    }
 }
