@@ -10,6 +10,7 @@
   <license>BSD</license>
   <review status="experimental" notes=""/>
   <url>http://ros.org/wiki/zeroconf_jmdns_demos</url>
+  <depend package="zeroconf_comms"/>
   <depend package="zeroconf_jmdns"/>
   <export>
     <rosjava-src location="src/java" />

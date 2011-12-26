@@ -871,28 +871,48 @@ public class ServiceInfoImpl extends ServiceInfo implements DNSListener, DNSStat
     public void updateRecord(DNSCache dnsCache, long now, DNSEntry rec) {
         if ((rec instanceof DNSRecord) && !rec.isExpired(now)) {
             boolean serviceUpdated = false;
+            String result;
+            HostInfo host_info;
             switch (rec.getRecordType()) {
                 case TYPE_A: // IPv4
-//                	try {
-//                		System.out.printf("UpdateRecord:\n  jmdns: %s\n  type ipv4\n  name: %s [%s]\n  Address: %s\n", 
-//                				this.getDns().getInetAddress().getHostAddress(),
-//                				rec.getName(), this.getServer(),           				
-//                				((Inet4Address) ((DNSRecord.Address) rec).getAddress()).getHostAddress()
-//                				);
-//                	} catch (IOException e) {} 
+//                	{
+//	            		result = "UpdateRecord (TYPE_IPv4):\n";
+//	            		host_info = this.getDns().getLocalHost();
+//	               		result += "    Record Jmdns : " + host_info.getInetAddress().getHostAddress();
+//	            		result += " [" + host_info.getInterface().getDisplayName() + "]\n";
+//	            		result += "    Record Name  : " + rec.getName() + "\n";
+//	            		result += "    Info Server  : " + this.getServer() + "\n";
+//	            		for ( Inet4Address address : _ipv4Addresses ) {
+//	            			result += "    Address     : " + address.getHostAddress() + "\n";
+//	            		}
+//	            		for ( Inet6Address address : _ipv6Addresses ) {
+//	            			result += "    Address     : " + address.getHostAddress() + "\n";;
+//	            		}
+//	        			result += "    [+] Address  : " + ((Inet4Address) ((DNSRecord.Address) rec).getAddress()).getHostAddress() + "\n";
+//	        			System.out.printf("%s", result);
+//                	}
                     if (rec.getName().equalsIgnoreCase(this.getServer())) {
                         _ipv4Addresses.add((Inet4Address) ((DNSRecord.Address) rec).getAddress());
                         serviceUpdated = true;
                     }
                     break;
                 case TYPE_AAAA: // IPv6
-//                	try {
-//                		System.out.printf("UpdateRecord:\n  jmdns: %s\n  type ipv4\n  name: %s [%s]\n  Address: %s\n", 
-//                				this.getDns().getInetAddress().getHostAddress(),
-//                				rec.getName(), this.getServer(),           				
-//                				((Inet4Address) ((DNSRecord.Address) rec).getAddress()).getHostAddress()
-//                				);
-//                	} catch (IOException e) {} 
+//                	{
+//	            		result = "UpdateRecord (TYPE_IPv6):\n";
+//	            		host_info = this.getDns().getLocalHost();
+//	               		result += "    Record Jmdns : " + host_info.getInetAddress().getHostAddress();
+//	            		result += " [" + host_info.getInterface().getDisplayName() + "]\n";
+//	            		result += "    Record Name  : " + rec.getName() + "\n";
+//	            		result += "    Info Server  : " + this.getServer() + "\n";
+//	            		for ( Inet4Address address : _ipv4Addresses ) {
+//	            			result += "    Address     : " + address.getHostAddress() + "\n";
+//	            		}
+//	            		for ( Inet6Address address : _ipv6Addresses ) {
+//	            			result += "    Address     : " + address.getHostAddress() + "\n";;
+//	            		}
+//	        			result += "    [+] Address  : " + ((DNSRecord.Address) rec).getAddress().getHostAddress() + "\n";
+//	        			System.out.printf("%s", result);
+//                	}
                     if (rec.getName().equalsIgnoreCase(this.getServer())) {
                         _ipv6Addresses.add((Inet6Address) ((DNSRecord.Address) rec).getAddress());
                         serviceUpdated = true;
@@ -901,20 +921,26 @@ public class ServiceInfoImpl extends ServiceInfo implements DNSListener, DNSStat
                 case TYPE_SRV:
                     // do a git checkout 6e46cc136a95849d2799a857da1ac851046aadb9 to see my first experiment here to solve multi-interface issues
                     if (rec.getName().equalsIgnoreCase(this.getQualifiedName())) {
-                        DNSRecord.Service srv = (DNSRecord.Service) rec;
+                		DNSRecord.Service srv = (DNSRecord.Service) rec;
+
+//                		{ // debugging
+//	                        result = "UpdateRecord (TYPE_SRV):\n";
+//	                		host_info = this.getDns().getLocalHost();
+//	            			result += "    Record Jmdns: " + host_info.getInetAddress().getHostAddress();
+//	                		result += " [" + host_info.getInterface().getDisplayName() + "]\n";
+//	                		result += "    DNS Server  : " + srv.getServer() + "\n";
+//	                		if ( _server == null ) {
+//	                			result += "    Info Server : -\n";
+//	                		} else {
+//		                		result += "    Info Server : " + _server + "\n";
+//	                		}
+//	                		System.out.printf("%s", result);
+//                    	}
+                		
                         // DJS: This is the original jmdns, but it fails on multiple interface pc's.
                         // Issue: http://sourceforge.net/tracker/?func=detail&aid=3437568&group_id=93852&atid=605791
                         boolean serverChanged = (_server == null) || !_server.equalsIgnoreCase(srv.getServer());
                         _server = srv.getServer();
-						// DJS: experimented with the following, but it fails on single interface pc's :/
-                        // boolean serverChanged = (_server == null) || !_server.equalsIgnoreCase(this.getDns().getHostName());
-                        // _server = this.getDns().getHostName();
-//                    	try {
-//                    		System.out.printf("UpdateRecord:\n  jmdns: %s\n  type srv\n  server: %s\n", 
-//	                    				this.getDns().getInetAddress().getHostAddress(),
-//	                    				srv.getServer()                				
-//	                    				);
-//                    	} catch (IOException e) {} 
                         _port = srv.getPort();
                         _weight = srv.getWeight();
                         _priority = srv.getPriority();
@@ -931,13 +957,6 @@ public class ServiceInfoImpl extends ServiceInfo implements DNSListener, DNSStat
                         } else {
                             serviceUpdated = true;
                         }
-                    //} else { // rec.getName != this.getQualifiedName()
-                    	//try {
-                    		//System.out.printf("UpdateRecord:\n  jmdns: %s\n  type srv\n  name: %s [%s]\n", 
-	                    	//			this.getDns().getInetAddress().getHostAddress(),
-                    		//			rec.getName(), this.getQualifiedName() 
-                    		//			);
-                    	//} catch (IOException e) {} 
                     }
                     break;
                 case TYPE_TXT:

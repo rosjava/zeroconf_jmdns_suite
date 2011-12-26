@@ -2,7 +2,8 @@ package ros.zeroconf.jmdns;
 
 import java.io.IOException;
 import java.lang.Thread;
-import java.net.Inet4Address;
+import java.lang.Boolean;
+import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.HashMap;
@@ -11,7 +12,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
-
 import javax.jmdns.JmmDNS;
 import javax.jmdns.NetworkTopologyEvent;
 import javax.jmdns.NetworkTopologyListener;
@@ -19,6 +19,7 @@ import javax.jmdns.ServiceEvent;
 import javax.jmdns.ServiceInfo;
 import javax.jmdns.ServiceListener;
 import javax.jmdns.ServiceTypeListener;
+import org.ros.message.zeroconf_comms.DiscoveredService;
 
 public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTopologyListener {
 
@@ -153,14 +154,62 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
      * 
      * @return service_infos : an array of discovered ServiceInfo objects.
      */
-    public List<ServiceInfo> listDiscoveredServices() {
-    	List<ServiceInfo> service_infos = new ArrayList<ServiceInfo>();;
+    public List<ServiceInfo> listJmdnsDiscoveredServices() {
+    	List<ServiceInfo> service_infos = new ArrayList<ServiceInfo>();
     	for(String service : listeners ) {
 	        service_infos.addAll(Arrays.asList(this.jmmdns.list(service)));
     	}
         return service_infos;
     }
-    
+
+    public List<DiscoveredService> listDiscoveredServices() {
+    	List<ServiceInfo> service_infos = new ArrayList<ServiceInfo>();
+    	for(String service : listeners ) {
+	        service_infos.addAll(Arrays.asList(this.jmmdns.list(service)));
+    	}
+    	// At this point, we have a real problem - quite often they are duplicated
+    	// but have different addresses resolved to each, in other words, we need
+    	// to uniquely resolve them since jmdns doesn't do us that favour!
+    	// Todo: Maybe get jmdns to patch this?
+    	List<DiscoveredService> discovered_services = new ArrayList<DiscoveredService>();
+    	for(ServiceInfo service_info : service_infos ) {
+    		Boolean service_found = false;
+    		for ( DiscoveredService discovered_service : discovered_services ) {
+    			if ( service_info.getQualifiedName().equals(discovered_service.name+"."+discovered_service.type+"."+discovered_service.domain+".") ) {
+    				for ( InetAddress inet_address : service_info.getInetAddresses() ) {
+    					Boolean address_found = false;
+	    				for ( String unique_address : discovered_service.addresses ) {
+	    					if ( inet_address.getHostAddress().equals(unique_address) ) {
+	    						address_found = true;
+	    						break;
+	    					}
+	    				}
+	    				if ( !address_found ) {
+	    					discovered_service.addresses.add(inet_address.getHostAddress());
+	    				}
+    				}
+    				service_found = true;
+    				break;
+    			}
+    		}
+    		if ( !service_found ) {
+    			DiscoveredService new_service = new DiscoveredService();
+    			new_service.name = service_info.getName();
+    			String[] type_domain_str = service_info.getType().split("\\.");
+    			new_service.type = type_domain_str[0] + "." + type_domain_str[1];
+    			new_service.domain = service_info.getDomain();
+    			new_service.hostname = service_info.getServer();
+    			new_service.port = service_info.getPort();
+    			for ( InetAddress inet_address : service_info.getInetAddresses() ) {
+    				new_service.addresses.add(inet_address.getHostAddress());
+    			}
+    			discovered_services.add(new_service);
+    		}
+    		
+    	}
+        return discovered_services;
+    }
+
     /**
      * This should be called when your application shuts down to remove all services
      * so you don't pollute the zeroconf namespace with hanging, unresolvable services. 
@@ -181,6 +230,16 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     	}
     }
     
+    public void display(DiscoveredService discovered_service) {
+    	logger.println("Discovered Service:");
+    	logger.println("  Name   : " + discovered_service.name );
+    	logger.println("  Type   : " + discovered_service.type );
+    	logger.println("  Port   : " + discovered_service.port );
+    	for ( String address : discovered_service.addresses ) {
+        	logger.println("  Address: " + address );
+    	}
+    }
+    
     public String toString(ServiceInfo service_info) {
     	String result = "Service Info:\n";
     	result += "  Name   : " + service_info.getName() + "\n";
@@ -191,7 +250,6 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     	}
     	return result;
     }
-    
     
     public void shutdown() throws IOException {
     	removeAllServices();
@@ -245,7 +303,7 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
         final ServiceInfo service_info = event.getInfo();
         // might need to add a timeout as a last arg here
         // true tells it to keep resolving when new, new info comes in (persistent).
-        jmmdns.requestServiceInfo(service_info.getType(), service_info.getName(), true);
+        jmmdns.getServiceInfos(service_info.getType(), service_info.getName(), true);
         ZeroconfListener callback = listener_callbacks.get(service_info.getType());
         if ( callback != null ) {
         	callback.serviceAdded(service_info);
@@ -268,13 +326,16 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
 
     @Override
     public void serviceResolved(ServiceEvent event) {
-        final String name = event.getName();
         final ServiceInfo service_info = event.getInfo();
         ZeroconfListener callback = listener_callbacks.get(service_info.getType());
         if ( callback != null ) {
         	callback.serviceResolved(service_info);
         } else {
-            logger.println("[+] Resolved Service: " + name);
+            logger.println("[=] Resolved        : " + service_info.getQualifiedName());
+        	logger.println("      Port          : " + service_info.getPort() );
+        	for ( int i = 0; i < service_info.getInetAddresses().length; ++i ) {
+            	logger.println("      Address       : " + service_info.getInetAddresses()[i].getHostAddress() );
+        	}
         }
     }
 
@@ -292,27 +353,6 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
 	/*************************************************************************
 	 * Main 
 	 ************************************************************************/
-    public static void main_listener(String argv[]) throws IOException {
-        Zeroconf browser = new Zeroconf();
-        browser.addListener("_ros-master._tcp","local");
-        int i = 0;
-        while( i < 8 ) {
-    		try {
-    			System.out.println("************ Discovered Services ************");
-    			List<ServiceInfo> service_infos = browser.listDiscoveredServices();
-    			for ( ServiceInfo service_info : service_infos ) {
-	        		browser.display(service_info);
-    			}
-        		Thread.sleep(1000L);
-		    } catch (InterruptedException e) {
-		        e.printStackTrace();
-		    }
-    		++i;
-        }
-        browser.removeListener("_ros-master._tcp","local");
-        browser.shutdown();
-    }
-    
     public static void main_publisher(String argv[]) throws IOException {
         Zeroconf publisher = new Zeroconf();
         publisher.addService("DudeMaster", "_ros-master._tcp", "local", 8888, "Dude's test master");

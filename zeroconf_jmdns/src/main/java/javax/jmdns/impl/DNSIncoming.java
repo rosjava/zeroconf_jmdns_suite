@@ -7,6 +7,7 @@ package javax.jmdns.impl;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
@@ -281,7 +282,8 @@ public final class DNSIncoming extends DNSMessage {
 
     private DNSRecord readAnswer(InetAddress source) {
         String domain = _messageInputStream.readName();
-        DNSRecordType type = DNSRecordType.typeForIndex(_messageInputStream.readUnsignedShort());
+        int type_value = _messageInputStream.readUnsignedShort();
+        DNSRecordType type = DNSRecordType.typeForIndex(type_value);
         if (type == DNSRecordType.TYPE_IGNORE) {
             logger.log(Level.SEVERE, "Could not find record type. domain: " + domain + "\n" + this.print(true));
         }
@@ -298,9 +300,11 @@ public final class DNSIncoming extends DNSMessage {
         switch (type) {
             case TYPE_A: // IPv4
                 rec = new DNSRecord.IPv4Address(domain, recordClass, unique, ttl, _messageInputStream.readBytes(len));
+                //System.out.printf("  Answer: [%s] %s\n", _packet.getAddress().getHostAddress(),  rec.toString());
                 break;
             case TYPE_AAAA: // IPv6
-                rec = new DNSRecord.IPv6Address(domain, recordClass, unique, ttl, _messageInputStream.readBytes(len));
+                rec = new DNSRecord.IPv6Address(domain, recordClass, unique, ttl, _messageInputStream.readBytes(len)); // last bit is raw address
+                //System.out.printf("  Answer: [%s] %s\n", _packet.getAddress().getHostAddress(),  rec.toString());
                 break;
             case TYPE_CNAME:
             case TYPE_PTR:
@@ -329,6 +333,7 @@ public final class DNSIncoming extends DNSMessage {
                     target = _messageInputStream.readNonNameString();
                 }
                 rec = new DNSRecord.Service(domain, recordClass, unique, ttl, priority, weight, port, target);
+                //System.out.printf("  Answer: [%s] %s\n", _packet.getAddress().getHostAddress(), rec.toString());
                 break;
             case TYPE_HINFO:
                 StringBuilder buf = new StringBuilder();

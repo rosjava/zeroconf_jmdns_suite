@@ -10,6 +10,7 @@
   <url>http://jmdns.sourceforge.net/</url>
 
   <depend package="rosjava_bootstrap"/>
+  <depend package="zeroconf_comms"/>
   <rosdep name="ant" />
   <rosdep name="java" />
 

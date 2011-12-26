@@ -1283,6 +1283,7 @@ public class JmDNSImpl extends JmDNS implements DNSStatefulObject, DNSTaskStarte
             if (logger.isLoggable(Level.FINEST)) {
                 logger.finest(this.getName() + ".updating record for event: " + event + " list " + serviceListenerList + " operation: " + operation);
             }
+            //System.out.println("Jmdns::updateRecord " + this.getName() + " updating record for event: " + event + "\n   list " + serviceListenerList + "\n   operation: " + operation );
             if (!serviceListenerList.isEmpty()) {
                 final ServiceEvent localEvent = event;
 
@@ -1416,8 +1417,12 @@ public class JmDNSImpl extends JmDNS implements DNSStatefulObject, DNSTaskStarte
 
         boolean hostConflictDetected = false;
         boolean serviceConflictDetected = false;
-
+        String addr = getLocalHost().getInetAddress().getHostAddress();
         for (DNSRecord newRecord : msg.getAllAnswers()) {
+        	String new_record = newRecord.toString();
+//        	if ( ( !new_record.contains("TYPE_PTR") ) && ( !new_record.contains("TYPE_TXT") ) ) {
+//            	System.out.printf("[%s] %s\n",addr,new_record);
+//        	}
             this.handleRecord(newRecord, now);
 
             if (DNSRecordType.TYPE_A.equals(newRecord.getRecordType()) || DNSRecordType.TYPE_AAAA.equals(newRecord.getRecordType())) {
@@ -1425,9 +1430,7 @@ public class JmDNSImpl extends JmDNS implements DNSStatefulObject, DNSTaskStarte
             } else {
                 serviceConflictDetected |= newRecord.handleResponse(this);
             }
-
         }
-
         if (hostConflictDetected || serviceConflictDetected) {
             this.startProber();
         }
@@ -1940,6 +1943,19 @@ public class JmDNSImpl extends JmDNS implements DNSStatefulObject, DNSTaskStarte
         if (logger.isLoggable(Level.FINER)) {
             logger.finer(this.getName() + ".collector: " + collector);
         }
+        // DJS: let's see what the collector finds for us.
+//        try {
+//        	System.out.println("Jmdns::list() : " + this.getInetAddress().getHostAddress());
+//        	for ( ServiceInfo service_info : collector.list(timeout) ) {
+//        		System.out.println("  Name    : " + service_info.getQualifiedName());
+//        		System.out.println("  Port    : " + service_info.getPort());
+//        		System.out.println("  Hostname: " + service_info.getServer());
+//            	for ( int i = 0; i < service_info.getInetAddresses().length; ++i ) {
+//            		System.out.println("  Address : " + service_info.getInetAddresses()[i].getHostAddress());
+//            	}
+//        	}
+//    	} catch (IOException e) {} 
+
         // At this stage the collector should never be null but it keeps findbugs happy.
         return (collector != null ? collector.list(timeout) : new ServiceInfo[0]);
     }

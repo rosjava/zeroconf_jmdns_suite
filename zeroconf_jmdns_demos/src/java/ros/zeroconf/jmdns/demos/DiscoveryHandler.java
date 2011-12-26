@@ -9,7 +9,7 @@ import javax.jmdns.ServiceInfo;
  * (service added, resolved, removed) to be processed in a custom way for the user
  * of the class. 
  */
-public class Listener implements ZeroconfListener {
+public class DiscoveryHandler implements ZeroconfListener {
 	
 	public void serviceAdded(ServiceInfo service_info) {
     	String result = "[+] " + service_info.getQualifiedName();
@@ -21,7 +21,8 @@ public class Listener implements ZeroconfListener {
 	}
 	public void serviceResolved(ServiceInfo service_info) {
     	String result = "[=] " + service_info.getQualifiedName() + "\n";
-    	result += "    Port   : " + service_info.getPort() + "\n";
+    	result += "    Port     : " + service_info.getPort() + "\n";
+    	result += "    Hostname : " + service_info.getServer() + "\n";
     	for ( int i = 0; i < service_info.getInetAddresses().length; ++i ) {
     		result += "    Address: " + service_info.getInetAddresses()[i].getHostAddress() + "\n";
     	}

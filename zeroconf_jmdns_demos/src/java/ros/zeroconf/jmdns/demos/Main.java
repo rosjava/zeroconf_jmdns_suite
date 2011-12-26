@@ -6,6 +6,7 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+import ros.zeroconf.jmdns.Zeroconf;
 
 /**
  * Main sample program for JmDNS.
@@ -36,12 +37,14 @@ public class Main {
 		if (argc == 0) {
         	Main.usage();
             System.exit(1);
-		} else if ( (argc >= 1) && "--listener".equals(argv[0])) {
-			Zeroconf.main_listener(argv);
+		} else if ( (argc >= 1) && "--jmdns-polling".equals(argv[0])) {
+			Discovery.main_jmdns_polling(argv);
+		} else if ( (argc >= 1) && "--polling".equals(argv[0])) {
+			Discovery.main_polling(argv);
 		} else if ( "--publisher".equals(argv[0]) ) {
 			Zeroconf.main_publisher(argv);
 		} else if ( "--discovery".equals(argv[0]) ) {
-			Discovery.main(argv);
+			Discovery.main_handler(argv);
         } else {
         	Main.usage();
             System.exit(1);
@@ -52,7 +55,7 @@ public class Main {
         System.out.println("jmdns:");
         System.out.println("     --debug          - output debugging info");
         System.out.println("     --publisher      - publishes a _ros-master._tcp for 8s");
-        System.out.println("     --listener       - polling discovery for ros masters (_ros-master._tcp)");
+        System.out.println("     --polling        - polling discovery for ros masters (_ros-master._tcp)");
         System.out.println("     --discovery      - callback discovery for ros services (ros, concert, app-manager)");
         System.out.println();
     }
