@@ -105,11 +105,11 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     	String service = service_type + "." + domain + ".";
     	logger.println("Activating listener: " + service);
     	listeners.add(service);
-    	// add to currently established interfaces
-    	jmmdns.addServiceListener(service, this);
     	if ( listener_callback != null ) { 
     		listener_callbacks.put(service, listener_callback);
     	}
+    	// add to currently established interfaces
+    	jmmdns.addServiceListener(service, this);
     }
     
     /**
