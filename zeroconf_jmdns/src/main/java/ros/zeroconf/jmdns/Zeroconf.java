@@ -6,6 +6,7 @@ import java.lang.Boolean;
 import java.net.InetAddress;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
+import java.net.NetworkInterface;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.HashMap;
@@ -235,7 +236,7 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     }
     
 	/*************************************************************************
-	 * Listener Callbacks 
+	 * Listener Callbacks - from ServiceListener and ServiceTypeListener
 	 ************************************************************************/
     @Override
     public void serviceAdded(ServiceEvent event) {
@@ -293,7 +294,11 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
 	 * Network Topology Callbacks 
 	 *****************************/
 	public void inetAddressAdded(NetworkTopologyEvent event) {
-		logger.println("[+] NetworkInterface: " + event.getInetAddress().getHostAddress());
+		try {
+			logger.println("[+] NetworkInterface: " + event.getInetAddress().getHostAddress() + " [" + NetworkInterface.getByInetAddress(event.getInetAddress()).getDisplayName() + "]");
+		} catch (IOException e) {
+	        e.printStackTrace();
+        }
         try {
         	event.getDNS().addServiceTypeListener(this);
         	for(String listener : listeners ) {
@@ -313,7 +318,11 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
 	}
 	
 	public void inetAddressRemoved(NetworkTopologyEvent event) {
-		logger.println("[-] NetworkInterface: " + event.getInetAddress().getHostAddress());
+		try {
+			logger.println("[-] NetworkInterface: " + event.getInetAddress().getHostAddress() + " [" + NetworkInterface.getByInetAddress(event.getInetAddress()).getDisplayName() + "]");
+		} catch (IOException e) {
+	        e.printStackTrace();
+        }
 		event.getDNS().removeServiceTypeListener(this);
     	for(String listener : listeners ) {
     		logger.println("      Removing service listener '" + listener + "'");
