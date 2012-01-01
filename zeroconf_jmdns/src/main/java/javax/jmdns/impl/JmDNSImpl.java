@@ -13,6 +13,7 @@ import java.net.MulticastSocket;
 import java.net.SocketException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -967,6 +968,27 @@ public class JmDNSImpl extends JmDNS implements DNSStatefulObject, DNSTaskStarte
     public void removeServiceListener(String type, ServiceListener listener) {
         String loType = type.toLowerCase();
         List<ServiceListenerStatus> list = _serviceListeners.get(loType);
+    	// DJS Trigger callbacks for service infos
+        ServiceCollector collector = _serviceCollectors.get(type);
+    	for ( ServiceInfo info : Arrays.asList(collector.list(-1)) ) {
+        	final ServiceEvent event = new ServiceEventImpl(this,info.getType(), info.getName(), info);
+            final List<ServiceListenerStatus> listCopy;
+            if ((list != null) && (!list.isEmpty())) {
+                synchronized (list) {
+                    listCopy = new ArrayList<ServiceListenerStatus>(list);
+                }
+                for (final ServiceListenerStatus listener_status : listCopy) {
+                    _executor.submit(new Runnable() {
+                        /** {@inheritDoc} */
+                        @Override
+                        public void run() {
+                            listener_status.serviceRemoved(event);
+                        }
+                    });
+                }
+            }
+    	}
+    	// resume normal service
         if (list != null) {
             synchronized (list) {
                 ServiceListenerStatus status = new ServiceListenerStatus(listener, ListenerStatus.ASYNCHONEOUS);
@@ -1992,7 +2014,8 @@ public class JmDNSImpl extends JmDNS implements DNSStatefulObject, DNSTaskStarte
     }
 
     /**
-     * This method disposes all ServiceCollector instances which have been created by calls to method <code>list(type)</code>.
+     * This method disposes all ServiceCollector instances which have been created by calls to 
+     * method <code>list(type)</code>.
      *
      * @see #list
      */

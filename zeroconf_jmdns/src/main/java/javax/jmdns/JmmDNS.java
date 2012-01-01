@@ -97,13 +97,17 @@ public interface JmmDNS extends Closeable {
          * @return the JmmDNS
          */
         public static JmmDNS getInstance() {
-            if (_instance == null) {
+        	// DJS don't ever want to retrieve an instance still floating around after
+        	// it's been closed, so forcing a new one (black magic, only should ever call 
+        	// this once)
+        	
+//            if (_instance == null) {
                 synchronized (Factory.class) {
-                    if (_instance == null) {
+//                    if (_instance == null) {
                         _instance = JmmDNS.Factory.newJmmDNS();
-                    }
+//                    }
                 }
-            }
+//            }
             return _instance;
         }
     }

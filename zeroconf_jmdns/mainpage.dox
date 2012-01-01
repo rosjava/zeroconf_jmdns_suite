@@ -36,8 +36,11 @@ For browsing:
 java -jar jmdns.jar -browse
 @endcode
 
-@section ToDo
+@section Modifications
 
- - should probably download via an ant svn task rather than saving files here
- 
+Might have missed a couple of early ones
+
+ - I think its in list(), using a set instead of list to guarantee uniquess
+ - jmdns::removeServiceListener we check for service infos and trigger serviceRemoved callbacks
+ - jmmdns::getInstance(), hack to always create new instances (dodgy)
 */

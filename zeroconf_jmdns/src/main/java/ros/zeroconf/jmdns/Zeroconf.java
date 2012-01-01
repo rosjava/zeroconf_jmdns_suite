@@ -232,6 +232,7 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     
     public void shutdown() throws IOException {
     	removeAllServices();
+    	logger.println("Shutdown");
     	jmmdns.close();
     }
     
@@ -265,6 +266,14 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
     }
 
     @Override
+    /**
+     * This implements service resolved in a very simple way. If the user has callbacks, then
+     * it just directly resolves the service info to a ros service info. Note that if you have
+     * multiple interfaces (e.g. eth0, wlan0) then this won't provide the resolved artifact
+     * for all interfaces. It might be worth adding a check for that service across all
+     * interfaces here and providing a fully updated (with regards to addresses) ros
+     * service info artifact to the user's callback here.
+     */
     public void serviceResolved(ServiceEvent event) {
         final ServiceInfo service_info = event.getInfo();
         ZeroconfDiscoveryHandler callback = listener_callbacks.get(service_info.getType());
@@ -293,6 +302,7 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
 	/******************************
 	 * Network Topology Callbacks 
 	 *****************************/
+    @Override
 	public void inetAddressAdded(NetworkTopologyEvent event) {
 		try {
 			logger.println("[+] NetworkInterface: " + event.getInetAddress().getHostAddress() + " [" + NetworkInterface.getByInetAddress(event.getInetAddress()).getDisplayName() + "]");
@@ -317,12 +327,18 @@ public class Zeroconf implements ServiceListener, ServiceTypeListener, NetworkTo
         }
 	}
 	
-	public void inetAddressRemoved(NetworkTopologyEvent event) {
-		try {
-			logger.println("[-] NetworkInterface: " + event.getInetAddress().getHostAddress() + " [" + NetworkInterface.getByInetAddress(event.getInetAddress()).getDisplayName() + "]");
-		} catch (IOException e) {
-	        e.printStackTrace();
-        }
+    @Override
+    public void inetAddressRemoved(NetworkTopologyEvent event) {
+    	String event_address_str = event.getInetAddress().getHostAddress();
+    	// can't get the display name like above, as the interface is no longer available.
+    	// if we really want the display name, need to store it somewhere when the network interface
+    	// is added.
+		logger.println("[-] NetworkInterface: " + event_address_str);
+		// Trigger service info callbacks - this is fairly brutal. It might be better to
+		// check here if that service is no longer supplied on all interfaces, then call
+		// serviceRemoved. If it is still supplied, provide a serviceResolved callback with
+		// the updated addresses.
+
 		event.getDNS().removeServiceTypeListener(this);
     	for(String listener : listeners ) {
     		logger.println("      Removing service listener '" + listener + "'");
