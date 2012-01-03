@@ -58,6 +58,8 @@ public class JmmDNSImpl implements JmmDNS, NetworkTopologyListener, ServiceInfoI
     private final ExecutorService                    _jmDNSExecutor;
 
     private final Timer                              _timer;
+    
+    private boolean is_closed;
 
     /**
      *
@@ -70,15 +72,21 @@ public class JmmDNSImpl implements JmmDNS, NetworkTopologyListener, ServiceInfoI
         _ListenerExecutor = Executors.newSingleThreadExecutor();
         _jmDNSExecutor = Executors.newCachedThreadPool();
         _timer = new Timer("Multihommed mDNS.Timer", true);
+        boolean is_closed = false;
         (new NetworkChecker(this, NetworkTopologyDiscovery.Factory.getInstance())).start(_timer);
     }
 
+    public boolean isClosed() {
+    	return is_closed;
+    }
+    
     /*
      * (non-Javadoc)
      * @see java.io.Closeable#close()
      */
     @Override
     public void close() throws IOException {
+    	is_closed = true;
         if (logger.isLoggable(Level.FINER)) {
             logger.finer("Cancelling JmmDNS: " + this);
         }
@@ -110,6 +118,7 @@ public class JmmDNSImpl implements JmmDNS, NetworkTopologyListener, ServiceInfoI
         _knownMDNS.clear();
     }
 
+    
     /*
      * (non-Javadoc)
      * @see javax.jmdns.JmmDNS#getNames()

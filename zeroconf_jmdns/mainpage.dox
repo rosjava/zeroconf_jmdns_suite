@@ -42,5 +42,9 @@ Might have missed a couple of early ones
 
  - I think its in list(), using a set instead of list to guarantee uniquess
  - jmdns::removeServiceListener we check for service infos and trigger serviceRemoved callbacks
- - jmmdns::getInstance(), hack to always create new instances (dodgy)
+ - jmmdns::isClosed(), jmmdns::getInstance(), hack to create new instances (null or after closing) 
+
+This is important on android because when the app calls onDestroy, it doesn't kill the actual
+process (faster startup times). If you don't kill the actual process, then static class variables
+aren't cleaned. Normal variables are cleaned though.
 */
