@@ -32,8 +32,8 @@ import org.ros.message.zeroconf_comms.DiscoveredService;
  * others that need some black magic, and also the ouput (in ServiceInfo types) is fixed -
  * you can't modify, or merge them to simplify the output list of discovered services.
  * 
- * Ideally I should work with the jmdns guy and merge alot back upstream, but its rather
- * a large job to really get in and understand all its workings.
+ * Currently working with the jmdns guy and merging convenient additions here upstream but
+ * its a gradual process that needs alot of testing.
  * 
  * In summary, this is a nice, simple api for publishing services and doing service 
  * discovery (either via polling or via callback).

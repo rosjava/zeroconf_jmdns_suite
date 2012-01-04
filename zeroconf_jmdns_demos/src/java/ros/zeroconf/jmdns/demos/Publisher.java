@@ -1,8 +1,6 @@
 package ros.zeroconf.jmdns.demos;
 
 import java.io.IOException;
-import java.util.List;
-import org.ros.message.zeroconf_comms.DiscoveredService;
 import ros.zeroconf.jmdns.Zeroconf;
 import ros.zeroconf.jmdns.StandardLogger;
 
