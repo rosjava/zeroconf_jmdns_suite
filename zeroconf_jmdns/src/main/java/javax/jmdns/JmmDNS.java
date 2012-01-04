@@ -100,18 +100,20 @@ public interface JmmDNS extends Closeable {
         	// DJS don't ever want to retrieve an instance still floating around after
         	// it's been closed, so forcing a new one (black magic, only should ever call 
         	// this once)
-        	
-//            if (_instance == null) {
+            if ( (_instance == null) || ( _instance.isClosed() ) ) {
                 synchronized (Factory.class) {
-//                    if (_instance == null) {
-                        _instance = JmmDNS.Factory.newJmmDNS();
-//                    }
+                    _instance = JmmDNS.Factory.newJmmDNS();
                 }
-//            }
+            }
             return _instance;
         }
     }
 
+    /**
+     * Flag indicating if this object has been closed or not.
+     */
+    public abstract boolean isClosed();
+    
     /**
      * Return the names of the JmDNS instances.
      *
