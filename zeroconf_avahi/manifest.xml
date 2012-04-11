@@ -16,7 +16,9 @@
   <depend package="std_msgs"/>
   <depend package="zeroconf_comms"/>
   
-  <rosdep name="avahi"/>
+  <rosdep name="libavahi-core-dev"/>
+  <rosdep name="libavahi-client-dev"/>
+  <rosdep name="avahi-daemon"/>
 
   <export>
     <cpp cflags="-I${prefix}/include" lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -lzeroconf_avahi"/>
