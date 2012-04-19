@@ -15,7 +15,10 @@ python-avahi:
   ubuntu: python-avahi
   debian: python-avahi
 
-avahi:
-  ubuntu: avahi-daemon libavahi-client-dev libavahi-core-dev
-  debian: avahi-daemon libavahi-client-dev libavahi-core-dev
+libavahi-client-dev:
+  ubuntu: libavahi-client-dev
+libavahi-core-dev:
+  ubuntu: libavahi-core-dev
+avahi-daemon:
+  ubuntu: avahi-daemon
 
