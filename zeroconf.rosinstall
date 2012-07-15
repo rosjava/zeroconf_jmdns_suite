@@ -1,6 +1,13 @@
-# Official ros
+# Official ROS Stacks
+
+- setup-file:
+    local-name: /opt/ros/fuerte/setup.sh
+
 - other:
-    local-name: /opt/ros/fuerte/ros
+    local-name: /opt/ros/fuerte/share/ros
+
+- other:
+    local-name: /opt/ros/fuerte/share
 
 - other:
     local-name: /opt/ros/fuerte/stacks
