@@ -27,10 +27,10 @@
 - git:
     local-name: zeroconf_implementations
     version: master
-    uri: 'git://github.com/stonier/zeroconf_implementations.git'
+    uri: 'https://github.com/stonier/zeroconf_implementations.git'
 
 - git:
     local-name: zeroconf_android
     version: master
-    uri: 'git://github.com/stonier/zeroconf_android.git'
+    uri: 'https://github.com/stonier/zeroconf_android.git'
 
