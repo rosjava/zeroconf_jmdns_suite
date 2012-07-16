@@ -606,9 +606,9 @@ void Zeroconf::resolve_callback(
 					/*********************
 					** Logging
 					**********************/
-					if ( (*iter)->service.ipv4_addresses.size() == 0 ) {
+					if ( (*iter)->service.ipv4_addresses.size() != 0 ) {
 						ROS_WARN_STREAM("Zeroconf: timed out resolving service [" << name << "][" <<  type << "][" << domain << "][" << interface << "][" << zeroconf->avahi_to_txt_protocol(protocol) << "][" << (*iter)->service.ipv4_addresses[0] << ":" << (*iter)->service.port << "]");
-					} else if ( (*iter)->service.ipv6_addresses.size() == 0 ) {
+					} else if ( (*iter)->service.ipv6_addresses.size() != 0 ) {
 						ROS_WARN_STREAM("Zeroconf: timed out resolving service [" << name << "][" <<  type << "][" << domain << "][" << interface << "][" << zeroconf->avahi_to_txt_protocol(protocol) << "][" << (*iter)->service.ipv6_addresses[0] << ":" << (*iter)->service.port << "]");
 					} else {
 						ROS_WARN_STREAM("Zeroconf: timed out resolving service [" << name << "][" <<  type << "][" << domain << "][" << interface << "][" << zeroconf->avahi_to_txt_protocol(protocol) << "]");
