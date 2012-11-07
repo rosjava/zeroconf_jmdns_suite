@@ -1,7 +1,0 @@
-#!/bin/bash
-
-# If we wanted to publish via avahi-publish
-# avahi-publish -s ros _ros-master._tcp 8888
-
-# Instead, publishing via our zeroconf node itself:
-rosservice call /add_service '{ service: { name: Ros, type: _ros-master._tcp, domain: local, port: 5555, description: ros } }'
