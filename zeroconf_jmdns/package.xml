@@ -1,5 +1,5 @@
 <package>
-  <name>zeroconf_jmnds</name>
+  <name>zeroconf_jmdns</name>
   <version>0.1.0</version>
   <description>
     An implementation of zeroconf in pure java.
