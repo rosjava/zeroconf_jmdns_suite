@@ -14,6 +14,22 @@
  * the License.
  */
 
+apply plugin: 'java'
+apply plugin: 'osgi'
+apply plugin: 'eclipse'
+apply plugin: 'maven'
+
+repositories {
+    mavenLocal()
+    maven {
+    url 'http://robotbrains.hideho.org/nexus/content/groups/ros-public'
+    }
+}
+
+group 'ros.rosjava_zeroconf'
+version = '0.1.0'
+
+
 dependencies {
 }
 
