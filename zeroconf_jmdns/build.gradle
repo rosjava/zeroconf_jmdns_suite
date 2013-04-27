@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Google Inc.
+ * Copyright (C) 2013 Yujin Robot.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -14,34 +14,14 @@
  * the License.
  */
 
-task wrapper(type: Wrapper) {
-  gradleVersion = '1.0-milestone-9'
-}
-
-allprojects {
-  group 'ros.rosjava_zeroconf'
-  version = '0.0.0-SNAPSHOT'
-  apply plugin: 'java'
-  apply plugin: 'osgi'
-  apply plugin: 'eclipse'
-  apply plugin: 'maven'
-  sourceCompatibility = 1.6
-  targetCompatibility = 1.6
-
-    repositories {
-      mavenLocal()
-      maven {
-        url 'http://robotbrains.hideho.org/nexus/content/groups/ros-public'
-      }
-    }
-}
-
 dependencies {
 }
 
 jar {
   manifest {
-   version = '0.0.0-SNAPSHOT'
-   symbolicName = 'org.ros.rosjava_zeroconf'
+   version = '0.1.0'
+   symbolicName = 'org.javax.jmdns'
+   instruction 'Export-Package', '!org.ros.zeroconf.*, org.javax.jmdns.*'
+   instruction 'Private-Package', 'org.ros.zeroconf.*'
   }
 }
