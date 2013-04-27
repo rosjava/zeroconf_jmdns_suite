@@ -26,7 +26,7 @@ repositories {
     }
 }
 
-group 'ros.rosjava_zeroconf'
+group 'ros.rosjava_extras'
 version = '0.1.0'
 
 
