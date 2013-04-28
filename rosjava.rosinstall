@@ -1,4 +1,4 @@
 [
-{'git': {'local-name': 'rosjava_core', 'version': 'hydro-devel', 'uri':'https://github.com/ros-java/rosjava_core.git'}},
-{'git': {'local-name': 'rosjava_extras', 'version': 'hydro-devel', 'uri':'https://github.com/ros-java/rosjava_extras.git'}},
+{'git': {'local-name': 'rosjava_core', 'version': 'hydro-legacy', 'uri':'https://github.com/ros-java/rosjava_core.git'}},
+{'git': {'local-name': 'rosjava_extras', 'version': 'hydro-legacy', 'uri':'https://github.com/ros-java/rosjava_extras.git'}},
 ]
