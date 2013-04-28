@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Yujin Robot.
+ * Copyright (C) 2013 Yujin Robot
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -14,14 +14,29 @@
  * the License.
  */
 
-dependencies {
+task wrapper(type: Wrapper) {
+  gradleVersion = '1.0-milestone-9'
 }
 
-jar {
-  manifest {
-   version = '0.1.0'
-   symbolicName = 'org.javax.jmdns'
-   instruction 'Export-Package', '!org.ros.zeroconf.*, org.javax.jmdns.*'
-   instruction 'Private-Package', 'org.ros.zeroconf.*'
+allprojects {
+  group 'ros.rosjava_extras'
+  version = '0.1.0'
+}
+
+subprojects {
+  apply plugin: 'java'
+  apply plugin: 'osgi'
+  apply plugin: 'eclipse'
+  apply plugin: 'maven'
+
+  sourceCompatibility = 1.6
+  targetCompatibility = 1.6
+
+  repositories {
+    mavenLocal()
+    mavenCentral()
   }
 }
+
+defaultTasks 'install'
+
