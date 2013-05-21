@@ -1,4 +1,0 @@
-#!/bin/bash
-
-# This will collide with 'add_ros' (different port, same name).
-rosservice call /add_service '{ service: { name: Ros, type: _ros-master._tcp, domain: local, port: 5556, description: ros } }'

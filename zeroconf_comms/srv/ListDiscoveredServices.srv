@@ -1,3 +1,0 @@
-string service_type
----
-zeroconf_comms/DiscoveredService[] services
