@@ -1,0 +1,16 @@
+<package>
+  <name>rosjava_tutorial_pubsub</name>
+  <version>0.1.0</version>
+  <description>
+     rosjava_tutorial_pubsub is a simple example project.
+  </description>
+  <maintainer email="d.stonier@gmail.com">Daniel Stonier</maintainer>
+  <license>Apache 2.0</license>
+  <url type="website">http://ros.org/wiki/rosjava_tutorial_pubsub</url>
+  <url type="repository">https://github.com/ros-java/rosjava_core</url>
+  <url type="bugtracker">https://github.com/ros-java/rosjava_core/issues</url>
+  <author email="d.stonier@gmail.com">Daniel Stonier</author>
+  <author email="damonkohler@google.com">Damon Kohler</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+</package>
