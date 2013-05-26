@@ -9,5 +9,6 @@ project(rosjava_jmdns)
 # Catkin
 ##############################################################################
 
-#find_package(catkin REQUIRED rosjava_tools)
+find_package(catkin REQUIRED rosjava_tools)
+catkin_rosjava_setup(install)
 catkin_package()

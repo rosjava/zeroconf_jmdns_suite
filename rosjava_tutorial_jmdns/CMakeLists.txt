@@ -10,4 +10,5 @@ project(rosjava_tutorial_pubsub)
 ##############################################################################
 
 find_package(catkin REQUIRED)
+catkin_rosjava_setup(install)
 catkin_package()
