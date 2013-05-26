@@ -1,5 +1,5 @@
 <package>
-  <name>rosjava_tutorial_pubsub</name>
+  <name>rosjava_tutorial_jmdns</name>
   <version>0.1.0</version>
   <description>
      rosjava_tutorial_pubsub is a simple example project.
