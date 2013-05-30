@@ -16,7 +16,7 @@
 
 apply plugin: 'application'
 
-mainClassName = 'org.ros.rosjava_tutorial_jmdns.Main'
+mainClassName = 'com.github.rosjava.rosjava_tutorial_jmdns.Main'
 
 dependencies {
   compile project(':rosjava_jmdns')
