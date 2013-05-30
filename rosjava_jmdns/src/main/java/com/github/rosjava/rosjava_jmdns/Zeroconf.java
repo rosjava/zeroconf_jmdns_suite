@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.ros.rosjava_jmdns;
+package com.github.rosjava.rosjava_jmdns;
 
 import java.io.IOException;
 import java.lang.Boolean;
@@ -37,7 +37,8 @@ import javax.jmdns.ServiceInfo;
 import javax.jmdns.ServiceListener;
 import javax.jmdns.ServiceTypeListener;
 
-import org.ros.rosjava_jmdns.DiscoveredService;
+import com.github.rosjava.rosjava_jmdns.DiscoveredService;
+
 
 /**
  * This is a wrapper around the jmmdns (multi-homed) part of the jmdns library. 

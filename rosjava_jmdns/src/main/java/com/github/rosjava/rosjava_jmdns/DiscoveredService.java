@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.ros.rosjava_jmdns;
+package com.github.rosjava.rosjava_jmdns;
 
 import java.util.ArrayList;
 
