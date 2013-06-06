@@ -13,14 +13,18 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+package com.github.ros_java.jmdns;
 
-dependencies {
-}
+import java.lang.String;
 
-jar {
-  manifest {
-   version = '0.1.0'
-   symbolicName = 'org.javax.jmdns'
-   instruction 'Export-Package', 'org.ros.zeroconf.*, org.javax.jmdns.*'
-  }
+import com.github.ros_java.jmdns.ZeroconfLogger;
+
+/**
+ * A standard logger (to System.out.println) that can be
+ * passed to the Zeroconf class.
+ */
+public class StandardLogger implements ZeroconfLogger {
+	public void println(String msg) {
+		System.out.println(msg);
+	}
 }

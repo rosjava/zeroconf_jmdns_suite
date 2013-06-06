@@ -13,12 +13,12 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.github.rosjava.tutorial_jmdns;
+package com.github.ros_java.jmdns.tutorials;
 
 import java.io.IOException;
 
-import com.github.rosjava.jmdns.StandardLogger;
-import com.github.rosjava.jmdns.Zeroconf;
+import com.github.ros_java.jmdns.StandardLogger;
+import com.github.ros_java.jmdns.Zeroconf;
 
 public class Publisher {
 	

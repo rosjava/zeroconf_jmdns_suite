@@ -14,5 +14,5 @@
  * the License.
  */
 
-include 'rosjava_jmdns'
-include 'rosjava_tutorial_jmdns'
+include 'jmdns'
+include 'jmdns_tutorials'
