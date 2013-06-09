@@ -69,7 +69,7 @@ Start listening in one shell:
 And execute the publisher in another shell:
 
 ```
-./build/install/rosjava_tutorial_jmdns/bin/rosjava_tutorial_jmdns --publisher
+./build/install/jmdns_tutorials/bin/jmdns_tutorials --publisher
 ```
 
 **Discovery - Polling**
@@ -83,7 +83,7 @@ Start publishing in one shell:
 And execute polling discovery in another (it will print out the discovered list every second):
 
 ```
-./build/install/rosjava_tutorial_jmdns/bin/rosjava_tutorial_jmdns --polling
+./build/install/jmdns_tutorials/bin/jmdns_tutorials --polling
 ```
 
 **Discovery - Callback**
@@ -91,6 +91,6 @@ And execute polling discovery in another (it will print out the discovered list 
 As above, but start the discovery handler:
 
 ```
-./build/install/rosjava_tutorial_jmdns/bin/rosjava_tutorial_jmdns --polling
+./build/install/jmdns_tutorials/bin/jmdns_tutorials --polling
 ```
 
