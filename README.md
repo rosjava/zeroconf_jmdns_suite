@@ -1,4 +1,4 @@
-# RosJava JmDNS
+# Zeroconf JmDNS
 
 This repository packages android friendly sources from the [jmdns](http://jmdns.sourceforge.net/) project
 and provides some tutorial demos.
