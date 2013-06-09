@@ -13,9 +13,9 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.github.ros_java.jmdns;
+package com.github.ros_java.zeroconf_jmdns_suite.jmdns;
 
-import com.github.ros_java.jmdns.DiscoveredService;
+import com.github.ros_java.zeroconf_jmdns_suite.jmdns.DiscoveredService;
 
 /**
  * @brief Interface for a user listener.

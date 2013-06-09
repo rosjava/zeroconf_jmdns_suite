@@ -16,7 +16,7 @@
 
 apply plugin: 'application'
 
-mainClassName = 'com.github.ros_java.jmdns.tutorials.Main'
+mainClassName = 'com.github.ros_java.zeroconf_jmdns_suite.jmdns.tutorials.Main'
 
 dependencies {
   compile project(':jmdns')

@@ -13,14 +13,14 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.github.ros_java.jmdns.tutorials;
+package com.github.ros_java.zeroconf_jmdns_suite.jmdns.tutorials;
 
 import java.io.IOException;
 import java.util.List;
 
-import com.github.ros_java.jmdns.DiscoveredService;
-import com.github.ros_java.jmdns.StandardLogger;
-import com.github.ros_java.jmdns.Zeroconf;
+import com.github.ros_java.zeroconf_jmdns_suite.jmdns.DiscoveredService;
+import com.github.ros_java.zeroconf_jmdns_suite.jmdns.StandardLogger;
+import com.github.ros_java.zeroconf_jmdns_suite.jmdns.Zeroconf;
 
 public class Discovery {
 	
