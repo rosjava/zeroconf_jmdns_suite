@@ -1,5 +1,5 @@
 <package>
-  <name>rosjava_jmdns</name>
+  <name>zeroconf_jmdns_suite</name>
   <version>0.1.0</version>
   <description>
     An implementation of zeroconf in pure java.
