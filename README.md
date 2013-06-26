@@ -56,7 +56,7 @@ in a similar way to the ros zeroconf_avahi package.
 
 ## Tutorials
 
-There are three demo programs. First build the rosjava_tutorial_jmdns package and then:
+There are three demo programs. First build the jmdns_tutorials package and then:
 
 **Publishing**
 
