@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.github.ros_java.zeroconf_jmdns_suite.jmdns;
+package com.github.rosjava.zeroconf_jmdns_suite.jmdns;
 
 import java.io.IOException;
 import java.lang.Boolean;
@@ -37,7 +37,7 @@ import javax.jmdns.ServiceInfo;
 import javax.jmdns.ServiceListener;
 import javax.jmdns.ServiceTypeListener;
 
-import com.github.ros_java.zeroconf_jmdns_suite.jmdns.DiscoveredService;
+import com.github.rosjava.zeroconf_jmdns_suite.jmdns.DiscoveredService;
 
 
 /**

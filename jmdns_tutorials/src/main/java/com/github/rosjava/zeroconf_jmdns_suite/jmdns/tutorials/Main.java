@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.github.ros_java.zeroconf_jmdns_suite.jmdns.tutorials;
+package com.github.rosjava.zeroconf_jmdns_suite.jmdns.tutorials;
 
 import java.io.IOException;
 //import java.util.Enumeration;

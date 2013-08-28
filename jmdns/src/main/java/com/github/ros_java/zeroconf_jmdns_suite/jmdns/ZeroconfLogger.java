@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.github.ros_java.zeroconf_jmdns_suite.jmdns;
+package com.github.rosjava.zeroconf_jmdns_suite.jmdns;
 
 import java.lang.String;
 

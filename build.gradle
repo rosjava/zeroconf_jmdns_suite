@@ -19,7 +19,7 @@ task wrapper(type: Wrapper) {
 }
 
 allprojects {
-  group 'com.github.ros_java.zeroconf_jmdns_suite'
+  group 'com.github.rosjava.zeroconf_jmdns_suite'
   version = '0.1.0'
 }
 

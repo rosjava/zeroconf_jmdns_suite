@@ -13,10 +13,10 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.github.ros_java.zeroconf_jmdns_suite.jmdns.tutorials;
+package com.github.rosjava.zeroconf_jmdns_suite.jmdns.tutorials;
 
-import com.github.ros_java.zeroconf_jmdns_suite.jmdns.DiscoveredService;
-import com.github.ros_java.zeroconf_jmdns_suite.jmdns.ZeroconfDiscoveryHandler;
+import com.github.rosjava.zeroconf_jmdns_suite.jmdns.DiscoveredService;
+import com.github.rosjava.zeroconf_jmdns_suite.jmdns.ZeroconfDiscoveryHandler;
 
 /**
  * This class is a handler that can be passed to

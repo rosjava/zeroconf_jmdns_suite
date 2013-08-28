@@ -21,6 +21,6 @@ jar {
   manifest {
    version = '0.1.0'
    symbolicName = 'org.javax.jmdns'
-   instruction 'Export-Package', 'com.github.ros_java.jmdns.*, org.javax.jmdns.*'
+   instruction 'Export-Package', 'com.github.rosjava.jmdns.*, org.javax.jmdns.*'
   }
 }
