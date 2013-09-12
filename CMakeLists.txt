@@ -9,6 +9,15 @@ project(zeroconf_jmdns_suite)
 # Catkin
 ##############################################################################
 
-find_package(catkin REQUIRED rosjava_tools)
-catkin_rosjava_setup()
+find_package(catkin REQUIRED rosjava_build_tools)
+
+catkin_rosjava_setup(uploadArchives)
+
 catkin_package()
+
+##############################################################################
+# Installation
+##############################################################################
+
+install(DIRECTORY ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_MAVEN_DESTINATION}/com/github/rosjava/zeroconf_jmdns_suite/${CMAKE_PROJECT_NAME}/ 
+        DESTINATION ${CATKIN_GLOBAL_MAVEN_DESTINATION}/com/github/rosjava/zeroconf_jmdns_suite/${CMAKE_PROJECT_NAME})
