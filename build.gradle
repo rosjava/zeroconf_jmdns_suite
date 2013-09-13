@@ -32,9 +32,11 @@ buildscript {
     }
 }
 
+apply plugin: 'catkin'
+
 allprojects {
     group 'com.github.rosjava.zeroconf_jmdns_suite'
-    version = '0.1.0'
+    version = project.catkin.pkg.version
 }
 
 subprojects {
