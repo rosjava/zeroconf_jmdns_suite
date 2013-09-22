@@ -43,9 +43,39 @@ allprojects {
     version = project.catkin.pkg.version
 }
 
+project.ext {
+  /* the ros plugin defines this, but since we're building the plugin... */
+  rosMavenDeploymentRepository = "$System.env.ROS_MAVEN_DEPLOYMENT_REPOSITORY"
+  rosMavenPath = "$System.env.ROS_MAVEN_PATH".split(':')
+}
+
 subprojects {
-    apply plugin: 'ros'
-    apply plugin: 'ros-java'
+    /* Have to manually do this below since our gradle plugin is our sub project */
+    apply plugin: 'java'
+    apply plugin: 'maven'
+
+    sourceCompatibility = 1.6
+    targetCompatibility = 1.6
+
+    def repoURLs = project.rosMavenPath.collect { 'file://' + it }
+    repositories {
+        repoURLs.each { p ->
+            maven {
+                url p
+            }
+        }
+        mavenLocal()
+        maven {
+            url 'https://github.com/rosjava/rosjava_mvn_repo/raw/master'
+        }
+    }
+    if ( project.rosMavenDeploymentRepository != 'null' && project.rosMavenDeploymentRepository != '' ) {
+        uploadArchives {
+            repositories.mavenDeployer {
+                repository(url: 'file://' + project.rosMavenDeploymentRepository)
+            }
+        }
+    }
 }
 
 defaultTasks 'uploadArchives'
