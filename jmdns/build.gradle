@@ -16,7 +16,7 @@
 
 dependencies {
 }
-
+/*
 jar {
   manifest {
    version = project.version
@@ -24,3 +24,4 @@ jar {
    instruction 'Export-Package', 'com.github.rosjava.jmdns.*, org.javax.jmdns.*'
   }
 }
+*/
