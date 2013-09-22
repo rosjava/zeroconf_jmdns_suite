@@ -2,6 +2,10 @@
 Changelog for package zeroconf_jmdns_suite
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.9 (2013-09-22)
+------------------
+* removing osgi information.
+
 0.1.8 (2013-09-17)
 ------------------
 * bugfix install rule target name.
