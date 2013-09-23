@@ -13,5 +13,7 @@
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>rosjava_tools</build_depend>
+  <!-- This makes sure gradle is downloaded without conflict (temporary fix) -->
+  <build_depend>rosjava_core</build_depend>
 </package>
 
