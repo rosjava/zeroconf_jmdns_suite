@@ -17,7 +17,6 @@
 task wrapper(type: Wrapper) {
   gradleVersion = '1.7'
 }
-/*
 buildscript {
     def rosMavenPath = "$System.env.ROS_MAVEN_PATH".split(':').collect { 'file://' + it }
     repositories {
@@ -35,67 +34,17 @@ buildscript {
         classpath group: 'org.ros.rosjava_bootstrap', name: 'gradle_plugins', version: '0.1.+'
     }
 }
-*/
-project.ext {
-  /* the ros plugin defines this, but since we're building the plugin... */
-  rosMavenDeploymentRepository = "$System.env.ROS_MAVEN_DEPLOYMENT_REPOSITORY"
-  rosMavenPath = "$System.env.ROS_MAVEN_PATH".split(':')
-}
-/*
+
 apply plugin: 'catkin'
-*/
+
 allprojects {
     group 'com.github.rosjava.zeroconf_jmdns_suite'
-    version = '0.1.9'
-    /*version = project.catkin.pkg.version*/
+    version = project.catkin.pkg.version
 }
 
 subprojects {
-    apply plugin: 'java'
-    apply plugin: 'maven'
-    apply plugin: 'maven-publish'
-
-    sourceCompatibility = 1.6
-    targetCompatibility = 1.6
-
-    publishing {
-        publications {
-            mavenJava(MavenPublication) {
-                from components.java
-            }
-        }
-        repositories {
-            maven {
-               url 'file://' + project.rosMavenDeploymentRepository 
-            }
-        }
-    }
-    def repoURLs = project.rosMavenPath.collect { 'file://' + it }
-    repositories {
-        repoURLs.each { p ->
-            maven {
-                url p
-            }
-        }
-        mavenLocal()
-        maven {
-            url 'https://github.com/rosjava/rosjava_mvn_repo/raw/master'
-        }
-    }
-/*
-    if ( project.rosMavenDeploymentRepository != 'null' && project.rosMavenDeploymentRepository != '' ) {
-        uploadArchives {
-            repositories.mavenDeployer {
-                repository(url: 'file://' + project.rosMavenDeploymentRepository)
-            }
-        }
-    }
-    println("Upload archives ${uploadArchives}")
-    println("Upload archives ${uploadArchives.repositories.mavenDeployer.repository.url}")
-    apply plugin: 'ros'
     apply plugin: 'ros-java'
-*/
 }
 
-defaultTasks 'uploadArchives'
+defaultTasks 'publishMavenJavaPublicationToMavenRepository'
 

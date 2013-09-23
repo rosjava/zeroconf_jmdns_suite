@@ -16,12 +16,3 @@
 
 dependencies {
 }
-/*
-jar {
-  manifest {
-   version = project.version
-   symbolicName = 'org.javax.jmdns'
-   instruction 'Export-Package', 'com.github.rosjava.jmdns.*, org.javax.jmdns.*'
-  }
-}
-*/
