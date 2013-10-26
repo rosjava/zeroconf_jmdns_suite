@@ -2,6 +2,10 @@
 Changelog for package zeroconf_jmdns_suite
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.11 (2013-10-25)
+------------------
+* official maven style open ended dependencies.
+
 0.1.10 (2013-09-23)
 -------------------
 * use updated ros gradle plugins with maven-publish for publishing.
