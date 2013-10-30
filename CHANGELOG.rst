@@ -2,6 +2,10 @@
 Changelog for package zeroconf_jmdns_suite
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.12 (2013-10-31)
+------------------
+* use ROS_MAVEN_REPOSITORY
+
 0.1.11 (2013-10-25)
 ------------------
 * official maven style open ended dependencies.
