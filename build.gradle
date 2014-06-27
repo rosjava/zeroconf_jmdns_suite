@@ -25,15 +25,15 @@ buildscript {
 apply plugin: 'catkin'
 
 allprojects {
-    group 'com.github.rosjava.zeroconf_jmdns_suite'
-    version = project.catkin.pkg.version
+  group 'com.github.rosjava.zeroconf_jmdns_suite'
+  version = project.catkin.pkg.version
 }
 
 subprojects {
-    apply plugin: 'ros-java'
-    apply plugin: "osgi"
-    apply plugin: "idea"
-    apply plugin: "eclipse"
+  apply plugin: 'ros-java'
+  apply plugin: "osgi"
+  apply plugin: "idea"
+  apply plugin: "eclipse"
 }
 
 defaultTasks 'publishMavenJavaPublicationToMavenRepository', 'installApp'
