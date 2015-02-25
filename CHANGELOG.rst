@@ -1,6 +1,11 @@
 Changelog
 =========
 
+0.2.1 (2015-02-25)
+------------------
+* gradle 1.8 -> 2.2.1
+* Contributors: Daniel Stonier
+
 0.2.0 (2015-02-18)
 ------------------
 * First build on indigo
