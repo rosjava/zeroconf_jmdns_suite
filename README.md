@@ -1,9 +1,10 @@
-See [rosjava_core](https://github.com/rosjava/rosjava_core) readme.
-
 # Zeroconf JmDNS #
 
 This repository packages android friendly sources from the [jmdns](http://jmdns.sourceforge.net/) project
 and provides some tutorial demos.
+
+See [rosjava_core](https://github.com/rosjava/rosjava_core) readme for
+more information and pointers on the overall rosjava and android ecosystem.
 
 ## The JmDNS Library ##
 
@@ -58,4 +59,5 @@ in a similar way to the ros zeroconf_avahi package.
 
 ## Tutorials ##
 
-Instructions can be found in the readme in the jmdns_tutorials package.
+Tutorials are implemented in the jmdns_tutorials project. Instructions can be found
+in [the zerconf_jmdns_suite package ROS wiki](http://wiki.ros.org/zeroconf_jmdns_suite).
