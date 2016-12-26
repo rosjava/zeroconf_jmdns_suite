@@ -1,7 +1,7 @@
 # Jmnds Tutorials
 
 There are three demo programs. These are useful for quickly testing or demonstrating the jmdns zeroconf capability. 
-For instructions on how to use the jmdns library in a similar way to these were written, see [the zerconf_jmdns_suite package ROS wiki](http://wiki.ros.org/zeroconf_jmdns_suite/Tutorials).
+For instructions on how to use the jmdns library in a similar way to these were written, see [the zeroconf_jmdns_suite Tutorials](http://wiki.ros.org/zeroconf_jmdns_suite/Tutorials) on the ROS wiki.
 
 **Publishing**
 
