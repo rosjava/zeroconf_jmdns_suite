@@ -47,5 +47,5 @@ subprojects {
   apply plugin: "eclipse"
 }
 
-defaultTasks 'publishMavenJavaPublicationToMavenRepository', 'installApp'
+defaultTasks 'publish', 'installApp'
 
