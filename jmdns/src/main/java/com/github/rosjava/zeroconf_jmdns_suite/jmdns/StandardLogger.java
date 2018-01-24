@@ -17,8 +17,6 @@ package com.github.rosjava.zeroconf_jmdns_suite.jmdns;
 
 import java.lang.String;
 
-import com.github.rosjava.zeroconf_jmdns_suite.jmdns.ZeroconfLogger;
-
 /**
  * A standard logger (to System.out.println) that can be
  * passed to the Zeroconf class.

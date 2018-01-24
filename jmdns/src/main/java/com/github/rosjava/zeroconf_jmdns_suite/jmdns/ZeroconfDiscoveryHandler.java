@@ -15,8 +15,6 @@
  */
 package com.github.rosjava.zeroconf_jmdns_suite.jmdns;
 
-import com.github.rosjava.zeroconf_jmdns_suite.jmdns.DiscoveredService;
-
 /**
  * @brief Interface for a user listener.
  * 

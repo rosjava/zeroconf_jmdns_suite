@@ -37,8 +37,6 @@ import javax.jmdns.ServiceInfo;
 import javax.jmdns.ServiceListener;
 import javax.jmdns.ServiceTypeListener;
 
-import com.github.rosjava.zeroconf_jmdns_suite.jmdns.DiscoveredService;
-
 
 /**
  * This is a wrapper around the jmmdns (multi-homed) part of the jmdns library. 
