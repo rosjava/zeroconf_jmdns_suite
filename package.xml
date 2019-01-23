@@ -1,6 +1,6 @@
 <package>
   <name>zeroconf_jmdns_suite</name>
-  <version>0.3.0</version>
+  <version>0.3.1</version>
   <description>
     An implementation of zeroconf in pure java.
   </description>

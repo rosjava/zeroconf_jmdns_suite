@@ -1,8 +1,8 @@
 Changelog
 =========
 
-Forthcoming
------------
+0.3.1 (2019-01-23)
+------------------
 * Updating Gradle version to 4.10.2.
 * Fixing package name for jmdns package.
 * Fix for tutorial links and testing instructions.
