@@ -1,6 +1,13 @@
 Changelog
 =========
 
+Forthcoming
+-----------
+* Updating Gradle version to 4.10.2.
+* Fixing package name for jmdns package.
+* Fix for tutorial links and testing instructions.
+* Contributors: Daniel Stonier, Juan Ignacio Ubeira, Julian Cerruti
+
 0.3.0 (2016-12-17)
 ------------------
 * Updates for kinetic release.
